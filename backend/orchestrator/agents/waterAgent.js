@@ -21,12 +21,15 @@ Findings from other agents so far: ${JSON.stringify(peerFindings)}
 Return JSON: { agent: "water", conclusion, signals, evidenceIds, selfConfidence, flags }`;
 }
 
+const SATURATED_ROUTE = 'R7'; // Hospital Road — the corridor Traffic defaults to (see trafficAgent.js)
+const SATURATION_FLAG_THRESHOLD = 70;
+
 /**
- * runWaterAgent({ scenario, chainSummary, peerFindings, emit })
+ * runWaterAgent({ scenario, causal, chainSummary, peerFindings, emit })
  * emit(type, payload, level) streams tool_call/tool_result/tool_error events
  * into the same trace the orchestrator is already emitting to.
  */
-export async function runWaterAgent({ scenario, chainSummary, peerFindings, emit }) {
+export async function runWaterAgent({ scenario, causal, chainSummary, peerFindings, emit }) {
   const wardId = scenario.wardId || 'ward18';
   const toolResults = [];
 
@@ -60,6 +63,14 @@ export async function runWaterAgent({ scenario, chainSummary, peerFindings, emit
   const prompt = buildPrompt({ chainSummary, peerFindings, toolResults });
   const result = await callGemini(prompt, AGENT_FINDING_SCHEMA, { model: MODELS.FAST, fallback });
   const finding = sanitizeFinding(result.data, 'water', toolResults);
+
+  // Deterministic, code-level flag (not left to Gemini): road_waterlogging is
+  // the causal node that actually floods the Hospital Road (R7) corridor —
+  // this is what Phase D3's conflict detector checks Traffic's proposal against.
+  const roadWaterlogging = causal?.activations?.road_waterlogging ?? 0;
+  if (roadWaterlogging > SATURATION_FLAG_THRESHOLD) {
+    finding.flags = [...finding.flags, `saturated_route:${SATURATED_ROUTE}:${roadWaterlogging.toFixed(0)}`];
+  }
 
   return {
     finding,

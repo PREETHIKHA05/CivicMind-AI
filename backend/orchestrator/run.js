@@ -1,12 +1,29 @@
 /**
- * Orchestrator skeleton. Phase 2: causal engine is real, everything else is a
- * stubbed placeholder. Phases 3-5 replace the stubs one agent at a time
- * without changing this file's event contract.
+ * Orchestrator. Causal engine, supervisor routing, all six domain agents, and
+ * conflict detection are real (Phases 2-4). Plan drafting, critique,
+ * confidence and gating are still stubbed placeholders — Phase 5 replaces
+ * them without changing this file's event contract.
  */
 import { propagateRisk } from '../causal/engine.js';
+import { decideRouting } from './supervisor.js';
+import { detectConflicts, resolveConflict } from './conflicts.js';
 import { runWaterAgent } from './agents/waterAgent.js';
+import { runWeatherAgent } from './agents/weatherAgent.js';
+import { runTrafficAgent } from './agents/trafficAgent.js';
+import { runEmergencyAgent } from './agents/emergencyAgent.js';
+import { runCitizenAgent } from './agents/citizenAgent.js';
+import { runMemoryAgent } from './agents/memoryAgent.js';
 
 const AGENT_IDS = ['weather', 'water', 'traffic', 'emergency', 'citizen', 'memory'];
+
+const AGENT_RUNNERS = {
+  water: runWaterAgent,
+  weather: runWeatherAgent,
+  traffic: runTrafficAgent,
+  emergency: runEmergencyAgent,
+  citizen: runCitizenAgent,
+  memory: runMemoryAgent
+};
 
 const seqCounters = new Map(); // runId -> next seq
 export const traceStore = new Map(); // runId -> events[]
@@ -49,7 +66,7 @@ export function getTrace(runId) {
 
 /**
  * Kicks off a run and returns its runId immediately (synchronously), then
- * streams events over Socket.IO as the (stubbed) pipeline executes.
+ * streams events over Socket.IO as the pipeline executes.
  */
 export function startRun(scenario, io) {
   const runId = `run-${Date.now()}`;
@@ -71,7 +88,7 @@ export async function runAgents(scenario, io, runId) {
   const extraSeeds = scenario.extraSeeds || [];
 
   emit(io, runId, 'run_started', 'ORCHESTRATOR', { scenario, runId }, 'info');
-  await sleep(150);
+  await sleep(120);
 
   const causal = propagateRisk(seedNode, magnitude, horizonMin, undefined, extraSeeds);
   emit(io, runId, 'causal_computed', 'CAUSAL_ENGINE', {
@@ -80,77 +97,73 @@ export async function runAgents(scenario, io, runId) {
     firedEdgeCount: causal.firedEdges.length,
     pathStrength: causal.pathStrength
   }, 'info');
-  await sleep(150);
+  await sleep(120);
 
-  // STUB routing — Phase 4 replaces this with the real enforced supervisor rules.
-  const invokedAgents = causal.riskIndex > 40
-    ? ['water', 'traffic', 'emergency', 'memory']
-    : ['water', 'memory'];
-
+  const routing = await decideRouting(causal, scenario, 1);
   emit(io, runId, 'routing_decision', 'SUPERVISOR', {
-    reason: `rainfall ${magnitude}mm/hr, riskIndex ${causal.riskIndex.toFixed(0)} -> invoke [${invokedAgents.join(', ')}] (stub)`,
-    agents: invokedAgents
+    reason: routing.reason,
+    agents: routing.agents,
+    enforced: routing.enforced,
+    geminiFallback: routing.geminiFallback
   }, 'info');
-  await sleep(150);
+  await sleep(120);
 
-  const stubFindings = {
-    weather: { conclusion: 'Rain cell stationary over Ward 18. (stub)', confidence: 0.92 },
-    traffic: { conclusion: 'Corridor speed dropping; recommend signal override. (stub)', confidence: 0.85 },
-    emergency: { conclusion: 'Ambulance transit at risk of delay on primary route. (stub)', confidence: 0.88 },
-    citizen: { conclusion: 'Distress report cluster forming in Ward 18 South. (stub)', confidence: 0.8 },
-    memory: { conclusion: 'Similar 2021 incident found; pump deployment reduced risk only partially. (stub)', confidence: 0.8 }
-  };
+  if (routing.action === 'ABORT') {
+    emit(io, runId, 'run_aborted', 'ORCHESTRATOR', { error: routing.reason }, 'error');
+    return { runId, causal, aborted: true };
+  }
 
+  const invokedAgents = routing.agents;
   const chainSummary = `rainfall ${magnitude}mm/hr, riskIndex ${causal.riskIndex.toFixed(0)}/100, terminals reached: ${causal.terminals.map((t) => `${t.id} (${t.activation.toFixed(0)})`).join(', ') || 'none'}`;
   const peerFindings = []; // essential: later agents see earlier agents' findings, not just parallel silence
 
   for (const agentId of invokedAgents) {
     emit(io, runId, 'agent_started', agentId.toUpperCase(), {}, 'info');
-    await sleep(80);
+    await sleep(60);
 
     const agentEmit = (type, payload, level = 'info') => emit(io, runId, type, agentId.toUpperCase(), payload, level);
+    const runner = AGENT_RUNNERS[agentId];
+    if (!runner) continue;
 
-    if (agentId === 'water') {
-      const { finding, geminiMeta } = await runWaterAgent({ scenario, chainSummary, peerFindings, emit: agentEmit });
-      peerFindings.push(finding);
-      agentEmit('agent_finding', {
-        conclusion: finding.conclusion,
-        confidence: finding.selfConfidence,
-        evidenceIds: finding.evidenceIds,
-        flags: finding.flags,
-        geminiFallback: geminiMeta.fallback,
-        geminiFallbackReason: geminiMeta.fallbackReason
-      }, finding.flags?.length ? 'warn' : 'info');
-    } else {
-      // STUB — Phase 4 replaces each of these with a real agent using the same skeleton as water.
-      await sleep(80);
-      emit(io, runId, 'tool_call', agentId.toUpperCase(), { tool: 'stub_tool', args: {} }, 'info');
-      await sleep(80);
-      emit(io, runId, 'tool_result', agentId.toUpperCase(), { result: 'stubbed', durationMs: 120 }, 'info');
-      await sleep(80);
-      const finding = stubFindings[agentId] || { conclusion: 'No finding. (stub)', confidence: 0.5 };
-      peerFindings.push({ agent: agentId, conclusion: finding.conclusion, selfConfidence: finding.confidence });
-      emit(io, runId, 'agent_finding', agentId.toUpperCase(), finding, 'info');
+    const { finding, geminiMeta } = await runner({ scenario, causal, chainSummary, peerFindings, emit: agentEmit });
+    peerFindings.push(finding);
+
+    agentEmit('agent_finding', {
+      conclusion: finding.conclusion,
+      confidence: finding.selfConfidence,
+      evidenceIds: finding.evidenceIds,
+      flags: finding.flags,
+      geminiFallback: geminiMeta.fallback,
+      geminiFallbackReason: geminiMeta.fallbackReason
+    }, finding.flags?.length ? 'warn' : 'info');
+    await sleep(80);
+  }
+
+  // Conflict detection — plain JS, no LLM. An if-statement over two agents'
+  // structured output, not a model call.
+  const conflicts = detectConflicts(peerFindings);
+  const conflictsResolved = [];
+  for (const conflict of conflicts) {
+    emit(io, runId, 'conflict_detected', 'PLANNER', { detail: conflict.detail, conflict }, 'warn');
+    await sleep(100);
+
+    const resolution = resolveConflict(conflict, scenario);
+    conflictsResolved.push({ conflict, resolution });
+
+    // Feed the resolution back into Traffic's finding so downstream planning sees the adopted route.
+    const trafficFinding = peerFindings.find((f) => f.agent === 'traffic');
+    if (trafficFinding && resolution.adoptedRoute) {
+      trafficFinding.proposedRoute = resolution.adoptedRoute;
+      trafficFinding.conflictOverride = resolution;
     }
+
+    emit(io, runId, 'conflict_resolved', 'PLANNER', { resolution: resolution.resolution, ...resolution }, 'warn');
     await sleep(100);
   }
 
-  emit(io, runId, 'memory_retrieved', 'MEMORY', { hits: 1, topSimilarity: 0.84 }, 'info');
-  await sleep(100);
-
-  if (causal.riskIndex > 60) {
-    emit(io, runId, 'conflict_detected', 'PLANNER', {
-      detail: 'Traffic proposed route R7; Water flagged R7 as saturated. (stub)'
-    }, 'warn');
-    await sleep(120);
-    emit(io, runId, 'conflict_resolved', 'PLANNER', {
-      resolution: 'Rejected R7, adopted R9 (+5 min transit cost). (stub)'
-    }, 'warn');
-    await sleep(120);
-  }
-
-  emit(io, runId, 'plan_drafted', 'PLANNER', { actionCount: 3 }, 'info');
-  await sleep(150);
+  // STUB — Phase 5 replaces plan drafting / critique / confidence / gating with the real thing.
+  emit(io, runId, 'plan_drafted', 'PLANNER', { actionCount: peerFindings.length, findingsUsed: peerFindings.length }, 'info');
+  await sleep(120);
   emit(io, runId, 'critique', 'CRITIC', { verdict: 'APPROVE (stub)' }, 'info');
   await sleep(100);
   emit(io, runId, 'confidence_computed', 'ORCHESTRATOR', { confidence: 0.75 }, 'info');
@@ -158,17 +171,18 @@ export async function runAgents(scenario, io, runId) {
 
   const gate = causal.riskIndex >= 85 ? 'AUTO_EXECUTE' : causal.riskIndex < 40 ? 'ESCALATE' : 'HUMAN_APPROVAL';
   emit(io, runId, 'gate_decision', 'ORCHESTRATOR', { gate }, gate === 'ESCALATE' ? 'warn' : 'info');
-  await sleep(100);
+  await sleep(80);
 
   emit(io, runId, 'run_completed', 'ORCHESTRATOR', {
     runId,
     agentsInvoked: invokedAgents,
     totalAgents: AGENT_IDS.length,
     riskIndex: causal.riskIndex,
-    gate
+    gate,
+    conflictCount: conflicts.length
   }, 'info');
 
-  return { runId, causal, gate, agentsInvoked: invokedAgents };
+  return { runId, causal, gate, agentsInvoked: invokedAgents, peerFindings, conflictsResolved };
 }
 
 export { AGENT_IDS };
