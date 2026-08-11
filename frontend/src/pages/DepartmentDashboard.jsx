@@ -35,7 +35,8 @@ import {
   BrainCircuit,
   PlusCircle,
   TrendingDown,
-  ChevronRight
+  ChevronRight,
+  LayoutDashboard
 } from 'lucide-react';
 
 export default function DepartmentDashboard() {
