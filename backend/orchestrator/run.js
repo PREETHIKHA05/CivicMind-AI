@@ -4,6 +4,7 @@
  * without changing this file's event contract.
  */
 import { propagateRisk } from '../causal/engine.js';
+import { runWaterAgent } from './agents/waterAgent.js';
 
 const AGENT_IDS = ['weather', 'water', 'traffic', 'emergency', 'citizen', 'memory'];
 
@@ -93,7 +94,6 @@ export async function runAgents(scenario, io, runId) {
   await sleep(150);
 
   const stubFindings = {
-    water: { conclusion: 'Drain saturation trending high; sump overflow risk within the hour. (stub)', confidence: 0.9 },
     weather: { conclusion: 'Rain cell stationary over Ward 18. (stub)', confidence: 0.92 },
     traffic: { conclusion: 'Corridor speed dropping; recommend signal override. (stub)', confidence: 0.85 },
     emergency: { conclusion: 'Ambulance transit at risk of delay on primary route. (stub)', confidence: 0.88 },
@@ -101,15 +101,37 @@ export async function runAgents(scenario, io, runId) {
     memory: { conclusion: 'Similar 2021 incident found; pump deployment reduced risk only partially. (stub)', confidence: 0.8 }
   };
 
+  const chainSummary = `rainfall ${magnitude}mm/hr, riskIndex ${causal.riskIndex.toFixed(0)}/100, terminals reached: ${causal.terminals.map((t) => `${t.id} (${t.activation.toFixed(0)})`).join(', ') || 'none'}`;
+  const peerFindings = []; // essential: later agents see earlier agents' findings, not just parallel silence
+
   for (const agentId of invokedAgents) {
     emit(io, runId, 'agent_started', agentId.toUpperCase(), {}, 'info');
-    await sleep(100);
-    emit(io, runId, 'tool_call', agentId.toUpperCase(), { tool: 'stub_tool', args: {} }, 'info');
     await sleep(80);
-    emit(io, runId, 'tool_result', agentId.toUpperCase(), { result: 'stubbed', durationMs: 120 }, 'info');
-    await sleep(80);
-    const finding = stubFindings[agentId] || { conclusion: 'No finding. (stub)', confidence: 0.5 };
-    emit(io, runId, 'agent_finding', agentId.toUpperCase(), finding, 'info');
+
+    const agentEmit = (type, payload, level = 'info') => emit(io, runId, type, agentId.toUpperCase(), payload, level);
+
+    if (agentId === 'water') {
+      const { finding, geminiMeta } = await runWaterAgent({ scenario, chainSummary, peerFindings, emit: agentEmit });
+      peerFindings.push(finding);
+      agentEmit('agent_finding', {
+        conclusion: finding.conclusion,
+        confidence: finding.selfConfidence,
+        evidenceIds: finding.evidenceIds,
+        flags: finding.flags,
+        geminiFallback: geminiMeta.fallback,
+        geminiFallbackReason: geminiMeta.fallbackReason
+      }, finding.flags?.length ? 'warn' : 'info');
+    } else {
+      // STUB — Phase 4 replaces each of these with a real agent using the same skeleton as water.
+      await sleep(80);
+      emit(io, runId, 'tool_call', agentId.toUpperCase(), { tool: 'stub_tool', args: {} }, 'info');
+      await sleep(80);
+      emit(io, runId, 'tool_result', agentId.toUpperCase(), { result: 'stubbed', durationMs: 120 }, 'info');
+      await sleep(80);
+      const finding = stubFindings[agentId] || { conclusion: 'No finding. (stub)', confidence: 0.5 };
+      peerFindings.push({ agent: agentId, conclusion: finding.conclusion, selfConfidence: finding.confidence });
+      emit(io, runId, 'agent_finding', agentId.toUpperCase(), finding, 'info');
+    }
     await sleep(100);
   }
 
