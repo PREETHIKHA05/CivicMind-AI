@@ -347,9 +347,15 @@ export default function DepartmentDashboard() {
               </div>
 
               {assignedTasks.length === 0 ? (
-                <p className="text-xs font-mono text-slate-400 p-4 text-center">
-                  No work orders currently assigned to {currentDept.name}.
-                </p>
+                <div className="p-6 text-center rounded-xl bg-slate-900/50 border border-slate-800 space-y-2">
+                  <Clock className="w-8 h-8 text-cyan-400/60 mx-auto" />
+                  <p className="text-xs font-mono font-bold text-slate-300">
+                    Awaiting Plan Approval & Task Dispatch
+                  </p>
+                  <p className="text-[11px] font-mono text-slate-400 max-w-xs mx-auto">
+                    No work orders assigned to {currentDept.name} yet. Tasks will automatically populate here when the Zone Counselor approves the Coordinated Response Plan.
+                  </p>
+                </div>
               ) : (
                 <div className="space-y-3">
                   {assignedTasks.map((task) => (

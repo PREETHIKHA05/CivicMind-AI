@@ -1,6 +1,6 @@
 /**
  * CivicMind AI Backend API Server & Real-time WebSocket Engine
- * Powered by MongoDB Atlas & Socket.io for Hackathon Multi-Laptop Sync
+ * Powered by MongoDB Atlas, Persistent Storage & Socket.io for Hackathon Multi-Laptop Workflow
  */
 
 import express from 'express';
@@ -21,6 +21,8 @@ import { plannerAgent } from './agents/plannerAgent.js';
 import { ResponsePlan } from './models/ResponsePlan.js';
 import { WorkOrder } from './models/WorkOrder.js';
 
+import { loadLocalDB, saveLocalDB } from './storage.js';
+
 dotenv.config();
 
 const app = express();
@@ -40,99 +42,40 @@ const MONGODB_URI = process.env.MONGODB_URI;
 app.use(cors());
 app.use(express.json());
 
-// In-Memory Database Fallback State for offline resilience
+// Persistent State Initialization (Never reset on restart unless explicitly requested)
+const defaultSynthesizedPlan = plannerAgent.synthesizePlan();
+const persistentData = loadLocalDB(defaultSynthesizedPlan);
+
 let isMongoConnected = false;
+let inMemoryPlan = persistentData.plan;
+let inMemoryWorkOrders = persistentData.workOrders; // Empty [] until Zone Counselor approves plan!
 
-let inMemoryPlan = plannerAgent.synthesizePlan();
-let inMemoryWorkOrders = [
-  {
-    taskId: "task-1",
-    actionId: "act-1",
-    departmentId: "water",
-    departmentName: "Water Resources & Drainage",
-    title: "Deploy Mobile Pumps to Station 4B",
-    recommendation: "Deploy 2x High-Capacity Mobile Pumps to Ward 18 Low-Point Sump (Station 4B).",
-    priority: "HIGH",
-    assignedBy: "Zone Counselor",
-    assignedTime: "07:10 AM",
-    status: "In Progress",
-    expectedImpact: "Reduces water accumulation by 65% in 20 minutes.",
-    logs: [
-      { time: "07:12 AM", author: "Eng. Rajesh Kumar", note: "Dispatch team mobilized with 2x 500HP diesel pumps en route to Ward 18." },
-      { time: "07:18 AM", author: "Eng. Rajesh Kumar", note: "Pump #1 connected and primed at Station 4B sump." }
-    ]
-  },
-  {
-    taskId: "task-2",
-    actionId: "act-2",
-    departmentId: "traffic",
-    departmentName: "Traffic Management Bureau",
-    title: "Green-Wave Signal Sync on Route B",
-    recommendation: "Activate Green-Wave Traffic Signal Timing on Route B (EVR Periyar Salai Diversion) and lock Gate 1 to emergency vehicles only.",
-    priority: "HIGH",
-    assignedBy: "Zone Counselor",
-    assignedTime: "07:10 AM",
-    status: "In Progress",
-    expectedImpact: "Clears 80% of non-essential traffic away from hospital corridor.",
-    logs: [
-      { time: "07:11 AM", author: "Inspector S. Ramanathan", note: "Adaptive signal timings override activated across 6 intersections on Route B." }
-    ]
-  },
-  {
-    taskId: "task-3",
-    actionId: "act-3",
-    departmentId: "emergency",
-    departmentName: "Emergency Services (108)",
-    title: "Reroute Ambulances via Route B Corridor",
-    recommendation: "Reroute Ambulance #108-B4 and all incoming trauma units to Route B via EVR Periyar Salai.",
-    priority: "CRITICAL",
-    assignedBy: "Zone Counselor",
-    assignedTime: "07:10 AM",
-    status: "In Progress",
-    expectedImpact: "Guarantees direct ER access in 11 minutes (saves 18 mins).",
-    logs: [
-      { time: "07:13 AM", author: "Dr. Anitha V.", note: "Ambulance #108-B4 driver notified. Switched navigation to Route B green corridor." }
-    ]
-  },
-  {
-    taskId: "task-4",
-    actionId: "act-4",
-    departmentId: "public",
-    departmentName: "Public Information & Advisory",
-    title: "Broadcast Ward 18 Traffic Bypass SMS",
-    recommendation: "Issue localized civic alert via SMS & Radio for Ward 18 drivers to bypass Hospital Road.",
-    priority: "MEDIUM",
-    assignedBy: "Zone Counselor",
-    assignedTime: "07:10 AM",
-    status: "Completed",
-    expectedImpact: "Diverts approximately 35% of incoming commuter traffic.",
-    logs: [
-      { time: "07:12 AM", author: "Priya Sundaram", note: "Emergency Cell Broadcast issued to 14,200 active mobile subscribers in Ward 18 radius." }
-    ]
-  }
-];
-
-// Connect to MongoDB Atlas
+// Connect to MongoDB Atlas if connection URI is provided
 if (MONGODB_URI && !MONGODB_URI.includes('cluster0.mongodb.net')) {
   mongoose.connect(MONGODB_URI, { serverSelectionTimeoutMS: 4000 })
     .then(async () => {
       isMongoConnected = true;
       console.log('🍃 Connected to MongoDB Atlas Cloud Database!');
-      await seedDatabaseIfEmpty();
+      await syncWithMongoDBAtlas();
     })
     .catch((err) => {
-      console.log('⚡ Running in High-Speed Real-time WebSocket Mode for Hackathon (100% Functional Across Laptops!).');
+      console.log('⚡ Running in High-Speed Real-time WebSocket Mode with Local DB Persistence.');
       isMongoConnected = false;
     });
 } else {
-  console.log('⚡ Running in High-Speed Real-time WebSocket Mode for Hackathon (100% Functional Across Laptops!).');
-  console.log('💡 Note: To connect to cloud MongoDB Atlas, create a free M0 cluster on https://cloud.mongodb.com and update MONGODB_URI in backend/.env');
+  console.log('⚡ Running in High-Speed Real-time WebSocket Mode with Local DB Persistence.');
+  console.log('💡 Note: To connect to cloud MongoDB Atlas, update MONGODB_URI in backend/.env');
 }
 
-async function seedDatabaseIfEmpty() {
+/**
+ * Loads existing database state from MongoDB Atlas without overwriting!
+ */
+async function syncWithMongoDBAtlas() {
   try {
     const existingPlan = await ResponsePlan.findOne({ planId: 'active-crp-01' });
-    if (!existingPlan) {
+    if (existingPlan) {
+      inMemoryPlan = existingPlan.toObject();
+    } else {
       await ResponsePlan.create({
         planId: 'active-crp-01',
         incidentId: inMemoryPlan.incidentId,
@@ -143,16 +86,16 @@ async function seedDatabaseIfEmpty() {
         status: inMemoryPlan.status || 'Awaiting Human Review',
         actions: inMemoryPlan.actions
       });
-      console.log('🌱 Seeded initial ResponsePlan into MongoDB Atlas');
     }
 
-    const taskCount = await WorkOrder.countDocuments();
-    if (taskCount === 0) {
-      await WorkOrder.insertMany(inMemoryWorkOrders);
-      console.log('🌱 Seeded initial WorkOrders into MongoDB Atlas');
+    const existingOrders = await WorkOrder.find({}).sort({ updatedAt: -1 });
+    if (existingOrders && existingOrders.length > 0) {
+      inMemoryWorkOrders = existingOrders.map(o => o.toObject());
     }
+
+    saveLocalDB(inMemoryPlan, inMemoryWorkOrders);
   } catch (err) {
-    console.error('Error seeding MongoDB Atlas:', err);
+    console.error('Error syncing with MongoDB Atlas:', err);
   }
 }
 
@@ -179,7 +122,7 @@ app.get('/api/health', (req, res) => {
   res.json({
     status: 'ONLINE',
     system: 'CivicMind AI Multi-Laptop Backend',
-    database: isMongoConnected ? 'MongoDB Atlas' : 'In-Memory Mode',
+    database: isMongoConnected ? 'MongoDB Atlas' : 'Local DB Persistence (db.json)',
     timestamp: new Date().toISOString(),
     connectedClients: io.engine.clientsCount
   });
@@ -215,26 +158,25 @@ app.get('/api/plan', async (req, res) => {
   }
 });
 
-// PUT Update Action in Plan
+// PUT Update Action in Plan (Zone Counselor edits)
 app.put('/api/plan/action', async (req, res) => {
   const { actionId, updatedFields } = req.body;
-  
+
+  inMemoryPlan.actions = inMemoryPlan.actions.map(act => act.id === actionId ? { ...act, ...updatedFields } : act);
+  saveLocalDB(inMemoryPlan, inMemoryWorkOrders);
+
   if (isMongoConnected) {
     try {
       const plan = await ResponsePlan.findOne({ planId: 'active-crp-01' });
       if (plan) {
         plan.actions = plan.actions.map(act => act.id === actionId ? { ...act.toObject(), ...updatedFields } : act);
         await plan.save();
-        io.emit('planUpdated', plan);
-        return res.json(plan);
       }
     } catch (err) {
       console.error("MongoDB plan update error:", err);
     }
   }
 
-  // Fallback / In-memory update
-  inMemoryPlan.actions = inMemoryPlan.actions.map(act => act.id === actionId ? { ...act, ...updatedFields } : act);
   io.emit('planUpdated', inMemoryPlan);
   res.json(inMemoryPlan);
 });
@@ -244,7 +186,7 @@ app.post('/api/plan/approve', async (req, res) => {
   const { operatorNote, actions, riskScore } = req.body;
   const nowTime = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' });
 
-  const targetActions = actions || (inMemoryPlan.actions);
+  const targetActions = actions || inMemoryPlan.actions;
   const updatedPlan = {
     ...inMemoryPlan,
     status: 'APPROVED BY ICCC OPERATOR',
@@ -256,7 +198,7 @@ app.post('/api/plan/approve', async (req, res) => {
 
   inMemoryPlan = updatedPlan;
 
-  // Convert enabled actions to Work Orders
+  // Convert enabled actions to Work Orders assigned to departments!
   const dispatchedOrders = targetActions
     .filter(act => act.enabled)
     .map((act, index) => {
@@ -280,6 +222,7 @@ app.post('/api/plan/approve', async (req, res) => {
     });
 
   inMemoryWorkOrders = dispatchedOrders;
+  saveLocalDB(inMemoryPlan, inMemoryWorkOrders);
 
   // Persist to MongoDB Atlas if connected
   if (isMongoConnected) {
@@ -290,12 +233,9 @@ app.post('/api/plan/approve', async (req, res) => {
         { upsert: true, new: true }
       );
 
+      await WorkOrder.deleteMany({});
       for (const order of dispatchedOrders) {
-        await WorkOrder.findOneAndUpdate(
-          { taskId: order.taskId },
-          order,
-          { upsert: true, new: true }
-        );
+        await WorkOrder.create(order);
       }
     } catch (err) {
       console.error("MongoDB Atlas approval save error:", err);
@@ -313,7 +253,7 @@ app.post('/api/plan/approve', async (req, res) => {
   });
 });
 
-// GET Work Orders (All or Department-Specific)
+// GET Work Orders (Only assigned work orders exist here!)
 app.get('/api/work-orders', async (req, res) => {
   const { departmentId } = req.query;
 
@@ -346,13 +286,15 @@ app.put('/api/work-orders/:taskId/status', async (req, res) => {
   let updatedOrder = null;
 
   inMemoryWorkOrders = inMemoryWorkOrders.map(order => {
-    if (order.taskId === taskId) {
+    if (order.taskId === taskId || order.id === taskId) {
       const newLogs = [...(order.logs || []), { time: nowTime, author: authorName, note: noteText }];
       updatedOrder = { ...order, status, logs: newLogs };
       return updatedOrder;
     }
     return order;
   });
+
+  saveLocalDB(inMemoryPlan, inMemoryWorkOrders);
 
   if (isMongoConnected) {
     try {
@@ -385,17 +327,18 @@ app.post('/api/work-orders/:taskId/logs', async (req, res) => {
   const nowTime = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
 
   const authorName = author || 'Official';
-
   let updatedOrder = null;
 
   inMemoryWorkOrders = inMemoryWorkOrders.map(order => {
-    if (order.taskId === taskId) {
+    if (order.taskId === taskId || order.id === taskId) {
       const newLogs = [...(order.logs || []), { time: nowTime, author: authorName, note }];
       updatedOrder = { ...order, logs: newLogs };
       return updatedOrder;
     }
     return order;
   });
+
+  saveLocalDB(inMemoryPlan, inMemoryWorkOrders);
 
   if (isMongoConnected) {
     try {
@@ -419,16 +362,47 @@ app.post('/api/work-orders/:taskId/logs', async (req, res) => {
   });
 });
 
-// POST Re-Seed Database
+// POST Reset Plan to Unapproved Draft State (Revert Approve Button Action)
+app.post('/api/plan/reset', async (req, res) => {
+  inMemoryPlan = {
+    ...inMemoryPlan,
+    status: 'Awaiting Human Review',
+    operatorNote: '',
+    approvalTime: null
+  };
+  inMemoryWorkOrders = [];
+  saveLocalDB(inMemoryPlan, inMemoryWorkOrders);
+
+  if (isMongoConnected) {
+    try {
+      await ResponsePlan.findOneAndUpdate(
+        { planId: 'active-crp-01' },
+        { status: 'Awaiting Human Review', operatorNote: '', approvalTime: null },
+        { upsert: true }
+      );
+      await WorkOrder.deleteMany({});
+    } catch (err) {
+      console.error("MongoDB plan reset error:", err);
+    }
+  }
+
+  io.emit('planReset', { plan: inMemoryPlan, workOrders: inMemoryWorkOrders });
+  res.json({ message: 'Plan reverted to unapproved draft state.', plan: inMemoryPlan, workOrders: [] });
+});
+
+// POST Reset Database to Unapproved Initial State
 app.post('/api/seed', async (req, res) => {
   inMemoryPlan = plannerAgent.synthesizePlan();
+  inMemoryWorkOrders = [];
+  saveLocalDB(inMemoryPlan, inMemoryWorkOrders);
+
   if (isMongoConnected) {
     await ResponsePlan.deleteMany({});
     await WorkOrder.deleteMany({});
-    await seedDatabaseIfEmpty();
+    await syncWithMongoDBAtlas();
   }
   io.emit('databaseSeeded', { plan: inMemoryPlan, workOrders: inMemoryWorkOrders });
-  res.json({ message: 'Database reset & seeded successfully!' });
+  res.json({ message: 'Database reset to initial unapproved state.' });
 });
 
 // Start Server

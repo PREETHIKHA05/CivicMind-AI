@@ -31,78 +31,8 @@ export function CityProvider({ children }) {
   // Editable Response Plan Actions
   const [planActions, setPlanActions] = useState(COORDINATED_RESPONSE_PLAN.actions);
 
-  // Department Assigned Work Orders (Tasks)
-  const [departmentTasks, setDepartmentTasks] = useState([
-    {
-      id: "task-1",
-      taskId: "task-1",
-      actionId: "act-1",
-      departmentId: "water",
-      departmentName: "Water Resources & Drainage",
-      title: "Deploy Mobile Pumps to Station 4B",
-      recommendation: "Deploy 2x High-Capacity Mobile Pumps to Ward 18 Low-Point Sump (Station 4B).",
-      priority: "HIGH",
-      assignedBy: "Zone Counselor",
-      assignedTime: "07:10 AM",
-      status: "In Progress",
-      expectedImpact: "Reduces water accumulation by 65% in 20 minutes.",
-      logs: [
-        { time: "07:12 AM", author: "Eng. Rajesh Kumar", note: "Dispatch team mobilized with 2x 500HP diesel pumps en route to Ward 18." },
-        { time: "07:18 AM", author: "Eng. Rajesh Kumar", note: "Pump #1 connected and primed at Station 4B sump." }
-      ]
-    },
-    {
-      id: "task-2",
-      taskId: "task-2",
-      actionId: "act-2",
-      departmentId: "traffic",
-      departmentName: "Traffic Management Bureau",
-      title: "Green-Wave Signal Sync on Route B",
-      recommendation: "Activate Green-Wave Traffic Signal Timing on Route B (EVR Periyar Salai Diversion) and lock Gate 1 to emergency vehicles only.",
-      priority: "HIGH",
-      assignedBy: "Zone Counselor",
-      assignedTime: "07:10 AM",
-      status: "In Progress",
-      expectedImpact: "Clears 80% of non-essential traffic away from hospital corridor.",
-      logs: [
-        { time: "07:11 AM", author: "Inspector S. Ramanathan", note: "Adaptive signal timings override activated across 6 intersections on Route B." }
-      ]
-    },
-    {
-      id: "task-3",
-      taskId: "task-3",
-      actionId: "act-3",
-      departmentId: "emergency",
-      departmentName: "Emergency Services (108)",
-      title: "Reroute Ambulances via Route B Corridor",
-      recommendation: "Reroute Ambulance #108-B4 and all incoming trauma units to Route B via EVR Periyar Salai.",
-      priority: "CRITICAL",
-      assignedBy: "Zone Counselor",
-      assignedTime: "07:10 AM",
-      status: "In Progress",
-      expectedImpact: "Guarantees direct ER access in 11 minutes (saves 18 mins).",
-      logs: [
-        { time: "07:13 AM", author: "Dr. Anitha V.", note: "Ambulance #108-B4 driver notified. Switched navigation to Route B green corridor." }
-      ]
-    },
-    {
-      id: "task-4",
-      taskId: "task-4",
-      actionId: "act-4",
-      departmentId: "public",
-      departmentName: "Public Information & Advisory",
-      title: "Broadcast Ward 18 Traffic Bypass SMS",
-      recommendation: "Issue localized civic alert via SMS & Radio for Ward 18 drivers to bypass Hospital Road.",
-      priority: "MEDIUM",
-      assignedBy: "Zone Counselor",
-      assignedTime: "07:10 AM",
-      status: "Completed",
-      expectedImpact: "Diverts approximately 35% of incoming commuter traffic.",
-      logs: [
-        { time: "07:12 AM", author: "Priya Sundaram", note: "Emergency Cell Broadcast issued to 14,200 active mobile subscribers in Ward 18 radius." }
-      ]
-    }
-  ]);
+  // Department Assigned Work Orders (Tasks) — Initialized EMPTY until assigned by Zone Counselor!
+  const [departmentTasks, setDepartmentTasks] = useState([]);
 
   // Toasts / Notifications
   const [toasts, setToasts] = useState([
@@ -119,7 +49,7 @@ export function CityProvider({ children }) {
     setToasts(prev => prev.filter(t => t.id !== id));
   };
 
-  // Dynamic Risk Score Calculation based on current planActions & completed work orders
+  // Dynamic Risk Score Calculation based on current planActions
   const calculateProjectedRisk = (actions = planActions) => {
     const baseRisk = CITY_METADATA.stats.preInterventionRisk; // 92
     
@@ -160,7 +90,7 @@ export function CityProvider({ children }) {
         setSocketConnected(false);
       });
 
-      // Initial Data from Backend
+      // Initial Data from Backend (Only assigned tasks are returned)
       socket.on('initialData', (data) => {
         if (data.plan) {
           if (data.plan.actions) setPlanActions(data.plan.actions);
@@ -168,7 +98,7 @@ export function CityProvider({ children }) {
           if (data.plan.operatorNote) setOperatorNote(data.plan.operatorNote);
           if (data.plan.approvalTime) setApprovalTime(data.plan.approvalTime);
         }
-        if (data.workOrders && data.workOrders.length > 0) {
+        if (data.workOrders) {
           const mapped = data.workOrders.map(w => ({ ...w, id: w.taskId || w.id }));
           setDepartmentTasks(mapped);
         }
@@ -212,6 +142,21 @@ export function CityProvider({ children }) {
         addToast('info', 'Field Log Updated', `New field log added for Work Order.`);
       });
 
+      socket.on('databaseSeeded', ({ plan, workOrders }) => {
+        setPlanStatus(plan.status);
+        setPlanActions(plan.actions);
+        setDepartmentTasks(workOrders || []);
+        addToast('info', 'System Reset', 'Plan reset to unapproved initial state.');
+      });
+
+      socket.on('planReset', ({ plan, workOrders }) => {
+        setPlanStatus('Awaiting Human Review');
+        setOperatorNote('');
+        setApprovalTime(null);
+        setDepartmentTasks([]);
+        addToast('warning', 'Plan Reverted', 'Plan reset to unapproved draft by Zone Counselor. Work orders cleared.');
+      });
+
     } catch (err) {
       console.warn("Socket.io client error:", err);
     }
@@ -230,7 +175,6 @@ export function CityProvider({ children }) {
       setCurrentRiskScore(newRisk);
     }
 
-    // Sync to backend API if available
     fetch(`${backendUrl}/api/plan/action`, {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json' },
@@ -302,7 +246,7 @@ export function CityProvider({ children }) {
 
     setDepartmentTasks(updatedTasks);
 
-    // Call REST API to dispatch to MongoDB Atlas & notify all laptops
+    // Call REST API to dispatch to Backend & notify all laptops
     fetch(`${backendUrl}/api/plan/approve`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -313,7 +257,7 @@ export function CityProvider({ children }) {
       })
     }).then(res => res.json())
       .then(data => {
-        addToast('success', 'Plan Approved & Dispatched', `Work orders saved to MongoDB Atlas & dispatched to all department dashboards!`);
+        addToast('success', 'Plan Approved & Dispatched', `Work orders dispatched to all department dashboards!`);
       })
       .catch(err => {
         addToast('success', 'Plan Approved', `Approved locally! Dynamic risk reduced to ${newRisk}/100.`);
@@ -331,6 +275,20 @@ export function CityProvider({ children }) {
     addToast('info', 'Plan Dismissed', 'Coordinated Response Plan dismissed by Zone Counselor.');
   };
 
+  const resetPlanToUnapproved = () => {
+    setPlanStatus('Awaiting Human Review');
+    setOperatorNote('');
+    setApprovalTime(null);
+    setDepartmentTasks([]);
+    const initialRisk = calculateProjectedRisk(planActions);
+    setCurrentRiskScore(initialRisk);
+
+    fetch(`${backendUrl}/api/plan/reset`, { method: 'POST' })
+      .catch(err => console.log('Backend sync offline, reset locally'));
+
+    addToast('warning', 'Plan Reverted', 'Coordinated Response Plan reverted to unapproved draft. Department work orders cleared.');
+  };
+
   // Department Task Status Update (Laptop B Official action)
   const updateTaskStatus = (taskId, newStatus, noteText = '') => {
     const nowTime = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
@@ -346,7 +304,6 @@ export function CityProvider({ children }) {
       return t;
     }));
 
-    // Send update to Backend MongoDB Atlas & WebSocket Broadcast
     fetch(`${backendUrl}/api/work-orders/${taskId}/status`, {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json' },
@@ -521,6 +478,7 @@ export function CityProvider({ children }) {
         approvePlan,
         requestPlanChanges,
         dismissPlan,
+        resetPlanToUnapproved,
         isSimulating,
         simStage,
         simLogs,

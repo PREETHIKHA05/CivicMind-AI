@@ -21,7 +21,8 @@ import {
   Check,
   X,
   Send,
-  Layers
+  Layers,
+  RotateCcw
 } from 'lucide-react';
 
 export default function ResponsePlans() {
@@ -31,21 +32,31 @@ export default function ResponsePlans() {
     approvePlan,
     requestPlanChanges,
     dismissPlan,
+    resetPlanToUnapproved,
     operatorNote,
     approvalTime,
     currentRiskScore,
     planActions,
     updatePlanAction,
     togglePlanAction,
-    calculateProjectedRisk,
-    setActivePage
+    calculateProjectedRisk
   } = useCity();
 
+  const isCounselor = currentUser && currentUser.role === 'counselor';
+  const dynamicRisk = calculateProjectedRisk(planActions);
+
+  // Editing Action State
+  const [editingActionId, setEditingActionId] = useState(null);
+  const [editFields, setEditFields] = useState({
+    recommendation: '',
+    priority: 'HIGH',
+    resourceCount: 1
+  });
+
+  // Modal State
   const [showConfirmModal, setShowConfirmModal] = useState(false);
   const [showChangesModal, setShowChangesModal] = useState(false);
-  const [editingActionId, setEditingActionId] = useState(null);
-  const [editForm, setEditForm] = useState({});
-  const [noteInput, setNoteInput] = useState('');
+  const [customNoteInput, setCustomNoteInput] = useState('');
 
   const iconMap = {
     Droplets,
@@ -54,47 +65,40 @@ export default function ResponsePlans() {
     Radio
   };
 
-  // Dynamically computed projected risk from active/edited actions
-  const dynamicRisk = calculateProjectedRisk(planActions);
-  const isCounselor = !currentUser || currentUser.role === 'counselor';
-
-  const handleApproveConfirm = () => {
-    approvePlan(noteInput);
-    setShowConfirmModal(false);
-  };
-
-  const handleRequestChangesConfirm = () => {
-    requestPlanChanges(noteInput || 'Zone Counselor requested plan parameter adjustments.');
-    setShowChangesModal(false);
-  };
-
-  const startEditAction = (action) => {
+  const handleStartEdit = (action) => {
     setEditingActionId(action.id);
-    setEditForm({
+    setEditFields({
       recommendation: action.recommendation,
       priority: action.priority,
-      resourceCount: action.resourceCount || 1,
-      resourceUnits: action.resourceUnits || '',
-      reason: action.reason
+      resourceCount: action.resourceCount || 1
     });
   };
 
-  const saveEditAction = (actionId) => {
-    updatePlanAction(actionId, {
-      recommendation: editForm.recommendation,
-      priority: editForm.priority,
-      resourceCount: Number(editForm.resourceCount),
-      resourceUnits: editForm.resourceUnits,
-      reason: editForm.reason,
-      expectedImpact: `Customized by ${currentUser?.name || 'Zone Counselor'}: Reduces risk with priority ${editForm.priority}`
-    });
+  const handleSaveEdit = (actionId) => {
+    updatePlanAction(actionId, editFields);
     setEditingActionId(null);
   };
 
+  const handleCancelEdit = () => {
+    setEditingActionId(null);
+  };
+
+  const handleConfirmApproval = () => {
+    approvePlan(customNoteInput);
+    setShowConfirmModal(false);
+    setCustomNoteInput('');
+  };
+
+  const handleConfirmChanges = () => {
+    requestPlanChanges(customNoteInput);
+    setShowChangesModal(false);
+    setCustomNoteInput('');
+  };
+
   return (
-    <div className="space-y-8 pb-12">
-      {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-2 border-b border-slate-800">
+    <div className="space-y-6 pb-12 font-sans">
+      {/* Top Header Card */}
+      <div className="glass-panel p-6 rounded-2xl border border-slate-800 flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
           <div className="flex items-center gap-2">
             <span className="text-xs font-mono font-bold text-cyan-400 uppercase tracking-widest">
@@ -186,7 +190,7 @@ export default function ResponsePlans() {
               <div className="flex items-center gap-2 text-emerald-400 font-semibold">
                 <CheckCircle2 className="w-5 h-5 shrink-0" />
                 <span>
-                  APPROVED BY ZONE COUNSELOR at {approvalTime || '07:12 AM'}. Work orders dispatched to 4 department dashboards.
+                  APPROVED BY ZONE COUNSELOR at {approvalTime || '07:12 AM'}. Work orders dispatched to department dashboards.
                 </span>
               </div>
             ) : (
@@ -198,7 +202,15 @@ export default function ResponsePlans() {
           </div>
 
           <div className="flex items-center gap-3 shrink-0">
-            {planStatus !== 'APPROVED BY ICCC OPERATOR' && (
+            {planStatus === 'APPROVED BY ICCC OPERATOR' ? (
+              <button
+                onClick={resetPlanToUnapproved}
+                className="px-5 py-2.5 rounded-xl bg-amber-950/80 hover:bg-amber-900 text-amber-200 border border-amber-500/50 font-mono text-xs font-bold cursor-pointer transition-all flex items-center gap-2 shadow-lg hover:scale-105"
+              >
+                <RotateCcw className="w-4 h-4 text-amber-400" />
+                <span>REVERT TO UNAPPROVED DRAFT</span>
+              </button>
+            ) : (
               <>
                 <button
                   onClick={() => setShowChangesModal(true)}
@@ -238,229 +250,220 @@ export default function ResponsePlans() {
           </span>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          {planActions.map((act) => {
-            const Icon = iconMap[act.deptIcon] || FileCheck2;
-            const isEditing = editingActionId === act.id;
+        <div className="grid grid-cols-1 gap-4">
+          {planActions.map((action) => {
+            const Icon = iconMap[action.deptIcon] || Sliders;
+            const isEditing = editingActionId === action.id;
 
             return (
               <div
-                key={act.id}
-                className={`glass-panel p-5 rounded-2xl border transition-all space-y-4 flex flex-col justify-between ${
-                  !act.enabled
-                    ? 'opacity-50 border-slate-800 bg-slate-950/40'
-                    : 'border-slate-800 hover:border-cyan-500/40'
+                key={action.id}
+                className={`glass-panel p-5 rounded-2xl border transition-all ${
+                  !action.enabled
+                    ? 'border-slate-800/50 opacity-60 bg-slate-950/40'
+                    : isEditing
+                    ? 'border-cyan-500 shadow-lg shadow-cyan-950/40 bg-slate-900/90'
+                    : 'border-slate-800 hover:border-slate-700 bg-slate-900/60'
                 }`}
               >
-                <div>
-                  {/* Action Card Top Bar */}
-                  <div className="flex items-center justify-between pb-3 border-b border-slate-800">
-                    <div className="flex items-center gap-2.5">
-                      <div className="p-2 rounded-xl bg-slate-900 border border-slate-800 text-cyan-400">
-                        <Icon className="w-5 h-5" />
-                      </div>
-                      <div>
-                        <span className="text-xs font-mono font-bold text-white block">{act.department}</span>
-                        <span className="text-[10px] font-mono text-slate-400">Target Risk Contribution: -{act.baseRiskImpact} pts</span>
-                      </div>
+                <div className="flex flex-col lg:flex-row items-start lg:items-center justify-between gap-4">
+                  {/* Action Title Header */}
+                  <div className="flex items-start gap-4">
+                    {/* Action Enable Toggle */}
+                    <button
+                      onClick={() => togglePlanAction(action.id)}
+                      className={`p-2 rounded-xl border font-mono text-xs font-bold transition-all cursor-pointer ${
+                        action.enabled
+                          ? 'bg-cyan-950 text-cyan-300 border border-cyan-500/50'
+                          : 'bg-slate-950 text-slate-500 border border-slate-800'
+                      }`}
+                      title={action.enabled ? 'Action Enabled' : 'Action Disabled'}
+                    >
+                      {action.enabled ? 'ON' : 'OFF'}
+                    </button>
+
+                    <div className="p-3 rounded-xl bg-slate-900 border border-slate-800 text-cyan-400 shrink-0">
+                      <Icon className="w-6 h-6" />
                     </div>
 
-                    <div className="flex items-center gap-2">
-                      {/* Toggle Action Enable/Disable */}
-                      <button
-                        onClick={() => togglePlanAction(act.id)}
-                        className={`px-2.5 py-1 rounded-lg text-[10px] font-mono font-bold uppercase cursor-pointer border transition-colors ${
-                          act.enabled
-                            ? 'bg-emerald-950/80 text-emerald-300 border-emerald-500/40 hover:bg-red-950 hover:text-red-300'
-                            : 'bg-slate-900 text-slate-500 border-slate-800 hover:bg-emerald-950 hover:text-emerald-300'
-                        }`}
-                        title={act.enabled ? "Disable Action in Plan" : "Enable Action in Plan"}
-                      >
-                        {act.enabled ? "ACTIVE IN PLAN" : "DISABLED"}
-                      </button>
+                    <div>
+                      <div className="flex items-center gap-2">
+                        <span className="text-xs font-bold text-white font-mono uppercase">
+                          {action.department}
+                        </span>
 
-                      {/* Edit Button */}
-                      {!isEditing && isCounselor && (
-                        <button
-                          onClick={() => startEditAction(act)}
-                          className="p-1.5 rounded-lg bg-slate-900 hover:bg-slate-800 text-slate-300 hover:text-cyan-400 border border-slate-800 transition-colors cursor-pointer"
-                          title="Edit Action Parameters"
+                        <span
+                          className={`px-2 py-0.5 rounded text-[10px] font-mono font-bold uppercase ${
+                            action.priority === 'CRITICAL'
+                              ? 'bg-red-950 text-red-300 border border-red-500/40'
+                              : action.priority === 'HIGH'
+                              ? 'bg-amber-950 text-amber-300 border border-amber-500/40'
+                              : 'bg-slate-800 text-slate-300 border border-slate-700'
+                          }`}
                         >
-                          <Edit3 className="w-4 h-4" />
-                        </button>
+                          {action.priority} PRIORITY
+                        </span>
+
+                        <span className="text-xs font-mono text-slate-400">
+                          Risk Impact: <strong className="text-emerald-400">-{action.baseRiskImpact} pts</strong>
+                        </span>
+                      </div>
+
+                      {/* Recommendation Text or Edit Input */}
+                      {isEditing ? (
+                        <div className="mt-2 space-y-2">
+                          <textarea
+                            value={editFields.recommendation}
+                            onChange={(e) => setEditFields({ ...editFields, recommendation: e.target.value })}
+                            className="w-full p-2.5 rounded-xl bg-slate-950 border border-cyan-500/60 text-xs text-white font-mono focus:outline-none focus:border-cyan-400"
+                            rows={2}
+                          />
+
+                          <div className="flex items-center gap-4 text-xs font-mono">
+                            <div className="flex items-center gap-2">
+                              <span className="text-slate-400">Priority:</span>
+                              <select
+                                value={editFields.priority}
+                                onChange={(e) => setEditFields({ ...editFields, priority: e.target.value })}
+                                className="bg-slate-950 border border-slate-800 text-cyan-300 rounded px-2 py-1"
+                              >
+                                <option value="CRITICAL">CRITICAL (1.25x Impact)</option>
+                                <option value="HIGH">HIGH (1.0x Impact)</option>
+                                <option value="MEDIUM">MEDIUM (0.7x Impact)</option>
+                                <option value="LOW">LOW (0.4x Impact)</option>
+                              </select>
+                            </div>
+
+                            <div className="flex items-center gap-2">
+                              <span className="text-slate-400">Resource Count:</span>
+                              <div className="flex items-center gap-1 bg-slate-950 rounded px-2 py-0.5 border border-slate-800">
+                                <button
+                                  onClick={() => setEditFields({ ...editFields, resourceCount: Math.max(1, editFields.resourceCount - 1) })}
+                                  className="text-slate-400 hover:text-white p-1"
+                                >
+                                  <Minus className="w-3 h-3" />
+                                </button>
+                                <span className="font-bold text-white px-1">{editFields.resourceCount}</span>
+                                <button
+                                  onClick={() => setEditFields({ ...editFields, resourceCount: editFields.resourceCount + 1 })}
+                                  className="text-slate-400 hover:text-white p-1"
+                                >
+                                  <Plus className="w-3 h-3" />
+                                </button>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      ) : (
+                        <p className="text-xs font-mono text-slate-200 mt-1 font-semibold">
+                          {action.recommendation}
+                        </p>
                       )}
                     </div>
                   </div>
 
-                  {/* Normal Card View vs Edit Form View */}
-                  {!isEditing ? (
-                    <div className="mt-3 space-y-2 text-xs">
-                      <div className="flex items-start justify-between gap-2">
-                        <div className="flex-1">
-                          <span className="text-[10px] font-mono text-cyan-400 uppercase font-bold block">
-                            RECOMMENDATION
-                          </span>
-                          <p className="text-slate-100 font-semibold font-mono mt-0.5">{act.recommendation}</p>
-                        </div>
-                        <span
-                          className={`px-2.5 py-0.5 rounded text-[10px] font-mono font-bold uppercase shrink-0 ${
-                            act.priority === 'CRITICAL'
-                              ? 'bg-red-950 text-red-300 border border-red-500/40'
-                              : 'bg-amber-950 text-amber-300 border border-amber-500/40'
-                          }`}
-                        >
-                          {act.priority}
-                        </span>
-                      </div>
-
-                      <div className="p-3 rounded-xl bg-slate-900/60 border border-slate-800/80">
-                        <span className="text-[10px] font-mono text-slate-400 uppercase font-bold block">REASONING & EVIDENCE</span>
-                        <p className="text-slate-300 font-mono text-[11px]">{act.reason}</p>
-                      </div>
-
-                      <div className="p-3 rounded-xl bg-emerald-950/30 border border-emerald-500/30">
-                        <span className="text-[10px] font-mono text-emerald-400 uppercase font-bold block">
-                          EXPECTED IMPACT & UNITS ({act.resourceUnits || 'Standard Deployment'})
-                        </span>
-                        <p className="text-emerald-200 font-mono text-[11px]">{act.expectedImpact}</p>
-                      </div>
-                    </div>
-                  ) : (
-                    /* Inline Action Editing Form for Zone Counselor */
-                    <div className="mt-3 space-y-3 bg-slate-950 p-4 rounded-xl border border-cyan-500/40 text-xs font-mono">
-                      <div className="flex items-center justify-between text-cyan-300 font-bold border-b border-slate-800 pb-1.5">
-                        <span>Edit Department Action Parameters</span>
-                        <span className="text-[10px] text-slate-400 font-normal">Modifies projected risk score</span>
-                      </div>
-
-                      <div>
-                        <label className="text-[10px] text-slate-400 uppercase font-bold block mb-1">
-                          Recommendation Text
-                        </label>
-                        <textarea
-                          value={editForm.recommendation}
-                          onChange={(e) => setEditForm({ ...editForm, recommendation: e.target.value })}
-                          className="w-full h-16 p-2 rounded-lg bg-slate-900 border border-slate-800 text-xs text-white focus:outline-none focus:border-cyan-500 font-mono"
-                        />
-                      </div>
-
-                      <div className="grid grid-cols-2 gap-2">
-                        <div>
-                          <label className="text-[10px] text-slate-400 uppercase font-bold block mb-1">
-                            Priority Level
-                          </label>
-                          <select
-                            value={editForm.priority}
-                            onChange={(e) => setEditForm({ ...editForm, priority: e.target.value })}
-                            className="w-full p-2 rounded-lg bg-slate-900 border border-slate-800 text-xs text-white focus:outline-none focus:border-cyan-500 font-mono"
-                          >
-                            <option value="CRITICAL">CRITICAL (1.25x Risk Reduction)</option>
-                            <option value="HIGH">HIGH (1.0x Risk Reduction)</option>
-                            <option value="MEDIUM">MEDIUM (0.7x Risk Reduction)</option>
-                            <option value="LOW">LOW (0.4x Risk Reduction)</option>
-                          </select>
-                        </div>
-
-                        <div>
-                          <label className="text-[10px] text-slate-400 uppercase font-bold block mb-1">
-                            Resource Units / Count
-                          </label>
-                          <input
-                            type="number"
-                            min="1"
-                            max="5"
-                            value={editForm.resourceCount}
-                            onChange={(e) => setEditForm({ ...editForm, resourceCount: e.target.value })}
-                            className="w-full p-2 rounded-lg bg-slate-900 border border-slate-800 text-xs text-white focus:outline-none focus:border-cyan-500 font-mono"
-                          />
-                        </div>
-                      </div>
-
-                      <div>
-                        <label className="text-[10px] text-slate-400 uppercase font-bold block mb-1">
-                          Operational Reason
-                        </label>
-                        <input
-                          type="text"
-                          value={editForm.reason}
-                          onChange={(e) => setEditForm({ ...editForm, reason: e.target.value })}
-                          className="w-full p-2 rounded-lg bg-slate-900 border border-slate-800 text-xs text-white focus:outline-none focus:border-cyan-500 font-mono"
-                        />
-                      </div>
-
-                      <div className="flex items-center justify-end gap-2 pt-1">
+                  {/* Right Actions / Edit Button */}
+                  <div className="flex items-center gap-3 shrink-0">
+                    {isEditing ? (
+                      <div className="flex items-center gap-2">
                         <button
-                          onClick={() => setEditingActionId(null)}
-                          className="px-3 py-1.5 rounded-lg bg-slate-800 text-slate-300 hover:text-white font-mono text-xs cursor-pointer"
+                          onClick={() => handleSaveEdit(action.id)}
+                          className="px-3 py-1.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-mono text-xs font-bold cursor-pointer transition-colors flex items-center gap-1"
                         >
-                          Cancel
+                          <Check className="w-3.5 h-3.5" />
+                          <span>SAVE</span>
                         </button>
                         <button
-                          onClick={() => saveEditAction(act.id)}
-                          className="px-4 py-1.5 rounded-lg bg-cyan-600 hover:bg-cyan-500 text-white font-mono text-xs font-bold cursor-pointer transition-colors"
+                          onClick={handleCancelEdit}
+                          className="px-3 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 font-mono text-xs cursor-pointer transition-colors"
                         >
-                          Save Changes & Recalculate Risk
+                          CANCEL
                         </button>
                       </div>
-                    </div>
-                  )}
+                    ) : (
+                      isCounselor && planStatus !== 'APPROVED BY ICCC OPERATOR' && (
+                        <button
+                          onClick={() => handleStartEdit(action)}
+                          className="px-3 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-cyan-300 border border-slate-700 font-mono text-xs font-medium cursor-pointer transition-colors flex items-center gap-1.5"
+                        >
+                          <Edit3 className="w-3.5 h-3.5" />
+                          <span>EDIT ACTION</span>
+                        </button>
+                      )
+                    )}
+                  </div>
                 </div>
 
-                {/* Card Footer Info */}
-                <div className="pt-3 border-t border-slate-800/80 flex items-center justify-between text-[11px] font-mono text-slate-400">
-                  <span>Confidence: <strong className="text-cyan-300">{act.confidence}</strong></span>
-                  <span className="truncate max-w-[200px] text-slate-500">
-                    Work Order Status: <strong className="text-white">{act.workOrderStatus || 'Pending Dispatch'}</strong>
-                  </span>
-                </div>
+                {/* Additional Impact Details */}
+                {!isEditing && (
+                  <div className="mt-3 pt-3 border-t border-slate-800/80 grid grid-cols-1 md:grid-cols-2 gap-3 text-[11px] font-mono text-slate-400">
+                    <div>
+                      <strong className="text-slate-300">Causal Trigger Reason:</strong> {action.reason}
+                    </div>
+                    <div>
+                      <strong className="text-emerald-400">Expected Outcome:</strong> {action.expectedImpact}
+                    </div>
+                  </div>
+                )}
               </div>
             );
           })}
         </div>
       </div>
 
-      {/* APPROVAL CONFIRMATION MODAL */}
+      {/* CONFIRM APPROVAL MODAL */}
       {showConfirmModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-md">
-          <div className="relative w-full max-w-md glass-panel p-6 rounded-2xl border border-emerald-500/40 space-y-4 shadow-2xl">
+        <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-md flex items-center justify-center p-4">
+          <div className="glass-panel p-6 rounded-2xl border border-cyan-500/40 max-w-lg w-full space-y-4 shadow-2xl">
             <div className="flex items-center gap-3 text-emerald-400">
               <CheckCircle2 className="w-6 h-6" />
-              <h3 className="text-lg font-bold text-white">Approve & Dispatch Work Orders?</h3>
+              <h3 className="text-lg font-bold text-white font-mono">
+                Confirm Plan Approval & Task Dispatch
+              </h3>
             </div>
 
-            <p className="text-xs text-slate-300 leading-relaxed font-mono">
-              Approving this plan as Zone Counselor will authorize work orders directly to Water, Traffic, Emergency Services, and Public Advisory department dashboards with calculated projected risk of <strong>{dynamicRisk}/100</strong>.
+            <p className="text-xs text-slate-300 font-mono leading-relaxed">
+              You are approving the 4-Point Coordinated Response Plan as <strong>Zone Counselor</strong>. Work orders will be dispatched directly to Water, Traffic, Emergency 108, and Public Info department dashboards.
             </p>
 
+            <div className="p-3 rounded-xl bg-slate-900 border border-slate-800 text-xs font-mono space-y-1">
+              <div className="flex justify-between text-slate-300">
+                <span>Calculated Project Risk Index:</span>
+                <strong className="text-emerald-400">{dynamicRisk}/100</strong>
+              </div>
+              <div className="flex justify-between text-slate-300">
+                <span>Active Actions Dispatched:</span>
+                <strong className="text-cyan-300">{planActions.filter(a => a.enabled).length} Departments</strong>
+              </div>
+            </div>
+
             <div>
-              <label className="text-[10px] font-mono text-slate-400 uppercase font-bold block mb-1">
-                ZONE COUNSELOR AUTHORIZATION NOTE
+              <label className="text-xs font-mono text-slate-400 block mb-1">
+                Official Authorization Note (Optional):
               </label>
               <textarea
-                value={noteInput}
-                onChange={(e) => setNoteInput(e.target.value)}
-                placeholder="Enter counselor authorization log..."
-                className="w-full h-20 p-2.5 rounded-xl bg-slate-900 border border-slate-800 text-xs text-slate-100 placeholder-slate-500 font-mono focus:outline-none focus:border-emerald-500/60"
+                value={customNoteInput}
+                onChange={(e) => setCustomNoteInput(e.target.value)}
+                placeholder="Approved for immediate multi-department dispatch by Zone Counselor..."
+                className="w-full p-2.5 rounded-xl bg-slate-950 border border-slate-800 text-xs font-mono text-white placeholder-slate-500 focus:outline-none focus:border-cyan-500"
+                rows={2}
               />
             </div>
 
-            <div className="p-2.5 rounded-lg bg-slate-900 border border-slate-800 text-[10px] font-mono text-slate-400">
-              Note: Work orders will immediately appear in each department's active dashboard terminal.
-            </div>
-
-            <div className="flex items-center justify-end gap-3 pt-2">
+            <div className="flex items-center justify-end gap-3 pt-2 font-mono text-xs">
               <button
                 onClick={() => setShowConfirmModal(false)}
-                className="px-4 py-2 rounded-xl bg-slate-800 text-slate-300 text-xs font-mono cursor-pointer"
+                className="px-4 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 font-bold cursor-pointer"
               >
-                Cancel
+                CANCEL
               </button>
 
               <button
-                onClick={handleApproveConfirm}
-                className="px-5 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-mono text-xs font-bold cursor-pointer transition-colors shadow-lg shadow-emerald-950"
+                onClick={handleConfirmApproval}
+                className="px-5 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold cursor-pointer shadow-lg flex items-center gap-1.5"
               >
-                CONFIRM & DISPATCH
+                <Send className="w-4 h-4" />
+                <span>CONFIRM & DISPATCH WORK ORDERS</span>
               </button>
             </div>
           </div>
@@ -469,40 +472,43 @@ export default function ResponsePlans() {
 
       {/* REQUEST CHANGES MODAL */}
       {showChangesModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-md">
-          <div className="relative w-full max-w-md glass-panel p-6 rounded-2xl border border-amber-500/40 space-y-4 shadow-2xl">
+        <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-md flex items-center justify-center p-4">
+          <div className="glass-panel p-6 rounded-2xl border border-amber-500/40 max-w-lg w-full space-y-4 shadow-2xl">
             <div className="flex items-center gap-3 text-amber-400">
-              <Edit3 className="w-6 h-6" />
-              <h3 className="text-lg font-bold text-white">Request Plan Modifications</h3>
+              <AlertTriangle className="w-6 h-6" />
+              <h3 className="text-lg font-bold text-white font-mono">
+                Request Changes to Response Plan
+              </h3>
             </div>
 
-            <p className="text-xs text-slate-300 leading-relaxed font-mono">
-              Specify instructions for Planner Agent to re-synthesize departmental actions.
+            <p className="text-xs text-slate-300 font-mono leading-relaxed">
+              Flag recommendations for adjustment before dispatching to department terminals.
             </p>
 
             <div>
-              <label className="text-[10px] font-mono text-slate-400 uppercase font-bold block mb-1">
-                CHANGE INSTRUCTIONS
+              <label className="text-xs font-mono text-slate-400 block mb-1">
+                Reason for Requested Changes:
               </label>
               <textarea
-                value={noteInput}
-                onChange={(e) => setNoteInput(e.target.value)}
-                placeholder="e.g. Increase mobile pump count at Station 4B to 3..."
-                className="w-full h-24 p-2.5 rounded-xl bg-slate-900 border border-slate-800 text-xs text-slate-100 placeholder-slate-500 font-mono focus:outline-none focus:border-amber-500/60"
+                value={customNoteInput}
+                onChange={(e) => setCustomNoteInput(e.target.value)}
+                placeholder="Requesting 3x mobile pumps instead of 2 for Station 4B sump..."
+                className="w-full p-2.5 rounded-xl bg-slate-950 border border-slate-800 text-xs font-mono text-white placeholder-slate-500 focus:outline-none focus:border-amber-500"
+                rows={3}
               />
             </div>
 
-            <div className="flex items-center justify-end gap-3 pt-2">
+            <div className="flex items-center justify-end gap-3 pt-2 font-mono text-xs">
               <button
                 onClick={() => setShowChangesModal(false)}
-                className="px-4 py-2 rounded-xl bg-slate-800 text-slate-300 text-xs font-mono cursor-pointer"
+                className="px-4 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 font-bold cursor-pointer"
               >
-                Cancel
+                CANCEL
               </button>
 
               <button
-                onClick={handleRequestChangesConfirm}
-                className="px-5 py-2.5 rounded-xl bg-amber-600 hover:bg-amber-500 text-white font-mono text-xs font-bold cursor-pointer transition-colors"
+                onClick={handleConfirmChanges}
+                className="px-5 py-2 rounded-xl bg-amber-600 hover:bg-amber-500 text-white font-bold cursor-pointer shadow-lg"
               >
                 SUBMIT REQUEST
               </button>
@@ -513,4 +519,3 @@ export default function ResponsePlans() {
     </div>
   );
 }
-

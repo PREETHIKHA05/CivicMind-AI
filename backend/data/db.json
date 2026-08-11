@@ -1,0 +1,134 @@
+{
+  "plan": {
+    "_id": "6a7b384d72320a5dd4fd15bc",
+    "planId": "active-crp-01",
+    "incidentId": "INC-2026-081",
+    "title": "Ward 18 Hospital Corridor Coordinated Emergency Mitigation",
+    "riskScorePre": 92,
+    "riskScorePost": 40,
+    "confidence": 94,
+    "status": "APPROVED BY ICCC OPERATOR",
+    "operatorNote": "Approved for immediate multi-department dispatch by Zone Counselor.",
+    "approvalTime": "08:29:19 pm",
+    "actions": [
+      {
+        "id": "act-1",
+        "departmentId": "water",
+        "department": "Water Resources & Drainage",
+        "deptIcon": "Droplets",
+        "enabled": true,
+        "priority": "HIGH",
+        "baseRiskImpact": 22,
+        "resourceUnits": "2 Mobile Pumps",
+        "resourceCount": 2,
+        "recommendation": "Deploy 2x High-Capacity Mobile Pumps to Ward 18 Low-Point Sump (Station 4B).",
+        "reason": "Ward 18 primary drain capacity depleted to 28%. Backwater effect detected at Gate 2.",
+        "confidence": "96%",
+        "expectedImpact": "Reduces water accumulation by 65% in 20 minutes; lowers flood risk score by 22 pts.",
+        "workOrderStatus": "Pending Dispatch"
+      },
+      {
+        "id": "act-2",
+        "departmentId": "traffic",
+        "department": "Traffic Management Bureau",
+        "deptIcon": "Car",
+        "enabled": true,
+        "priority": "HIGH",
+        "baseRiskImpact": 15,
+        "resourceUnits": "Route B Green-Wave Sync",
+        "resourceCount": 1,
+        "recommendation": "Activate Green-Wave Traffic Signal Timing on Route B (EVR Periyar Salai) and restrict Gate 1 to emergency transit.",
+        "reason": "Hospital Road speed dropped to 6 km/h. Bottleneck forming at Trauma Center Gate 1.",
+        "confidence": "94%",
+        "expectedImpact": "Clears 80% of non-essential traffic away from hospital corridor within 8 minutes.",
+        "workOrderStatus": "Pending Dispatch"
+      },
+      {
+        "id": "act-3",
+        "departmentId": "emergency",
+        "department": "Emergency Services (108)",
+        "deptIcon": "Ambulance",
+        "enabled": true,
+        "priority": "CRITICAL",
+        "baseRiskImpact": 10,
+        "resourceUnits": "3 Ambulances Rerouted",
+        "resourceCount": 3,
+        "recommendation": "Reroute Ambulance #108-B4 and all incoming trauma units to Route B via EVR Periyar Salai.",
+        "reason": "Ambulance #108-B4 carrying critical cardiac patient stuck 800m from ER entrance.",
+        "confidence": "98%",
+        "expectedImpact": "Guarantees direct ER access in 11 minutes (saving 18 minutes of transit time).",
+        "workOrderStatus": "Pending Dispatch"
+      },
+      {
+        "id": "act-4",
+        "departmentId": "public",
+        "department": "Public Information & Advisory",
+        "deptIcon": "Radio",
+        "enabled": true,
+        "priority": "MEDIUM",
+        "baseRiskImpact": 4,
+        "resourceUnits": "Zone SMS Broadcast",
+        "resourceCount": 1,
+        "recommendation": "Issue localized civic alert via SMS & Radio for Ward 18 drivers to bypass Hospital Road.",
+        "reason": "38 geotagged reports of knee-deep water on Hospital Road verified within 15 mins.",
+        "confidence": "88%",
+        "expectedImpact": "Diverts approximately 35% of incoming commuter traffic.",
+        "workOrderStatus": "Pending Dispatch"
+      }
+    ],
+    "createdAt": "2026-08-11T14:57:17.973Z",
+    "updatedAt": "2026-08-11T14:59:19.534Z",
+    "__v": 0
+  },
+  "workOrders": [
+    {
+      "_id": "6a7b38c772320a5dd4fd15c3",
+      "taskId": "task-1786460359529-1",
+      "actionId": "act-2",
+      "departmentId": "traffic",
+      "departmentName": "Traffic Management Bureau",
+      "title": "Traffic Management Bureau Action: Route B Green-Wave Sync",
+      "recommendation": "Activate Green-Wave Traffic Signal Timing on Route B (EVR Periyar Salai) and restrict Gate 1 to emergency transit.",
+      "priority": "HIGH",
+      "assignedBy": "Zone Counselor",
+      "assignedTime": "08:29:19 pm",
+      "status": "Assigned",
+      "expectedImpact": "Clears 80% of non-essential traffic away from hospital corridor within 8 minutes.",
+      "logs": [
+        {
+          "time": "08:29:19 pm",
+          "author": "Zone Counselor",
+          "note": "Work Order issued via Approved Plan."
+        }
+      ],
+      "createdAt": "2026-08-11T14:59:19.664Z",
+      "updatedAt": "2026-08-11T14:59:19.664Z",
+      "__v": 0
+    },
+    {
+      "_id": "6a7b38c772320a5dd4fd15c1",
+      "taskId": "task-1786460359529-0",
+      "actionId": "act-1",
+      "departmentId": "water",
+      "departmentName": "Water Resources & Drainage",
+      "title": "Water Resources & Drainage Action: 2 Mobile Pumps",
+      "recommendation": "Deploy 2x High-Capacity Mobile Pumps to Ward 18 Low-Point Sump (Station 4B).",
+      "priority": "HIGH",
+      "assignedBy": "Zone Counselor",
+      "assignedTime": "08:29:19 pm",
+      "status": "Assigned",
+      "expectedImpact": "Reduces water accumulation by 65% in 20 minutes; lowers flood risk score by 22 pts.",
+      "logs": [
+        {
+          "time": "08:29:19 pm",
+          "author": "Zone Counselor",
+          "note": "Work Order issued via Approved Plan."
+        }
+      ],
+      "createdAt": "2026-08-11T14:59:19.629Z",
+      "updatedAt": "2026-08-11T14:59:19.629Z",
+      "__v": 0
+    }
+  ],
+  "lastSavedAt": "2026-08-11T15:00:07.981Z"
+}

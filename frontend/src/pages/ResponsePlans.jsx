@@ -21,7 +21,8 @@ import {
   Check,
   X,
   Send,
-  Layers
+  Layers,
+  RotateCcw
 } from 'lucide-react';
 
 export default function ResponsePlans() {
@@ -31,6 +32,7 @@ export default function ResponsePlans() {
     approvePlan,
     requestPlanChanges,
     dismissPlan,
+    resetPlanToUnapproved,
     operatorNote,
     approvalTime,
     currentRiskScore,
@@ -198,7 +200,15 @@ export default function ResponsePlans() {
           </div>
 
           <div className="flex items-center gap-3 shrink-0">
-            {planStatus !== 'APPROVED BY ICCC OPERATOR' && (
+            {planStatus === 'APPROVED BY ICCC OPERATOR' ? (
+              <button
+                onClick={resetPlanToUnapproved}
+                className="px-5 py-2.5 rounded-xl bg-amber-950/80 hover:bg-amber-900 text-amber-200 border border-amber-500/50 font-mono text-xs font-bold cursor-pointer transition-all flex items-center gap-2 shadow-lg hover:scale-105"
+              >
+                <RotateCcw className="w-4 h-4 text-amber-400" />
+                <span>REVERT TO UNAPPROVED DRAFT</span>
+              </button>
+            ) : (
               <>
                 <button
                   onClick={() => setShowChangesModal(true)}
