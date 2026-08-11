@@ -7,9 +7,9 @@
     "riskScorePre": 92,
     "riskScorePost": 40,
     "confidence": 94,
-    "status": "APPROVED BY ICCC OPERATOR",
-    "operatorNote": "Approved for immediate multi-department dispatch by Zone Counselor.",
-    "approvalTime": "08:29:19 pm",
+    "status": "Awaiting Human Review",
+    "operatorNote": "",
+    "approvalTime": null,
     "actions": [
       {
         "id": "act-1",
@@ -77,58 +77,9 @@
       }
     ],
     "createdAt": "2026-08-11T14:57:17.973Z",
-    "updatedAt": "2026-08-11T14:59:19.534Z",
+    "updatedAt": "2026-08-11T17:28:20.414Z",
     "__v": 0
   },
-  "workOrders": [
-    {
-      "_id": "6a7b38c772320a5dd4fd15c3",
-      "taskId": "task-1786460359529-1",
-      "actionId": "act-2",
-      "departmentId": "traffic",
-      "departmentName": "Traffic Management Bureau",
-      "title": "Traffic Management Bureau Action: Route B Green-Wave Sync",
-      "recommendation": "Activate Green-Wave Traffic Signal Timing on Route B (EVR Periyar Salai) and restrict Gate 1 to emergency transit.",
-      "priority": "HIGH",
-      "assignedBy": "Zone Counselor",
-      "assignedTime": "08:29:19 pm",
-      "status": "Assigned",
-      "expectedImpact": "Clears 80% of non-essential traffic away from hospital corridor within 8 minutes.",
-      "logs": [
-        {
-          "time": "08:29:19 pm",
-          "author": "Zone Counselor",
-          "note": "Work Order issued via Approved Plan."
-        }
-      ],
-      "createdAt": "2026-08-11T14:59:19.664Z",
-      "updatedAt": "2026-08-11T14:59:19.664Z",
-      "__v": 0
-    },
-    {
-      "_id": "6a7b38c772320a5dd4fd15c1",
-      "taskId": "task-1786460359529-0",
-      "actionId": "act-1",
-      "departmentId": "water",
-      "departmentName": "Water Resources & Drainage",
-      "title": "Water Resources & Drainage Action: 2 Mobile Pumps",
-      "recommendation": "Deploy 2x High-Capacity Mobile Pumps to Ward 18 Low-Point Sump (Station 4B).",
-      "priority": "HIGH",
-      "assignedBy": "Zone Counselor",
-      "assignedTime": "08:29:19 pm",
-      "status": "Assigned",
-      "expectedImpact": "Reduces water accumulation by 65% in 20 minutes; lowers flood risk score by 22 pts.",
-      "logs": [
-        {
-          "time": "08:29:19 pm",
-          "author": "Zone Counselor",
-          "note": "Work Order issued via Approved Plan."
-        }
-      ],
-      "createdAt": "2026-08-11T14:59:19.629Z",
-      "updatedAt": "2026-08-11T14:59:19.629Z",
-      "__v": 0
-    }
-  ],
-  "lastSavedAt": "2026-08-11T15:00:07.981Z"
+  "workOrders": [],
+  "lastSavedAt": "2026-08-11T17:28:45.806Z"
 }

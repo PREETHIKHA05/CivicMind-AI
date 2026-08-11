@@ -35,12 +35,18 @@ export default function ResponsePlans() {
     resetPlanToUnapproved,
     operatorNote,
     approvalTime,
-    currentRiskScore,
     planActions,
     updatePlanAction,
     togglePlanAction,
-    calculateProjectedRisk
+    calculateProjectedRisk,
+    departmentTasks,
+    setActivePage
   } = useCity();
+
+  const totalTasks = departmentTasks ? departmentTasks.length : 0;
+  const completedTasks = departmentTasks ? departmentTasks.filter(t => t.status === 'Completed').length : 0;
+  const inProgressTasks = departmentTasks ? departmentTasks.filter(t => t.status === 'In Progress').length : 0;
+  const progressPercent = totalTasks > 0 ? Math.round((completedTasks / totalTasks) * 100) : 0;
 
   const isCounselor = currentUser && currentUser.role === 'counselor';
   const dynamicRisk = calculateProjectedRisk(planActions);
@@ -190,7 +196,7 @@ export default function ResponsePlans() {
               <div className="flex items-center gap-2 text-emerald-400 font-semibold">
                 <CheckCircle2 className="w-5 h-5 shrink-0" />
                 <span>
-                  APPROVED BY ZONE COUNSELOR at {approvalTime || '07:12 AM'}. Work orders dispatched to department dashboards.
+                  APPROVED BY ZONE COUNSELOR at {approvalTime || '07:12 AM'}. Work orders dispatched to 4 department dashboards.
                 </span>
               </div>
             ) : (
@@ -238,6 +244,89 @@ export default function ResponsePlans() {
           </div>
         </div>
       </div>
+
+      {/* LIVE MULTI-DEPARTMENT WORK ORDER EXECUTION PROGRESS CARD */}
+      {planStatus === 'APPROVED BY ICCC OPERATOR' && (
+        <div className="glass-panel p-6 rounded-2xl border border-emerald-500/40 bg-slate-900/90 space-y-4 shadow-2xl">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-3 border-b border-slate-800">
+            <div>
+              <div className="flex items-center gap-2">
+                <span className="px-2.5 py-0.5 rounded bg-emerald-950 text-emerald-300 border border-emerald-500/40 text-[10px] font-mono font-bold uppercase tracking-wider">
+                  LIVE FIELD EXECUTION PROGRESS
+                </span>
+                <span className="text-xs font-mono text-slate-400">Real-Time WebSocket Department Sync</span>
+              </div>
+              <h3 className="text-lg font-extrabold text-white font-mono mt-1">
+                Department Work Order Execution Tracker
+              </h3>
+            </div>
+
+            <div className="flex items-center gap-3 font-mono text-xs shrink-0">
+              <div className="px-3 py-1.5 rounded-xl bg-emerald-950/80 border border-emerald-500/40 text-emerald-300 font-bold">
+                ● {completedTasks} / {totalTasks} Completed
+              </div>
+              <div className="px-3 py-1.5 rounded-xl bg-cyan-950/80 border border-cyan-500/40 text-cyan-300 font-bold">
+                ● {inProgressTasks} In Progress
+              </div>
+            </div>
+          </div>
+
+          {/* PROGRESS BAR */}
+          <div className="space-y-2">
+            <div className="flex items-center justify-between text-xs font-mono">
+              <span className="text-slate-300 font-bold">Overall Department Completion Progress:</span>
+              <span className="text-emerald-400 font-extrabold text-sm font-mono">{progressPercent}%</span>
+            </div>
+
+            <div className="w-full h-3.5 bg-slate-950 rounded-full overflow-hidden p-0.5 border border-slate-800 flex">
+              <div 
+                className="h-full bg-gradient-to-r from-emerald-500 via-teal-400 to-cyan-400 rounded-full transition-all duration-700 shadow-md shadow-emerald-950"
+                style={{ width: `${progressPercent}%` }}
+              />
+            </div>
+          </div>
+
+          {/* Individual Department Task Cards Grid */}
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3 pt-2 font-mono">
+            {departmentTasks.map((task) => (
+              <div 
+                key={task.id || task.taskId}
+                className={`p-3.5 rounded-xl border text-xs space-y-2 transition-all ${
+                  task.status === 'Completed'
+                    ? 'bg-emerald-950/30 border-emerald-500/50'
+                    : task.status === 'In Progress'
+                    ? 'bg-cyan-950/30 border-cyan-500/50'
+                    : 'bg-slate-900 border-slate-800'
+                }`}
+              >
+                <div className="flex items-center justify-between gap-2">
+                  <span className="font-bold text-white truncate">{task.departmentName}</span>
+                  <span className={`px-2 py-0.5 rounded text-[10px] font-bold uppercase shrink-0 ${
+                    task.status === 'Completed'
+                      ? 'bg-emerald-950 text-emerald-300 border border-emerald-500/40'
+                      : task.status === 'In Progress'
+                      ? 'bg-cyan-950 text-cyan-300 border border-cyan-500/40 animate-pulse'
+                      : 'bg-slate-800 text-slate-300 border border-slate-700'
+                  }`}>
+                    {task.status}
+                  </span>
+                </div>
+
+                <p className="text-[11px] text-slate-300 font-medium leading-tight line-clamp-2">
+                  {task.title}
+                </p>
+
+                {task.logs && task.logs.length > 0 && (
+                  <div className="pt-1.5 border-t border-slate-800/80 text-[10px] text-slate-400 font-mono">
+                    <span className="text-cyan-400 font-semibold">Latest Log:</span>{' '}
+                    <span className="text-slate-300 truncate block">{task.logs[task.logs.length - 1].note}</span>
+                  </div>
+                )}
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
 
       {/* EDITABLE DEPARTMENT RECOMMENDATIONS LIST */}
       <div className="space-y-4">
