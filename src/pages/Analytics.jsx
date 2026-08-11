@@ -1,8 +1,6 @@
 import React, { useState } from 'react';
 import { RECHARTS_DATA } from '../data/mockData';
 import {
-  LineChart,
-  Line,
   BarChart,
   Bar,
   XAxis,
@@ -14,7 +12,7 @@ import {
   AreaChart,
   Area
 } from 'recharts';
-import { BarChart3, TrendingUp, Calendar, ShieldCheck, Zap } from 'lucide-react';
+import { BarChart3, TrendingUp, Calendar, Zap } from 'lucide-react';
 
 export default function Analytics() {
   const [timeFilter, setTimeFilter] = useState('Today'); // 'Today' | '7 Days' | '30 Days'
@@ -113,30 +111,6 @@ export default function Analytics() {
           </div>
         </div>
 
-        {/* CHART 3: AI MODEL RECOMMENDATION ACCURACY */}
-        <div className="glass-panel p-5 rounded-2xl border border-slate-800 space-y-4 lg:col-span-2">
-          <div className="flex items-center justify-between border-b border-slate-800 pb-2">
-            <h3 className="text-xs font-mono font-bold text-white uppercase tracking-wider flex items-center gap-2">
-              <ShieldCheck className="w-4 h-4 text-purple-400" />
-              <span>HISTORICAL AI PREDICTIVE ACCURACY & INCIDENTS MITIGATED</span>
-            </h3>
-            <span className="text-[10px] font-mono text-purple-300">Monthly Audit Benchmark</span>
-          </div>
-
-          <div className="h-64 w-full">
-            <ResponsiveContainer width="100%" height="100%">
-              <LineChart data={RECHARTS_DATA.accuracyMetrics}>
-                <CartesianGrid strokeDasharray="3 3" stroke="#1e293b" />
-                <XAxis dataKey="month" stroke="#64748b" fontSize={10} tickLine={false} />
-                <YAxis stroke="#64748b" fontSize={10} tickLine={false} />
-                <Tooltip contentStyle={{ backgroundColor: '#0f172a', borderColor: '#334155', borderRadius: '8px', fontSize: '12px' }} />
-                <Legend wrapperStyle={{ fontSize: '11px', paddingTop: '10px' }} />
-                <Line type="monotone" dataKey="accuracy" name="Prediction Accuracy (%)" stroke="#a855f7" strokeWidth={3} dot={{ r: 4 }} />
-                <Line type="monotone" dataKey="incidentsPrevented" name="Incidents Mitigated" stroke="#3b82f6" strokeWidth={2} dot={{ r: 4 }} />
-              </LineChart>
-            </ResponsiveContainer>
-          </div>
-        </div>
       </div>
     </div>
   );

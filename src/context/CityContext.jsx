@@ -75,6 +75,24 @@ export function CityProvider({ children }) {
 
   const [currentRiskScore, setCurrentRiskScore] = useState(CITY_METADATA.stats.preInterventionRisk);
 
+  // ---------------- Agent Orchestrator Run State ----------------
+  const [agentTrace, setAgentTrace] = useState([]);
+  const [activeAgents, setActiveAgents] = useState([]);
+  const [currentRun, setCurrentRun] = useState(null); // { runId, riskIndex, terminals, gate, agentsInvoked, totalAgents }
+  const [runStatus, setRunStatus] = useState('idle'); // idle | running | completed | aborted
+
+  const startAgentRun = (scenario) => {
+    setRunStatus('running');
+    fetch(`${backendUrl}/api/runs/start`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(scenario)
+    }).catch(() => {
+      setRunStatus('idle');
+      addToast('warning', 'Run Failed to Start', 'Could not reach the orchestrator backend.');
+    });
+  };
+
   // ---------------- WebSocket Real-Time Listener ----------------
   useEffect(() => {
     let socket;
@@ -155,6 +173,40 @@ export function CityProvider({ children }) {
         setApprovalTime(null);
         setDepartmentTasks([]);
         addToast('warning', 'Plan Reverted', 'Plan reset to unapproved draft by Zone Counselor. Work orders cleared.');
+      });
+
+      // Live Agent Orchestrator Trace — one event per emitted step, seq-ordered
+      socket.on('agent:event', (event) => {
+        if (event.type === 'run_started') {
+          setAgentTrace([event]);
+          setActiveAgents([]);
+          setCurrentRun({ runId: event.runId });
+          setRunStatus('running');
+          return;
+        }
+
+        setAgentTrace(prev => {
+          if (prev.length > 0 && prev[0].runId !== event.runId) return prev; // stale event from a prior run
+          return [...prev, event].sort((a, b) => a.seq - b.seq);
+        });
+
+        if (event.type === 'routing_decision') {
+          setActiveAgents(event.payload.agents || []);
+        }
+        if (event.type === 'causal_computed') {
+          setCurrentRun(prev => ({ ...prev, riskIndex: event.payload.riskIndex, terminals: event.payload.terminals }));
+        }
+        if (event.type === 'gate_decision') {
+          setCurrentRun(prev => ({ ...prev, gate: event.payload.gate }));
+        }
+        if (event.type === 'run_completed') {
+          setCurrentRun(prev => ({ ...prev, ...event.payload }));
+          setRunStatus('completed');
+        }
+        if (event.type === 'run_aborted') {
+          setRunStatus('aborted');
+          addToast('warning', 'Run Aborted', event.payload?.error || 'The agent run was aborted.');
+        }
       });
 
     } catch (err) {
@@ -381,65 +433,10 @@ export function CityProvider({ children }) {
     setCurrentRiskScore(planStatus === 'APPROVED BY ICCC OPERATOR' ? projected : 92);
   };
 
-  // Simulation Stage Auto-Advance
-  useEffect(() => {
-    let timer;
-    if (isSimulating && simStage > 0 && simStage <= 10) {
-      timer = setTimeout(() => {
-        const stageMessages = {
-          1: 'Stage 1: Weather Agent detects Doppler rain cell (120 mm/hr) stationary over Ward 18.',
-          2: 'Stage 2: Water Agent detects secondary drain outflow capacity drops to 28%.',
-          3: 'Stage 3: Traffic Agent reports Hospital Road speed down to 6 km/h (1.8km tailback).',
-          4: 'Stage 4: Emergency Agent flags Ambulance #108-B4 delayed carrying critical patient.',
-          5: 'Stage 5: Memory Agent matches 91% vector similarity with Nov 2024 flood incident.',
-          6: 'Stage 6: Planner Agent calculates cascading risk: 92/100 (Hospital Access Lockout).',
-          7: 'Stage 7: CivicMind synthesizes 4-point Coordinated Response Plan across departments.',
-          8: 'Stage 8: Plan presented to Zone Counselor for Human Review & Editing.',
-          9: 'Stage 9: Zone Counselor reviews and approves Coordinated Response Plan.',
-          10: 'Stage 10: Department work orders executed. Mobile pumps and traffic diversion clear corridor. Risk drops.'
-        };
-
-        const msg = stageMessages[simStage];
-        if (msg) {
-          setSimLogs(prev => [...prev, `${new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' })} - ${msg}`]);
-        }
-
-        if (simStage === 9) {
-          approvePlan('Auto-approved via End-to-End Simulation Run.');
-        }
-
-        if (simStage < 10) {
-          setSimStage(prev => prev + 1);
-        } else {
-          setIsSimulating(false);
-          const finalRisk = calculateProjectedRisk(planActions);
-          addToast('success', 'Simulation Complete', `Projected Risk Score successfully lowered from 92 to ${finalRisk}.`);
-        }
-      }, simSpeed);
-    }
-    return () => clearTimeout(timer);
-  }, [isSimulating, simStage, simSpeed]);
-
-  const [isAgentReasoning, setIsAgentReasoning] = useState(false);
-  const [activeReasoningAgentIndex, setActiveReasoningAgentIndex] = useState(-1);
-
-  const runAgentReasoning = () => {
-    setIsAgentReasoning(true);
-    setActiveReasoningAgentIndex(0);
-
-    let idx = 0;
-    const interval = setInterval(() => {
-      idx++;
-      if (idx < AI_AGENTS.length) {
-        setActiveReasoningAgentIndex(idx);
-      } else {
-        clearInterval(interval);
-        setIsAgentReasoning(false);
-        setActiveReasoningAgentIndex(-1);
-        addToast('purple', 'Agent Council Consensus', '7/7 AI Agents reached 95% consensus on response recommendations.');
-      }
-    }, 1200);
-  };
+  // Simulation stage auto-advance and fake agent reasoning were removed here.
+  // They are being replaced by the real orchestrator's agent:event stream
+  // (Phase 2+). The human approval gate must never be triggered by a timer —
+  // approvePlan() is only ever called from an explicit operator click.
 
   return (
     <CityContext.Provider
@@ -486,9 +483,11 @@ export function CityProvider({ children }) {
         startSimulation,
         stopSimulation,
         resetSimulation,
-        isAgentReasoning,
-        activeReasoningAgentIndex,
-        runAgentReasoning,
+        agentTrace,
+        activeAgents,
+        currentRun,
+        runStatus,
+        startAgentRun,
         isAiDrawerOpen,
         setIsAiDrawerOpen,
         aiMessages,

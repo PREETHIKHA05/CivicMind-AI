@@ -20,8 +20,11 @@ import { plannerAgent } from './agents/plannerAgent.js';
 
 import { ResponsePlan } from './models/ResponsePlan.js';
 import { WorkOrder } from './models/WorkOrder.js';
+import { TraceEvent } from './models/TraceEvent.js';
 
 import { loadLocalDB, saveLocalDB } from './storage.js';
+import { propagateRisk, loadGraph } from './causal/engine.js';
+import { startRun, getTrace, setTracePersistHook } from './orchestrator/run.js';
 
 dotenv.config();
 
@@ -49,6 +52,14 @@ const persistentData = loadLocalDB(defaultSynthesizedPlan);
 let isMongoConnected = false;
 let inMemoryPlan = persistentData.plan;
 let inMemoryWorkOrders = persistentData.workOrders; // Empty [] until Zone Counselor approves plan!
+
+// Best-effort trace persistence — in-memory Map in orchestrator/run.js is the
+// source of truth (same pattern as inMemoryPlan); Mongo is a mirror only.
+setTracePersistHook((event) => {
+  if (isMongoConnected) {
+    TraceEvent.create(event).catch(() => {});
+  }
+});
 
 // Connect to MongoDB Atlas if connection URI is provided
 if (MONGODB_URI && !MONGODB_URI.includes('cluster0.mongodb.net')) {
@@ -141,6 +152,54 @@ app.get('/api/agents', (req, res) => {
       { ...plannerAgent }
     ]
   });
+});
+
+// GET Causal Graph Structure (nodes + edges, for frontend rendering)
+app.get('/api/causal/graph', (req, res) => {
+  res.json(loadGraph());
+});
+
+// POST Propagate Risk Through Causal Graph — synchronous, deterministic, no LLM
+app.post('/api/causal/propagate', (req, res) => {
+  const { seedNode = 'rainfall_intensity', magnitude, horizonMin = 180 } = req.body;
+
+  if (typeof magnitude !== 'number' || Number.isNaN(magnitude)) {
+    return res.status(400).json({ error: 'magnitude must be a number' });
+  }
+
+  try {
+    const result = propagateRisk(seedNode, magnitude, horizonMin);
+    res.json(result);
+  } catch (err) {
+    res.status(400).json({ error: err.message });
+  }
+});
+
+// POST Start an Agent Run — returns runId immediately, events stream over Socket.IO on 'agent:event'
+app.post('/api/runs/start', (req, res) => {
+  const scenario = req.body || {};
+  if (typeof scenario.magnitude !== 'number' || Number.isNaN(scenario.magnitude)) {
+    return res.status(400).json({ error: 'scenario.magnitude must be a number' });
+  }
+  const runId = startRun(scenario, io);
+  res.json({ runId, scenario });
+});
+
+// GET Trace for a Run (replay) — serves from the in-memory store first, falls back to Mongo
+app.get('/api/runs/:id/trace', async (req, res) => {
+  const inMemory = getTrace(req.params.id);
+  if (inMemory.length > 0) {
+    return res.json({ runId: req.params.id, events: inMemory });
+  }
+  if (isMongoConnected) {
+    try {
+      const events = await TraceEvent.find({ runId: req.params.id }).sort({ seq: 1 });
+      return res.json({ runId: req.params.id, events });
+    } catch (err) {
+      console.error('Trace replay fetch error:', err);
+    }
+  }
+  res.json({ runId: req.params.id, events: [] });
 });
 
 // GET Current Response Plan

@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { useCity } from '../context/CityContext';
 import { AI_AGENTS } from '../data/mockData';
 import {
@@ -10,27 +10,123 @@ import {
   BrainCircuit,
   Cpu,
   Play,
-  CheckCircle2,
   GitMerge,
-  Sparkles,
-  Activity
+  Sparkles
 } from 'lucide-react';
 
-export default function AgentCouncil() {
-  const {
-    isAgentReasoning,
-    activeReasoningAgentIndex,
-    runAgentReasoning
-  } = useCity();
+const DOMAIN_AGENT_IDS = ['weather', 'water', 'traffic', 'emergency', 'citizen', 'memory'];
 
-  const iconMap = {
-    CloudRain,
-    Waves,
-    Car,
-    Ambulance,
-    MessageSquare,
-    BrainCircuit,
-    Cpu
+const LEVEL_STYLES = {
+  info: 'text-slate-300',
+  warn: 'text-amber-300',
+  error: 'text-red-400'
+};
+
+const AGENT_COLOR = {
+  ORCHESTRATOR: '#94a3b8',
+  CAUSAL_ENGINE: '#06b6d4',
+  SUPERVISOR: '#ec4899',
+  PLANNER: '#ec4899',
+  CRITIC: '#f59e0b',
+  WEATHER: '#06b6d4',
+  WATER: '#3b82f6',
+  TRAFFIC: '#f59e0b',
+  EMERGENCY: '#ef4444',
+  CITIZEN: '#10b981',
+  MEMORY: '#a855f7'
+};
+
+function formatTime(ts) {
+  try {
+    return new Date(ts).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+  } catch {
+    return '';
+  }
+}
+
+// Renders each event's body lines from its payload. Payload shapes are a
+// contract shared with backend/orchestrator/run.js — kept stable across
+// Phase 2 (stubbed) and Phase 3+ (real agents/planner/critic).
+function eventLines(event) {
+  const p = event.payload || {};
+  switch (event.type) {
+    case 'run_started':
+      return [`scenario: rainfall ${p.scenario?.magnitude ?? '?'}mm/hr, horizon ${p.scenario?.horizonMin ?? '?'}min`];
+    case 'causal_computed':
+      return [`riskIndex=${p.riskIndex?.toFixed?.(1)} · terminals=${p.terminals?.length ?? 0} · firedEdges=${p.firedEdgeCount ?? 0} · pathStrength=${p.pathStrength?.toFixed?.(3)}`];
+    case 'routing_decision':
+      return [p.reason, `invoke [${(p.agents || []).join(', ')}]`].filter(Boolean);
+    case 'agent_started':
+      return ['started'];
+    case 'tool_call':
+      return [`→ ${p.tool}(${p.args ? JSON.stringify(p.args) : ''})`];
+    case 'tool_result':
+      return [`← ${typeof p.result === 'string' ? p.result : JSON.stringify(p.result)}   [${p.durationMs ?? '?'}ms]`];
+    case 'tool_error':
+      return [`✗ ${p.tool} failed: ${p.error}`];
+    case 'agent_finding':
+      return [`"${p.conclusion}"${p.confidence !== undefined ? `   conf ${p.confidence}` : ''}`, ...(p.flags?.length ? [`⚠ flags: ${p.flags.join('; ')}`] : [])];
+    case 'memory_retrieved':
+      return [`${p.hits ?? 0} hit(s) · top similarity ${p.topSimilarity ?? '?'}`];
+    case 'conflict_detected':
+      return [p.detail];
+    case 'conflict_resolved':
+      return [p.resolution];
+    case 'plan_drafted':
+      return [`${p.actionCount ?? '?'} action(s) drafted`];
+    case 'critique':
+      return [p.verdict, ...(p.reasons?.length ? p.reasons : [])].filter(Boolean);
+    case 'revision_started':
+      return [`revision #${p.revisionNumber}`];
+    case 'confidence_computed':
+      return [`confidence=${p.confidence}`];
+    case 'gate_decision':
+      return [`gate=${p.gate}${p.gateReason ? ` — ${p.gateReason}` : ''}`];
+    case 'run_completed':
+      return [`agents invoked: ${(p.agentsInvoked || []).join(', ')} (${p.agentsInvoked?.length ?? 0}/${p.totalAgents ?? 6}) · riskIndex=${p.riskIndex?.toFixed?.(1)} · gate=${p.gate}`];
+    case 'run_aborted':
+      return [`error: ${p.error}`];
+    default:
+      return [JSON.stringify(p)];
+  }
+}
+
+export default function AgentCouncil() {
+  const { agentTrace, activeAgents, currentRun, runStatus, startAgentRun } = useCity();
+  const [rainfall, setRainfall] = useState(118);
+
+  const iconMap = { CloudRain, Waves, Car, Ambulance, MessageSquare, BrainCircuit, Cpu };
+
+  // Per-agent status derived from the live trace, not a timer.
+  const agentStatus = {};
+  for (const id of DOMAIN_AGENT_IDS) agentStatus[id] = 'idle';
+  for (const id of activeAgents) if (agentStatus[id] !== undefined) agentStatus[id] = 'queued';
+  for (const event of agentTrace) {
+    const id = event.agent?.toLowerCase();
+    if (!DOMAIN_AGENT_IDS.includes(id)) continue;
+    if (event.type === 'agent_started') agentStatus[id] = 'active';
+    if (event.type === 'agent_finding') agentStatus[id] = 'done';
+  }
+
+  // Auto-scroll trace panel, pausing when the operator manually scrolls up.
+  const scrollRef = useRef(null);
+  const [autoScroll, setAutoScroll] = useState(true);
+
+  useEffect(() => {
+    if (autoScroll && scrollRef.current) {
+      scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
+    }
+  }, [agentTrace, autoScroll]);
+
+  const handleScroll = () => {
+    const el = scrollRef.current;
+    if (!el) return;
+    const atBottom = el.scrollHeight - el.scrollTop - el.clientHeight < 24;
+    setAutoScroll(atBottom);
+  };
+
+  const runAnalysis = () => {
+    startAgentRun({ seedNode: 'rainfall_intensity', magnitude: rainfall, horizonMin: 180 });
   };
 
   return (
@@ -43,21 +139,36 @@ export default function AgentCouncil() {
           </span>
           <h1 className="text-2xl font-extrabold text-white tracking-tight">AGENT COUNCIL</h1>
           <p className="text-xs text-slate-400 font-mono">
-            Specialized AI agents collaborate in real-time before synthesizing recommendations.
+            Live orchestrator trace — deterministic causal engine plus (from Phase 3 on) real Gemini calls.
           </p>
         </div>
 
-        <button
-          onClick={runAgentReasoning}
-          disabled={isAgentReasoning}
-          className="px-5 py-2.5 rounded-xl bg-gradient-to-r from-purple-600 via-pink-600 to-cyan-600 hover:from-purple-500 hover:to-cyan-500 text-white font-mono text-xs font-bold flex items-center gap-2 shadow-lg shadow-purple-950 cursor-pointer disabled:opacity-50 transition-all border border-purple-400/30"
-        >
-          <Sparkles className="w-4 h-4 text-purple-200 animate-spin" />
-          <span>{isAgentReasoning ? 'REASONING IN PROGRESS...' : 'RUN AGENT ANALYSIS'}</span>
-        </button>
+        <div className="flex items-center gap-3">
+          <label className="flex items-center gap-2 text-xs font-mono text-slate-400">
+            <span>Rainfall</span>
+            <input
+              type="number"
+              min="0"
+              max="200"
+              value={rainfall}
+              onChange={(e) => setRainfall(Number(e.target.value))}
+              className="w-16 px-2 py-1 rounded-lg bg-slate-900 border border-slate-700 text-slate-200"
+            />
+            <span>mm/hr</span>
+          </label>
+
+          <button
+            onClick={runAnalysis}
+            disabled={runStatus === 'running'}
+            className="px-5 py-2.5 rounded-xl bg-gradient-to-r from-purple-600 via-pink-600 to-cyan-600 hover:from-purple-500 hover:to-cyan-500 text-white font-mono text-xs font-bold flex items-center gap-2 shadow-lg shadow-purple-950 cursor-pointer disabled:opacity-50 transition-all border border-purple-400/30"
+          >
+            {runStatus === 'running' ? <Sparkles className="w-4 h-4 text-purple-200 animate-spin" /> : <Play className="w-4 h-4" />}
+            <span>{runStatus === 'running' ? 'RUN IN PROGRESS...' : 'RUN AGENT ANALYSIS'}</span>
+          </button>
+        </div>
       </div>
 
-      {/* WOW MOMENT 2: AGENT COLLABORATION VISUALIZATION DIAGRAM */}
+      {/* Topology — nodes light up as agents actually fire */}
       <div className="glass-panel p-6 rounded-2xl border border-purple-500/30 shadow-2xl relative overflow-hidden">
         <div className="flex items-center justify-between pb-4 border-b border-slate-800">
           <div className="flex items-center gap-2.5">
@@ -67,16 +178,12 @@ export default function AgentCouncil() {
             </h2>
           </div>
 
-          <span className="px-3 py-1 rounded-full bg-purple-950/80 text-purple-300 border border-purple-500/40 text-xs font-mono font-semibold">
-            {isAgentReasoning
-              ? `Agent ${activeReasoningAgentIndex + 1}/7 Analyzing...`
-              : 'Consensus Reached (95%)'}
+          <span className="px-3 py-1 rounded-full bg-slate-900 text-slate-400 border border-slate-700 text-xs font-mono font-semibold">
+            {currentRun?.gate ? `Gate: ${currentRun.gate}` : runStatus === 'running' ? 'Run in progress…' : 'No live run yet'}
           </span>
         </div>
 
-        {/* Circular / Distributed Node Layout */}
         <div className="my-8 py-6 relative flex flex-col items-center justify-center min-h-[320px]">
-          {/* Connecting SVG Lines */}
           <svg className="absolute inset-0 w-full h-full pointer-events-none z-0 opacity-40">
             <line x1="50%" y1="50%" x2="20%" y2="20%" stroke="#06b6d4" strokeWidth="2" strokeDasharray="4" />
             <line x1="50%" y1="50%" x2="50%" y2="15%" stroke="#3b82f6" strokeWidth="2" strokeDasharray="4" />
@@ -86,32 +193,33 @@ export default function AgentCouncil() {
             <line x1="50%" y1="50%" x2="82%" y2="80%" stroke="#a855f7" strokeWidth="2" strokeDasharray="4" />
           </svg>
 
-          {/* Central Planner Agent */}
-          <div className="relative z-10 p-5 rounded-2xl bg-slate-900 border-2 border-pink-500 text-center shadow-2xl shadow-pink-950/50 max-w-xs animate-pulse-subtle">
+          <div className={`relative z-10 p-5 rounded-2xl bg-slate-900 border-2 text-center shadow-2xl max-w-xs ${
+            runStatus === 'running' ? 'border-pink-500 shadow-pink-950/50 animate-pulse-subtle' : 'border-slate-700'
+          }`}>
             <div className="w-12 h-12 mx-auto rounded-xl bg-pink-950 text-pink-400 border border-pink-500/40 flex items-center justify-center mb-2">
               <Cpu className="w-7 h-7" />
             </div>
             <span className="text-xs font-mono font-bold text-pink-300 block">PLANNER AGENT</span>
             <span className="text-[10px] text-slate-400 font-mono block mt-1">
-              {isAgentReasoning ? 'Synthesizing inputs...' : 'Consensus reached (95%)'}
+              {currentRun?.gate ? `Gate: ${currentRun.gate}` : runStatus === 'running' ? 'Synthesizing…' : 'Awaiting live run'}
             </span>
           </div>
 
-          {/* Outer Agents Ring Display */}
           <div className="w-full grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-3 mt-8 relative z-10">
-            {AI_AGENTS.filter(a => a.id !== 'planner').map((ag, i) => {
+            {AI_AGENTS.filter(a => a.id !== 'planner').map((ag) => {
               const Icon = iconMap[ag.avatar] || Cpu;
-              const isActiveReasoning = isAgentReasoning && activeReasoningAgentIndex === i;
-              const isDone = isAgentReasoning ? activeReasoningAgentIndex > i : true;
+              const status = agentStatus[ag.id] || 'idle';
 
               return (
                 <div
                   key={ag.id}
                   className={`p-3 rounded-xl border text-center transition-all ${
-                    isActiveReasoning
+                    status === 'active'
                       ? 'bg-cyan-950 border-cyan-400 shadow-lg shadow-cyan-500/50 scale-105 animate-pulse'
-                      : isDone
+                      : status === 'done'
                       ? 'bg-slate-900/80 border-slate-700 text-slate-200'
+                      : status === 'queued'
+                      ? 'bg-slate-900/50 border-slate-600 text-slate-300'
                       : 'bg-slate-950/60 border-slate-800 text-slate-500'
                   }`}
                 >
@@ -122,9 +230,7 @@ export default function AgentCouncil() {
                     <Icon className="w-4 h-4" />
                   </div>
                   <span className="text-[11px] font-mono font-bold block truncate">{ag.name}</span>
-                  <span className="text-[9px] font-mono block text-slate-400 mt-0.5">
-                    {isActiveReasoning ? 'Reasoning...' : isDone ? 'Completed' : 'Pending'}
-                  </span>
+                  <span className="text-[9px] font-mono block text-slate-400 mt-0.5 capitalize">{status}</span>
                 </div>
               );
             })}
@@ -132,69 +238,49 @@ export default function AgentCouncil() {
         </div>
       </div>
 
-      {/* Grid of 7 Detailed Agent Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {AI_AGENTS.map((agent, index) => {
-          const Icon = iconMap[agent.avatar] || Cpu;
+      {/* Flight-recorder trace */}
+      <div className="glass-panel rounded-2xl border border-slate-800 overflow-hidden">
+        <div className="flex items-center justify-between px-5 py-3 border-b border-slate-800">
+          <h3 className="text-xs font-mono font-bold text-slate-200 uppercase tracking-wider">Orchestrator Trace</h3>
+          <div className="flex items-center gap-3 text-[10px] font-mono text-slate-500">
+            <span>{agentTrace.length} events</span>
+            {!autoScroll && (
+              <button
+                onClick={() => setAutoScroll(true)}
+                className="px-2 py-0.5 rounded bg-cyan-950 text-cyan-300 border border-cyan-500/40 cursor-pointer"
+              >
+                resume auto-scroll
+              </button>
+            )}
+          </div>
+        </div>
 
-          return (
-            <div
-              key={agent.id}
-              className="glass-panel-interactive p-5 rounded-2xl border border-slate-800 space-y-4 flex flex-col justify-between"
-            >
-              <div>
-                <div className="flex items-center justify-between pb-3 border-b border-slate-800">
-                  <div className="flex items-center gap-2.5">
-                    <div
-                      className="p-2.5 rounded-xl border flex items-center justify-center"
-                      style={{ backgroundColor: `${agent.color}20`, color: agent.color, borderColor: `${agent.color}40` }}
-                    >
-                      <Icon className="w-5 h-5" />
-                    </div>
-                    <div>
-                      <h3 className="text-sm font-extrabold text-white">{agent.name}</h3>
-                      <span className="text-[10px] font-mono text-slate-400">{agent.role}</span>
-                    </div>
+        <div
+          ref={scrollRef}
+          onScroll={handleScroll}
+          className="max-h-[420px] overflow-y-auto px-5 py-4 font-mono text-[11.5px] leading-relaxed bg-[#060a12] space-y-3"
+        >
+          {agentTrace.length === 0 ? (
+            <div className="text-slate-600">No run yet. Click RUN AGENT ANALYSIS to start the orchestrator.</div>
+          ) : (
+            agentTrace.map((event) => {
+              const color = AGENT_COLOR[event.agent] || '#94a3b8';
+              const levelClass = LEVEL_STYLES[event.level] || LEVEL_STYLES.info;
+              return (
+                <div key={`${event.runId}-${event.seq}`} className={levelClass}>
+                  <div className="flex items-baseline gap-3">
+                    <span className="text-slate-600">{formatTime(event.ts)}</span>
+                    <span className="font-bold" style={{ color }}>{event.agent}</span>
+                    <span className="text-slate-500 lowercase">{event.type.replace(/_/g, ' ')}</span>
                   </div>
-
-                  <span className="px-2 py-0.5 rounded bg-emerald-950 text-emerald-300 border border-emerald-500/30 text-[10px] font-mono font-bold uppercase">
-                    {agent.status}
-                  </span>
+                  {eventLines(event).map((line, i) => (
+                    <div key={i} className="pl-[88px] text-slate-300">{line}</div>
+                  ))}
                 </div>
-
-                <div className="mt-3 space-y-2 text-xs">
-                  <div>
-                    <span className="text-[10px] font-mono text-slate-500 block uppercase font-bold">CURRENT TASK</span>
-                    <span className="text-slate-300 font-mono">{agent.task}</span>
-                  </div>
-
-                  <div className="p-3 rounded-xl bg-slate-900/80 border border-slate-800/80">
-                    <span className="text-[10px] font-mono text-cyan-400 block uppercase font-bold mb-1">
-                      LAST OBSERVATION
-                    </span>
-                    <p className="text-slate-200 font-mono text-[11px] leading-relaxed">
-                      "{agent.lastObservation}"
-                    </p>
-                  </div>
-                </div>
-              </div>
-
-              {/* Confidence Meter */}
-              <div className="pt-3 border-t border-slate-800/80 space-y-1.5 font-mono text-xs">
-                <div className="flex items-center justify-between text-[11px]">
-                  <span className="text-slate-400">Confidence Score:</span>
-                  <span className="font-bold text-cyan-300">{agent.confidence}%</span>
-                </div>
-                <div className="w-full h-1.5 rounded-full bg-slate-900 overflow-hidden">
-                  <div
-                    className="h-full rounded-full bg-gradient-to-r from-cyan-500 to-purple-500"
-                    style={{ width: `${agent.confidence}%` }}
-                  />
-                </div>
-              </div>
-            </div>
-          );
-        })}
+              );
+            })
+          )}
+        </div>
       </div>
     </div>
   );
