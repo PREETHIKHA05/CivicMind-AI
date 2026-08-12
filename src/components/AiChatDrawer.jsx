@@ -117,7 +117,7 @@ export default function AiChatDrawer() {
 
       {/* Quick Prompts */}
       <div className="px-4 py-2 border-t border-slate-800/60 bg-slate-950/40">
-        <div className="text-[10px] font-mono text-slate-500 mb-1.5 font-bold uppercase tracking-wider">
+        <div className="text-[10px] font-mono text-slate-500 mb-1.5 font-bold tracking-wider">
           Suggested Queries:
         </div>
         <div className="flex flex-wrap gap-1.5">

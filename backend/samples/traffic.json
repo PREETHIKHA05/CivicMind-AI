@@ -1,0 +1,23 @@
+{
+  "agent": "traffic",
+  "conclusion": "Hospital Road is at standstill (avg 4 km/hr). Recommended emergency diversion is via Route R7 (Rajiv Gandhi Salai spur), which currently shows 18 km/hr flow and can absorb the rerouted volume. Signal override on junctions J14 and J17 is ready to activate on command.",
+  "signals": {
+    "hospital_road_speed_km_hr": 4,
+    "hospital_road_congestion_pct": 93,
+    "r7_current_speed_km_hr": 18,
+    "r7_capacity_vehicles_hr": 1800,
+    "r7_current_volume_vehicles_hr": 620,
+    "signal_override_ready": true,
+    "estimated_clearance_min_via_r7": 11
+  },
+  "evidenceIds": [
+    "tool:traffic:loop_detector:J14",
+    "tool:traffic:loop_detector:J17",
+    "tool:traffic:cctv_flow:R7-N"
+  ],
+  "selfConfidence": 0.87,
+  "flags": [
+    "hospital_road_gridlock",
+    "diversion_R7_proposed"
+  ]
+}

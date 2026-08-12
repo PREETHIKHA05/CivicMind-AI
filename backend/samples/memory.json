@@ -1,0 +1,23 @@
+{
+  "agent": "memory",
+  "conclusion": "Historical match found: October 2023 Ward 18 flood event (105 mm/hr, 38-minute duration) shares 91% spatial overlap with current sensor profile. In that event, the R7 outfall failed within 19 minutes of peak inflow, causing surface flooding that closed the R7 on-ramp for 6 hours. Canal North diversion activated at T+24 min reduced sump level by 34% within 15 minutes. STEMI mortality in that event was zero — ambulance rerouted via Canal North bypass in time.",
+  "signals": {
+    "historical_match_similarity_pct": 91,
+    "matched_event_date": "2023-10-18",
+    "matched_rainfall_mm_hr": 105,
+    "matched_r7_failure_min": 19,
+    "canal_north_effect_pct_reduction": 34,
+    "canal_north_activation_lag_min": 15,
+    "historical_stemi_outcome": "survived_via_canal_north_bypass"
+  },
+  "evidenceIds": [
+    "tool:memory:vector_search:ward18-flood-2023-10-18",
+    "tool:memory:incident_archive:INC-2023-1018-W18"
+  ],
+  "selfConfidence": 0.88,
+  "flags": [
+    "r7_historical_failure_pattern",
+    "canal_north_proven_effective",
+    "stemi_outcome_precedent_available"
+  ]
+}

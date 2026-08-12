@@ -18,6 +18,7 @@ import { TraceEvent } from './models/TraceEvent.js';
 import { loadLocalDB, saveLocalDB } from './storage.js';
 import { propagateRisk, loadGraph } from './causal/engine.js';
 import { startRun, getTrace, setTracePersistHook, setPlanReadyHook } from './orchestrator/run.js';
+import { callGemini, MODELS } from './llm/gemini.js';
 
 dotenv.config();
 
@@ -668,7 +669,73 @@ app.post('/api/plan/broadcast-message', async (req, res) => {
   res.json(payload);
 });
 
+// POST Synthesise Cascading Risks from Agent Findings — calls Gemini, returns exactly three risks.
+// This is the only new endpoint added for the Agent Council page rework.
+app.post('/api/planner/synthesise', async (req, res) => {
+  const { findings } = req.body;
+
+  if (!Array.isArray(findings) || findings.length < 2) {
+    return res.status(400).json({ error: 'findings must be an array of at least two agent objects.' });
+  }
+
+  const FINDINGS_JSON = JSON.stringify(findings, null, 2);
+
+  const prompt = `You are the Planner Agent in a multi-agent urban risk system for Chennai.
+Department agents have each reported independently. Identify the three most
+serious CASCADING risks — risks emerging from interaction between
+departments, not ones any single agent could see alone.
+
+Rules:
+- Every risk must cite at least two different agents.
+- Only use numbers present in the findings. Never estimate.
+- If two findings conflict, say so explicitly.
+- Order by severity, most severe first.
+
+Findings: ${FINDINGS_JSON}
+
+Return JSON only, no markdown fences:
+{ "risks": [ { "title": "", "severity": "CRITICAL|HIGH|MEDIUM",
+  "cascade": "2-3 sentences", "contributingAgents": [],
+  "evidenceIds": [], "affectedDepartments": [],
+  "estimatedOnsetMinutes": 0, "confidence": 0.0,
+  "recommendedAction": "" } ] }`;
+
+  try {
+    const llmResult = await callGemini(prompt, null, {
+      model: MODELS.STRONG,
+      maxRetries: 2,
+      fallback: null
+    });
+
+    if (llmResult.fallback) {
+      return res.status(502).json({
+        error: `LLM unavailable: ${llmResult.fallbackReason}. Cannot synthesise without real Gemini output.`
+      });
+    }
+
+    const raw = llmResult.data;
+
+    // Accept { risks: [...] } or a bare array
+    let risks = Array.isArray(raw) ? raw : raw?.risks;
+
+    if (!Array.isArray(risks)) {
+      return res.status(502).json({
+        error: 'Gemini returned an unexpected shape — expected { risks: [...] }. Raw: ' + JSON.stringify(raw).slice(0, 300)
+      });
+    }
+
+    // Trim to exactly 3
+    risks = risks.slice(0, 3);
+
+    return res.json({ risks });
+  } catch (err) {
+    console.error('[/api/planner/synthesise] Unexpected error:', err);
+    return res.status(500).json({ error: err.message || 'Internal server error during synthesis.' });
+  }
+});
+
 // Start Server
+
 server.listen(PORT, '0.0.0.0', () => {
   console.log(`🚀 CivicMind Backend running on http://0.0.0.0:${PORT}`);
   console.log(`📡 Real-time Socket.io WebSockets enabled for Hackathon multi-laptop workflow!`);

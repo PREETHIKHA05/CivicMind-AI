@@ -1,0 +1,23 @@
+{
+  "agent": "emergency",
+  "conclusion": "Unit 108-B4 is carrying a STEMI patient and has been stationary for 9 minutes, 740 m from the Ward 18 ER entrance. Current ETA is 31 minutes via Hospital Road — this exceeds the 90-minute STEMI intervention window by a critical margin if the patient's symptom onset was as reported. Two additional units are queued behind the same bottleneck.",
+  "signals": {
+    "unit_b4_distance_to_er_m": 740,
+    "unit_b4_stationary_min": 9,
+    "hospital_road_eta_min": 31,
+    "stemi_window_remaining_min": 14,
+    "units_blocked_at_bottleneck": 3,
+    "er_bed_availability": 4,
+    "er_trauma_team_status": "on_standby"
+  },
+  "evidenceIds": [
+    "tool:emergency:avl_unit_b4:001",
+    "tool:emergency:dispatch_log:108-2026-0812-0047"
+  ],
+  "selfConfidence": 0.97,
+  "flags": [
+    "critical_cardiac_in_transit",
+    "stemi_window_breach_imminent",
+    "multiple_units_blocked"
+  ]
+}
