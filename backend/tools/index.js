@@ -140,6 +140,9 @@ export function simulateDiversion(fromRoute, toRoute, scenario = {}) {
     return envelope({ dept: 'traffic', name, ok: false, data: null, notes: 'Forced failure: routing simulator unavailable.', forced: true });
   }
   const statusRes = getRouteStatus([fromRoute, toRoute], scenario);
+  if (!statusRes.ok) {
+    return envelope({ dept: 'traffic', name, ok: false, data: null, notes: 'Underlying getRouteStatus() call failed — cannot compute a diversion cost.' });
+  }
   const [from, to] = statusRes.data.routes;
   const transitCostMin = Math.max(1, Math.round((to.saturationPct - from.saturationPct) / 10));
   return envelope({

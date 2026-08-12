@@ -1,0 +1,17 @@
+{
+  "name": "Extreme Pump Failure",
+  "description": "150mm/hr with pumps fully failed (maintenance deficit) and a broad telemetry blackout (4 tools forced offline, plausible under the worst conditions) — evidence coverage and agent agreement collapse, critic cannot reach APPROVE within the revision cap, escalates to human.",
+  "scenario": {
+    "seedNode": "rainfall_intensity",
+    "magnitude": 150,
+    "horizonMin": 180,
+    "extraSeeds": [{ "nodeId": "pump_maintenance_deficit", "magnitude": 90 }],
+    "forceFailTools": ["drain_capacity", "route_status", "hospital_access", "ambulance_fleet"]
+  },
+  "expected": {
+    "gate": "ESCALATE",
+    "conflictExpected": true,
+    "minAgentsInvoked": 5,
+    "maxAgentsInvoked": 6
+  }
+}

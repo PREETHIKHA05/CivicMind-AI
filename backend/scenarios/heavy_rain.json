@@ -1,0 +1,17 @@
+{
+  "name": "Heavy Rain",
+  "description": "118mm/hr with one mobile pump degraded (mild maintenance deficit) — full cascade reaches hospital access, Traffic/Water route conflict fires, human approval required.",
+  "scenario": {
+    "seedNode": "rainfall_intensity",
+    "magnitude": 118,
+    "horizonMin": 180,
+    "extraSeeds": [{ "nodeId": "pump_maintenance_deficit", "magnitude": 45 }],
+    "forceFailTools": []
+  },
+  "expected": {
+    "gate": "HUMAN_APPROVAL",
+    "conflictExpected": true,
+    "minAgentsInvoked": 5,
+    "maxAgentsInvoked": 6
+  }
+}

@@ -15,6 +15,7 @@ import {
 } from 'lucide-react';
 
 const DOMAIN_AGENT_IDS = ['weather', 'water', 'traffic', 'emergency', 'citizen', 'memory'];
+const INJECTABLE_TOOLS = ['drain_capacity', 'route_status', 'hospital_access', 'ambulance_fleet'];
 
 const LEVEL_STYLES = {
   info: 'text-slate-300',
@@ -92,8 +93,14 @@ function eventLines(event) {
 }
 
 export default function AgentCouncil() {
-  const { agentTrace, activeAgents, currentRun, runStatus, startAgentRun } = useCity();
+  const { agentTrace, activeAgents, currentRun, runStatus, startAgentRun, loadTraceReplay } = useCity();
   const [rainfall, setRainfall] = useState(118);
+  const [failTools, setFailTools] = useState([]);
+  const [replayRunId, setReplayRunId] = useState('');
+
+  const toggleFailTool = (tool) => {
+    setFailTools((prev) => (prev.includes(tool) ? prev.filter((t) => t !== tool) : [...prev, tool]));
+  };
 
   const iconMap = { CloudRain, Waves, Car, Ambulance, MessageSquare, BrainCircuit, Cpu };
 
@@ -126,7 +133,11 @@ export default function AgentCouncil() {
   };
 
   const runAnalysis = () => {
-    startAgentRun({ seedNode: 'rainfall_intensity', magnitude: rainfall, horizonMin: 180 });
+    startAgentRun({ seedNode: 'rainfall_intensity', magnitude: rainfall, horizonMin: 180, forceFailTools: failTools });
+  };
+
+  const runReplay = () => {
+    if (replayRunId.trim()) loadTraceReplay(replayRunId.trim());
   };
 
   return (
@@ -164,6 +175,48 @@ export default function AgentCouncil() {
           >
             {runStatus === 'running' ? <Sparkles className="w-4 h-4 text-purple-200 animate-spin" /> : <Play className="w-4 h-4" />}
             <span>{runStatus === 'running' ? 'RUN IN PROGRESS...' : 'RUN AGENT ANALYSIS'}</span>
+          </button>
+        </div>
+      </div>
+
+      {/* Demo hardening controls: failure injection + trace replay */}
+      <div className="flex flex-col sm:flex-row sm:items-center gap-4 text-xs font-mono">
+        <div className="flex items-center gap-2 flex-wrap">
+          <span className="text-slate-500 uppercase tracking-wider">Inject tool failures:</span>
+          {INJECTABLE_TOOLS.map((tool) => (
+            <label
+              key={tool}
+              className={`px-2 py-1 rounded-lg border cursor-pointer select-none ${
+                failTools.includes(tool)
+                  ? 'bg-red-950 text-red-300 border-red-500/50'
+                  : 'bg-slate-900 text-slate-400 border-slate-700'
+              }`}
+            >
+              <input
+                type="checkbox"
+                checked={failTools.includes(tool)}
+                onChange={() => toggleFailTool(tool)}
+                className="hidden"
+              />
+              {tool}
+            </label>
+          ))}
+        </div>
+
+        <div className="flex items-center gap-2 sm:ml-auto">
+          <span className="text-slate-500 uppercase tracking-wider">Replay run:</span>
+          <input
+            type="text"
+            value={replayRunId}
+            onChange={(e) => setReplayRunId(e.target.value)}
+            placeholder="run-1786..."
+            className="w-36 px-2 py-1 rounded-lg bg-slate-900 border border-slate-700 text-slate-200"
+          />
+          <button
+            onClick={runReplay}
+            className="px-3 py-1 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700 cursor-pointer"
+          >
+            LOAD
           </button>
         </div>
       </div>

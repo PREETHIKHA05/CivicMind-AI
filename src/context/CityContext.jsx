@@ -103,6 +103,24 @@ export function CityProvider({ children }) {
     });
   };
 
+  // Trace replay — loads a previously completed run's stored events without starting a new run.
+  const loadTraceReplay = (runId) => {
+    fetch(`${backendUrl}/api/runs/${runId}/trace`)
+      .then((res) => res.json())
+      .then((data) => {
+        if (!data.events || data.events.length === 0) {
+          addToast('warning', 'No Trace Found', `No stored events for run ${runId}.`);
+          return;
+        }
+        setAgentTrace(data.events);
+        setActiveAgents([]);
+        setCurrentRun({ runId });
+        setRunStatus('completed');
+        addToast('info', 'Trace Replay Loaded', `Replaying ${data.events.length} events from ${runId}.`);
+      })
+      .catch(() => addToast('warning', 'Replay Failed', 'Could not fetch that trace from the backend.'));
+  };
+
   // ---------------- WebSocket Real-Time Listener ----------------
   useEffect(() => {
     let socket;
@@ -516,6 +534,7 @@ export function CityProvider({ children }) {
         currentRun,
         runStatus,
         startAgentRun,
+        loadTraceReplay,
         planRunId,
         planConfidenceBreakdown,
         planGate,

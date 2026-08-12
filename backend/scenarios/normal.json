@@ -1,0 +1,17 @@
+{
+  "name": "Normal",
+  "description": "Rainfall within normal drainage design capacity — short causal chain, no terminal reached, low-stakes reversible response.",
+  "scenario": {
+    "seedNode": "rainfall_intensity",
+    "magnitude": 60,
+    "horizonMin": 180,
+    "extraSeeds": [],
+    "forceFailTools": []
+  },
+  "expected": {
+    "gate": "AUTO_EXECUTE",
+    "conflictExpected": false,
+    "minAgentsInvoked": 3,
+    "maxAgentsInvoked": 5
+  }
+}
