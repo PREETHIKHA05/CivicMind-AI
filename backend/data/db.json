@@ -25,6 +25,7 @@
         "reason": "Current rainfall inflow of 118 mm/hr far exceeds 45 mm/hr capacity, leading to an overflow ETA of 1 minute.",
         "confidence": "95%",
         "expectedImpact": "Mitigate immediate overflow severity and reduce flood accumulation across critical road nodes.",
+        "workOrderStatus": "Pending Dispatch",
         "evidenceIds": [
           "tool:water:drain_capacity:002",
           "tool:water:overflow_eta:003",
@@ -46,6 +47,7 @@
         "reason": "Route R7 faces flood saturation risks; route R9 currently operates at 70% saturation with 16 km/h speed.",
         "confidence": "90%",
         "expectedImpact": "Keep emergency corridors open while maintaining traffic flow around inundated segments.",
+        "workOrderStatus": "Pending Dispatch",
         "evidenceIds": [
           "tool:traffic:route_status:004",
           "tool:traffic:simulate_diversion:006"
@@ -66,6 +68,7 @@
         "reason": "Currently 7 out of 12 baseline ambulance units are delayed by an average of 57 minutes, while KMC Trauma suffers 56% access loss and 34% ER capacity strain.",
         "confidence": "88%",
         "expectedImpact": "Bypass flooded sections to re-establish emergency patient transfer to KMC Trauma.",
+        "workOrderStatus": "Pending Dispatch",
         "evidenceIds": [
           "tool:emergency:ambulance_fleet:007",
           "tool:health:hospital_access:008",
@@ -87,6 +90,7 @@
         "reason": "Report volume activation is elevated at 71 and panic index activation is at 56 amidst 118 mm/hr rainfall and 708 mm projected 6-hour accumulation.",
         "confidence": "85%",
         "expectedImpact": "Inform citizens, prevent uncoordinated travel onto inundated routes, and reduce panic.",
+        "workOrderStatus": "Pending Dispatch",
         "evidenceIds": [
           "tool:citizen:causal_snapshot:001",
           "tool:weather:rainfall_nowcast:001"
@@ -234,9 +238,9 @@
       }
     ],
     "createdAt": "2026-08-12T05:51:03.192Z",
-    "updatedAt": "2026-08-12T05:51:03.192Z",
+    "updatedAt": "2026-08-12T09:13:17.615Z",
     "__v": 0
   },
   "workOrders": [],
-  "lastSavedAt": "2026-08-12T09:13:17.608Z"
+  "lastSavedAt": "2026-08-12T09:53:40.870Z"
 }

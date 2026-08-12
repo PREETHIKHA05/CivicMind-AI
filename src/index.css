@@ -1,15 +1,11 @@
 @import "tailwindcss";
 
 @layer base {
-  body {
-    font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+  body, code, kbd, samp, pre, .font-mono {
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif !important;
     background-color: #f6f5f9;
     color: #1e1b4b;
     overflow-x: hidden;
-  }
-
-  code, kbd, samp, pre {
-    font-family: 'JetBrains Mono', monospace;
   }
 }
 
@@ -107,5 +103,38 @@
 
 .animate-scanline {
   animation: scanline 8s linear infinite;
+}
+
+/* Ambient background animations */
+@keyframes ambient-glow {
+  0%, 100% {
+    transform: translate(0px, 0px) scale(1);
+  }
+  33% {
+    transform: translate(30px, -50px) scale(1.1);
+  }
+  66% {
+    transform: translate(-20px, 20px) scale(0.95);
+  }
+}
+
+.animate-ambient-glow {
+  animation: ambient-glow 15s infinite ease-in-out;
+}
+
+@keyframes ambient-glow-delayed {
+  0%, 100% {
+    transform: translate(0px, 0px) scale(0.95);
+  }
+  33% {
+    transform: translate(-40px, 30px) scale(1.05);
+  }
+  66% {
+    transform: translate(30px, -20px) scale(1.1);
+  }
+}
+
+.animate-ambient-glow-delayed {
+  animation: ambient-glow-delayed 18s infinite ease-in-out;
 }
 

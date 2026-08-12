@@ -18,7 +18,7 @@ import {
 } from 'lucide-react';
 
 export default function Sidebar() {
-  const { activePage, setActivePage, currentUser, departmentTasks } = useCity();
+  const { activePage, setActivePage, currentUser, departmentTasks, setIsAiDrawerOpen } = useCity();
   const [isCollapsed, setIsCollapsed] = useState(false);
 
   const isDeptRole = currentUser && currentUser.role === 'department';
@@ -30,23 +30,23 @@ export default function Sidebar() {
 
   // Counselors see all 9 pages. Department Officials see department-tailored pages.
   const counselorNavItems = [
-    { id: 'command-center', label: '1. Command Center', shortLabel: 'Command', icon: LayoutDashboard },
-    { id: 'city-intelligence', label: '2. City Intelligence', shortLabel: 'City Data', icon: Building2 },
-    { id: 'incident-intelligence', label: '3. Incident Intelligence', shortLabel: 'Incidents', icon: AlertTriangle, badge: '7 Active' },
-    { id: 'agent-council', label: '4. Agent Council', shortLabel: 'Agents', icon: GitMerge, badge: '7 Online' },
-    { id: 'causal-intelligence', label: '5. Causal Intelligence', shortLabel: 'Causal Graph', icon: BrainCircuit },
-    { id: 'response-plans', label: '6. Response Plans', shortLabel: 'Plans', icon: FileCheck2, badge: 'Editable' },
-    { id: 'department-dashboard', label: '7. Dept Dashboards', shortLabel: 'Work Orders', icon: Layers, badge: `${myDeptTasks.length} Tasks` },
-    { id: 'city-memory', label: '8. City Memory', shortLabel: 'Memory', icon: History }
+    { id: 'command-center', label: 'Command Center', shortLabel: 'Command', icon: LayoutDashboard },
+    { id: 'city-intelligence', label: 'City Intelligence', shortLabel: 'City Data', icon: Building2 },
+    { id: 'incident-intelligence', label: 'Incident Intelligence', shortLabel: 'Incidents', icon: AlertTriangle },
+    { id: 'agent-council', label: 'Agent Council', shortLabel: 'Agents', icon: GitMerge },
+    { id: 'causal-intelligence', label: 'Causal Intelligence', shortLabel: 'Causal Graph', icon: BrainCircuit },
+    { id: 'response-plans', label: 'Response Plans', shortLabel: 'Plans', icon: FileCheck2 },
+    { id: 'department-dashboard', label: 'Dept Dashboards', shortLabel: 'Work Orders', icon: Layers, badge: myDeptTasks.length > 0 ? `${myDeptTasks.length} Tasks` : undefined },
+    { id: 'city-memory', label: 'City Memory', shortLabel: 'Memory', icon: History }
   ];
 
   const departmentNavItems = [
-    { id: 'department-dashboard', label: '1. Dept Command Overview', shortLabel: 'Overview', icon: LayoutDashboard },
-    { id: 'department-dashboard-tasks', label: '2. Assigned Work Orders', shortLabel: 'Work Orders', icon: FileText, badge: `${myDeptTasks.length} Active` },
-    { id: 'department-dashboard-telemetry', label: '3. Sensors & Telemetry', shortLabel: 'Telemetry', icon: Activity },
-    { id: 'causal-intelligence', label: '4. City Causal Impact', shortLabel: 'Causal Graph', icon: BrainCircuit },
-    { id: 'department-dashboard-protocols', label: '5. Emergency Protocols', shortLabel: 'Protocols', icon: Sparkles },
-    { id: 'city-intelligence', label: '6. City-Wide Feed', shortLabel: 'City Feed', icon: Building2 }
+    { id: 'department-dashboard', label: 'Dept Command Overview', shortLabel: 'Overview', icon: LayoutDashboard },
+    { id: 'department-dashboard-tasks', label: 'Assigned Work Orders', shortLabel: 'Work Orders', icon: FileText, badge: myDeptTasks.length > 0 ? `${myDeptTasks.length} Tasks` : undefined },
+    { id: 'department-dashboard-telemetry', label: 'Sensors & Telemetry', shortLabel: 'Telemetry', icon: Activity },
+    { id: 'causal-intelligence', label: 'City Causal Impact', shortLabel: 'Causal Graph', icon: BrainCircuit },
+    { id: 'department-dashboard-protocols', label: 'Emergency Protocols', shortLabel: 'Protocols', icon: Sparkles },
+    { id: 'city-intelligence', label: 'City-Wide Feed', shortLabel: 'City Feed', icon: Building2 }
   ];
 
   const navItems = isDeptRole ? departmentNavItems : counselorNavItems;
@@ -67,10 +67,10 @@ export default function Sidebar() {
 
             {!isCollapsed && (
               <div className="flex flex-col">
-                <span className="font-extrabold tracking-tight text-slate-800 text-base leading-tight">
+                <span className="font-bold tracking-tight text-black text-2xl leading-none">
                   CIVICMIND <span className="text-purple-600">AI</span>
                 </span>
-                <span className="text-[10px] font-mono font-medium text-slate-500 tracking-wider uppercase truncate max-w-[130px]" title={isDeptRole ? deptName : "Zone Counselor Console"}>
+                <span className="text-sm font-semibold text-purple-700 tracking-wider uppercase truncate mt-1" title={isDeptRole ? deptName : "Zone Counselor Console"}>
                   {isDeptRole ? deptName.split(' ')[0] + ' Terminal' : 'Zone Counselor'}
                 </span>
               </div>
@@ -86,16 +86,7 @@ export default function Sidebar() {
           </button>
         </div>
 
-        {/* Role Mode Indicator Strip */}
-        {!isCollapsed && (
-          <div className="px-4 py-2 bg-purple-50/30 border-b border-purple-100/50 flex items-center justify-between text-xs font-mono text-purple-700">
-            <span className="flex items-center gap-2">
-              <span className="w-2 h-2 rounded-full bg-purple-500"></span>
-              <span>{isDeptRole ? `${currentUser.deptName.split(' ')[0]} Official` : 'ZONE COUNSELOR'}</span>
-            </span>
-            <span className="text-slate-400 font-bold">v2.4</span>
-          </div>
-        )}
+
 
         {/* Navigation Item List */}
         <nav className="p-2 space-y-1 mt-2">
@@ -115,7 +106,7 @@ export default function Sidebar() {
                     setActivePage(item.id);
                   }
                 }}
-                className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-xl font-semibold text-sm transition-all cursor-pointer group relative ${
+                className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-xl font-medium text-base transition-all cursor-pointer group relative ${
                   isActive
                     ? 'bg-purple-50 text-purple-700 border border-purple-200/60 shadow-sm'
                     : 'text-slate-600 hover:text-purple-700 hover:bg-purple-50/30 border border-transparent'
@@ -155,7 +146,25 @@ export default function Sidebar() {
       </div>
 
       {/* Bottom Status Panel */}
-      <div className="p-3 border-t border-purple-100 bg-purple-50/10"></div>
+      <div className="p-3 border-t border-purple-100 bg-purple-50/10 flex flex-col gap-2">
+        {!isCollapsed ? (
+          <button
+            onClick={() => setIsAiDrawerOpen(true)}
+            className="w-full flex items-center justify-center gap-2 px-3 py-2.5 rounded-xl font-medium text-sm bg-purple-600 hover:bg-purple-700 text-white transition-all cursor-pointer shadow-md shadow-purple-600/10 group"
+          >
+            <Sparkles className="w-4 h-4 text-white group-hover:scale-110 transition-transform" />
+            <span>Ask AI Agent (Chat Bot)</span>
+          </button>
+        ) : (
+          <button
+            onClick={() => setIsAiDrawerOpen(true)}
+            className="w-full flex items-center justify-center p-2 rounded-xl bg-purple-600 hover:bg-purple-700 text-white transition-all cursor-pointer group"
+            title="Ask AI Agent (Chat Bot)"
+          >
+            <Sparkles className="w-5 h-5 text-white group-hover:scale-110 transition-transform" />
+          </button>
+        )}
+      </div>
     </aside>
   );
 }
