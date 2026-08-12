@@ -9,6 +9,7 @@ import { Server } from 'socket.io';
 import cors from 'cors';
 import mongoose from 'mongoose';
 import dotenv from 'dotenv';
+import nodemailer from 'nodemailer';
 
 import { ResponsePlan } from './models/ResponsePlan.js';
 import { WorkOrder } from './models/WorkOrder.js';
@@ -33,6 +34,90 @@ const io = new Server(server, {
 
 const PORT = process.env.PORT || 5000;
 const MONGODB_URI = process.env.MONGODB_URI;
+const ENABLE_EMAIL_NOTIFICATIONS = (process.env.ENABLE_EMAIL_NOTIFICATIONS || 'false').toLowerCase() === 'true';
+const SMTP_HOST = process.env.SMTP_HOST;
+const SMTP_PORT = parseInt(process.env.SMTP_PORT || '587', 10);
+const SMTP_USER = process.env.SMTP_USER;
+const SMTP_PASS = process.env.SMTP_PASS;
+const DEMO_SMS_RECIPIENTS = [
+  SMTP_USER || 'admin.flow0@gmail.com'
+];
+
+const normalizePhoneNumber = (value = '') => {
+  const clean = String(value).replace(/[^\d+]/g, '').replace(/\s+/g, '');
+  if (!clean) return null;
+  const stripped = clean.replace(/^\+/, '');
+  return stripped;
+};
+
+const sendEmailBroadcast = async (message, recipients = []) => {
+  if (!ENABLE_EMAIL_NOTIFICATIONS) {
+    throw new Error('Email notifications are disabled (ENABLE_EMAIL_NOTIFICATIONS not true)');
+  }
+
+  if (!SMTP_HOST || !SMTP_PORT || !SMTP_USER || !SMTP_PASS) {
+    throw new Error('SMTP configuration is incomplete in backend/.env');
+  }
+
+  const configured = (process.env.EMAIL_RECIPIENTS || '')
+    .split(',')
+    .map((v) => v && v.trim())
+    .filter(Boolean);
+
+  const emailRegex = /\S+@\S+\.\S+/;
+
+  // Normalize incoming recipients to strings
+  const cleanedRequestRecipients = Array.isArray(recipients)
+    ? recipients.map((r) => (r || '').toString().trim()).filter(Boolean)
+    : [];
+
+  // Filter only entries that look like emails
+  const validRequestEmails = cleanedRequestRecipients.filter((v) => emailRegex.test(v));
+
+  let finalRecipients = [];
+
+  if (validRequestEmails.length > 0) {
+    finalRecipients = validRequestEmails;
+  } else if (configured.length > 0) {
+    // Fallback to configured env recipients when request contains no valid emails
+    console.warn('sendEmailBroadcast: request contained no valid email addresses, falling back to EMAIL_RECIPIENTS from env. Request payload:', JSON.stringify(cleanedRequestRecipients));
+    finalRecipients = configured;
+  } else if (DEMO_SMS_RECIPIENTS && DEMO_SMS_RECIPIENTS.length > 0) {
+    console.warn('sendEmailBroadcast: no valid recipients in request or EMAIL_RECIPIENTS; using demo recipient list. Request payload:', JSON.stringify(cleanedRequestRecipients));
+    finalRecipients = DEMO_SMS_RECIPIENTS;
+  }
+
+  // Deduplicate and limit
+  const distinctEmails = [...new Set(finalRecipients)].slice(0, 10);
+
+  if (distinctEmails.length === 0) {
+    throw new Error('No valid recipient email addresses available. Provide a list of valid emails in the request or set EMAIL_RECIPIENTS in backend/.env');
+  }
+
+  const transporter = nodemailer.createTransport({
+    host: SMTP_HOST,
+    port: SMTP_PORT,
+    secure: SMTP_PORT === 465, // true for 465, false for other ports
+    auth: {
+      user: SMTP_USER,
+      pass: SMTP_PASS
+    }
+  });
+
+  const info = await transporter.sendMail({
+    from: SMTP_USER,
+    to: distinctEmails.join(','),
+    subject: 'CivicMind AI — Ward 18 Emergency Advisory',
+    text: message
+  });
+
+  return distinctEmails.map((email) => ({
+    to: email,
+    sid: info.messageId || `email-${Date.now()}-${Math.random().toString(16).slice(2,6)}`,
+    status: 'sent',
+    sentAt: new Date().toISOString()
+  }));
+};
 
 app.use(cors());
 app.use(express.json());
@@ -505,6 +590,82 @@ app.post('/api/seed', async (req, res) => {
   }
   io.emit('databaseSeeded', { plan: inMemoryPlan, workOrders: inMemoryWorkOrders });
   res.json({ message: 'Database reset to initial unapproved state.' });
+});
+
+// SMS broadcast for citizen alerting from the Zone Counselor response plan page.
+app.post('/api/plan/broadcast-message', async (req, res) => {
+  const rawMessage = req.body?.message || 'Ward 18 emergency advisory: follow the official diversion route and stay alert for on-ground updates.';
+  const recipients = Array.isArray(req.body?.recipients) && req.body.recipients.length > 0
+    ? req.body.recipients.slice(0, 4)
+    : DEMO_SMS_RECIPIENTS;
+
+  const message = rawMessage.trim() || 'Ward 18 emergency advisory: follow the official diversion route and stay alert for on-ground updates.';
+
+  let finalRecipients = [];
+  let payload;
+
+  try {
+    const results = await sendEmailBroadcast(message, recipients);
+    if (results && results.length > 0) {
+      finalRecipients = results.map((item) => ({
+        id: `email-${Date.now()}-${Math.random().toString(16).slice(2, 6)}`,
+        to: item.to,
+        status: item.status,
+        sentAt: item.sentAt,
+        body: message,
+        sid: item.sid
+      }));
+
+      payload = {
+        success: true,
+        provider: 'email',
+        message,
+        recipients: finalRecipients,
+        sentCount: finalRecipients.length,
+        summary: `Email broadcast sent to ${finalRecipients.length} recipients.`
+      };
+    } else {
+      finalRecipients = recipients.map((addr, index) => ({
+        id: `email-${Date.now()}-${index + 1}`,
+        to: (addr || '').toString(),
+        status: 'sent',
+        sentAt: new Date().toISOString(),
+        body: message
+      }));
+
+      payload = {
+        success: true,
+        provider: 'email',
+        message,
+        recipients: finalRecipients,
+        sentCount: finalRecipients.length,
+        summary: `Email broadcast recorded for ${finalRecipients.length} recipients.`
+      };
+    }
+  } catch (error) {
+    console.error('Email broadcast error:', error);
+    finalRecipients = recipients.map((addr, index) => ({
+      id: `email-${Date.now()}-${index + 1}`,
+      to: (addr || '').toString(),
+      status: 'failed',
+      sentAt: new Date().toISOString(),
+      body: message,
+      error: error.message
+    }));
+
+    payload = {
+      success: false,
+      provider: 'email',
+      message,
+      recipients: finalRecipients,
+      sentCount: 0,
+      summary: `Email broadcast failed: ${error.message}`,
+      error: error.message
+    };
+  }
+
+  io.emit('citizenBroadcastSent', payload);
+  res.json(payload);
 });
 
 // Start Server

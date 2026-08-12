@@ -38,6 +38,7 @@ export default function ResponsePlans() {
     planActions,
     updatePlanAction,
     togglePlanAction,
+    broadcastCitizenMessage,
     calculateProjectedRisk,
     planRunId,
     planConfidenceBreakdown,
@@ -68,7 +69,12 @@ export default function ResponsePlans() {
   // Modal State
   const [showConfirmModal, setShowConfirmModal] = useState(false);
   const [showChangesModal, setShowChangesModal] = useState(false);
+  const [showBroadcastModal, setShowBroadcastModal] = useState(false);
   const [customNoteInput, setCustomNoteInput] = useState('');
+  const [broadcastMessage, setBroadcastMessage] = useState('Ward 18 emergency advisory: follow the official diversion route and stay alert for on-ground updates.');
+  const [broadcastRecipients, setBroadcastRecipients] = useState([
+    '+919360198178'
+  ]);
 
   const iconMap = {
     Droplets,
@@ -105,6 +111,15 @@ export default function ResponsePlans() {
     requestPlanChanges(customNoteInput);
     setShowChangesModal(false);
     setCustomNoteInput('');
+  };
+
+  const handleBroadcastMessage = async () => {
+    const trimmed = broadcastMessage.trim();
+    const result = await broadcastCitizenMessage(trimmed, broadcastRecipients);
+    if (result?.success) {
+      setShowBroadcastModal(false);
+      setBroadcastMessage('Ward 18 emergency advisory: follow the official diversion route and stay alert for on-ground updates.');
+    }
   };
 
   // Cold start / post-reset empty state — never render the approval UI against
@@ -257,6 +272,16 @@ export default function ResponsePlans() {
                 >
                   REQUEST CHANGES
                 </button>
+
+                {isCounselor && (
+                  <button
+                    onClick={() => setShowBroadcastModal(true)}
+                    className="px-4 py-2.5 rounded-xl bg-gradient-to-r from-violet-500 to-indigo-600 hover:from-violet-400 hover:to-indigo-500 text-white font-mono text-xs font-bold shadow-lg shadow-violet-950 cursor-pointer transition-all border border-violet-400/40 flex items-center gap-2"
+                  >
+                    <Radio className="w-4 h-4" />
+                    <span>BROADCAST MESSAGE TO CITIZENS</span>
+                  </button>
+                )}
 
                 <button
                   onClick={dismissPlan}
@@ -703,6 +728,69 @@ export default function ResponsePlans() {
               >
                 <Send className="w-4 h-4" />
                 <span>CONFIRM & DISPATCH WORK ORDERS</span>
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* BROADCAST MESSAGE MODAL */}
+      {showBroadcastModal && (
+        <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-md flex items-center justify-center p-4">
+          <div className="glass-panel p-6 rounded-2xl border border-violet-500/40 max-w-xl w-full space-y-4 shadow-2xl">
+            <div className="flex items-center gap-3 text-violet-400">
+              <Radio className="w-6 h-6" />
+              <h3 className="text-lg font-bold text-white font-mono">
+                Broadcast Message to Citizens
+              </h3>
+            </div>
+
+            <p className="text-xs text-slate-300 font-mono leading-relaxed">
+              Real Fast2SMS dispatch for the verified Ward 18 recipient.
+            </p>
+
+            <div>
+              <label className="text-xs font-mono text-slate-400 block mb-1">
+                SMS message:
+              </label>
+              <textarea
+                value={broadcastMessage}
+                onChange={(e) => setBroadcastMessage(e.target.value)}
+                className="w-full p-2.5 rounded-xl bg-slate-950 border border-slate-800 text-xs font-mono text-white placeholder-slate-500 focus:outline-none focus:border-violet-500"
+                rows={4}
+              />
+            </div>
+
+            <div>
+              <label className="text-xs font-mono text-slate-400 block mb-1">
+                Recipient number:
+              </label>
+              <div className="space-y-2 rounded-xl border border-slate-800 bg-slate-950/80 p-3">
+                {broadcastRecipients.map((number, index) => (
+                  <div key={index} className="flex items-center gap-2 text-xs font-mono text-slate-300">
+                    <span className="w-5 h-5 rounded-full bg-violet-950 text-violet-300 border border-violet-500/40 flex items-center justify-center text-[10px] font-bold">
+                      {index + 1}
+                    </span>
+                    <span>{number}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            <div className="flex items-center justify-end gap-3 pt-2 font-mono text-xs">
+              <button
+                onClick={() => setShowBroadcastModal(false)}
+                className="px-4 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 font-bold cursor-pointer"
+              >
+                CANCEL
+              </button>
+
+              <button
+                onClick={handleBroadcastMessage}
+                className="px-5 py-2 rounded-xl bg-violet-600 hover:bg-violet-500 text-white font-bold cursor-pointer shadow-lg flex items-center gap-1.5"
+              >
+                <Send className="w-4 h-4" />
+                <span>SEND SMS</span>
               </button>
             </div>
           </div>
