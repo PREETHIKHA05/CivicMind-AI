@@ -17,11 +17,14 @@ export function CityProvider({ children }) {
 
   // Navigation State
   const [activePage, setActivePage] = useState('command-center');
-  
+
   // Selected Items State
-  const [selectedIncident, setSelectedIncident] = useState(INCIDENTS_LIST[0]);
+  const [selectedIncident, setSelectedIncident] = useState(null); // Start with null instead of mock data
   const [selectedAgent, setSelectedAgent] = useState(AI_AGENTS[0]);
   const [selectedMarker, setSelectedMarker] = useState(MAP_MARKERS[0]);
+
+  // Active Incidents List (populated by Agent Council synthesis)
+  const [incidents, setIncidents] = useState([]);
 
   // Response Plan State & Dynamic Action Editing — starts empty; the backend is
   // authoritative (see 'initialData'/'planGenerated' socket handlers below).
@@ -55,7 +58,7 @@ export function CityProvider({ children }) {
   const addToast = (type, title, message) => {
     const id = Date.now();
     const time = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-    setToasts(prev => [ { id, type, title, message, time }, ...prev.slice(0, 4) ]);
+    setToasts(prev => [{ id, type, title, message, time }, ...prev.slice(0, 4)]);
   };
 
   const removeToast = (id) => {
@@ -65,7 +68,7 @@ export function CityProvider({ children }) {
   // Dynamic Risk Score Calculation based on current planActions
   const calculateProjectedRisk = (actions = planActions) => {
     const baseRisk = CITY_METADATA.stats.preInterventionRisk; // 92
-    
+
     const priorityMultipliers = {
       CRITICAL: 1.25,
       HIGH: 1.0,
@@ -213,6 +216,16 @@ export function CityProvider({ children }) {
         setPlanConflictsResolved(plan.conflictsResolved || []);
         setPlanCausalRiskIndex(plan.causalRiskIndex ?? null);
         setCurrentRiskScore(plan.riskScorePre ?? plan.causalRiskIndex ?? currentRiskScore);
+
+        // If incidents are included in the plan, update incidents state
+        if (plan.incidents && plan.incidents.length > 0) {
+          setIncidents(plan.incidents);
+          // Auto-select the first incident if none selected
+          if (!selectedIncident) {
+            setSelectedIncident(plan.incidents[0]);
+          }
+        }
+
         addToast('info', 'New Plan Generated', `Orchestrator run complete — gate: ${plan.gate || 'n/a'}, confidence ${plan.confidence ?? '?'}%.`);
       });
 
@@ -397,7 +410,7 @@ export function CityProvider({ children }) {
 
     setDepartmentTasks(prev => prev.map(t => {
       if (t.id === taskId || t.taskId === taskId) {
-        const newLogs = noteText 
+        const newLogs = noteText
           ? [...t.logs, { time: nowTime, author: authorName, note: noteText }]
           : [...t.logs, { time: nowTime, author: authorName, note: `Task status updated to ${newStatus}.` }];
         return { ...t, status: newStatus, logs: newLogs };
@@ -482,6 +495,98 @@ export function CityProvider({ children }) {
     setCurrentRiskScore(planStatus === 'APPROVED BY ICCC OPERATOR' ? projected : 92);
   };
 
+  // Generate Plan from Agent Council Synthesis
+  const generatePlanFromRisks = (risks) => {
+    if (!risks || risks.length === 0) return;
+
+    // Transform risks into incidents
+    const newIncidents = risks.map((risk, index) => ({
+      id: `INC-${new Date().getFullYear()}-${String(Date.now()).slice(-6)}-${index + 1}`,
+      title: risk.title,
+      summary: risk.cascade || 'Multi-system cascade detected by agent synthesis.',
+      severity: risk.severity || 'HIGH',
+      confidence: typeof risk.confidence === 'number' ? Math.round(risk.confidence * 100) : 85,
+      ward: 'Ward 18',
+      time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+      riskScore: 92,
+      affectedDepartments: risk.affectedDepartments || ['Water Management', 'Traffic Control'],
+      contributingAgents: risk.contributingAgents || [],
+      evidenceIds: risk.evidenceIds || [],
+      recommendedAction: risk.recommendedAction,
+      estimatedOnsetMinutes: risk.estimatedOnsetMinutes,
+      rootCauses: [risk.cascade || 'Multi-agent consensus identified cascading failure pattern'],
+      cascadingEffects: [
+        `Primary impact: ${risk.title}`,
+        risk.recommendedAction ? `Mitigation required: ${risk.recommendedAction}` : 'Immediate response required',
+        `Estimated onset: ${risk.estimatedOnsetMinutes || 'Unknown'} minutes`
+      ],
+      aiAssessment: `${risk.contributingAgents?.length || 0} agents reached consensus. ${risk.cascade || 'Critical infrastructure cascade detected.'}`,
+      affectedSensors: ['Rainfall Monitor', 'Sump Level Sensor', 'Traffic Loop Detectors'],
+      causalNodes: ['rainfall_intensity', 'sump_water_level', 'hospital_road_congestion']
+    }));
+
+    setIncidents(newIncidents);
+    if (newIncidents.length > 0) {
+      setSelectedIncident(newIncidents[0]);
+    }
+
+    // Generate response plan actions from risks
+    const departmentMapping = {
+      'Water': 'water',
+      'Water Management': 'water',
+      'Traffic': 'traffic',
+      'Traffic Control': 'traffic',
+      'Emergency': 'emergency',
+      'Emergency Services': 'emergency',
+      'Public Info': 'public',
+      'Public Information': 'public',
+      'Health': 'health'
+    };
+
+    const iconMapping = {
+      'water': 'Droplets',
+      'traffic': 'Car',
+      'emergency': 'Ambulance',
+      'public': 'Radio',
+      'health': 'HeartPulse'
+    };
+
+    const departmentNames = {
+      'water': 'Water Resources & Drainage',
+      'traffic': 'Traffic Management Bureau',
+      'emergency': 'Emergency Services (108)',
+      'public': 'Public Information & Advisory',
+      'health': 'Municipal Public Health'
+    };
+
+    const newPlanActions = risks.map((risk, index) => {
+      const affectedDept = risk.affectedDepartments?.[0] || 'Water Management';
+      const deptId = departmentMapping[affectedDept] || 'water';
+
+      return {
+        id: `action-${Date.now()}-${index}`,
+        department: departmentNames[deptId],
+        departmentId: deptId,
+        deptIcon: iconMapping[deptId],
+        recommendation: risk.recommendedAction || 'Deploy emergency response team',
+        priority: risk.severity || 'HIGH',
+        resourceUnits: 'Emergency Mitigation',
+        resourceCount: 2,
+        baseRiskImpact: 15,
+        enabled: true,
+        reason: risk.cascade || 'Agent synthesis identified critical risk',
+        expectedImpact: `Mitigate ${risk.title}`,
+        reversible: true,
+        evidenceIds: risk.evidenceIds || []
+      };
+    });
+
+    setPlanActions(newPlanActions);
+    setPlanStatus('Awaiting Human Review');
+
+    addToast('success', 'Incidents & Plan Generated', `${newIncidents.length} incidents detected and response plan created.`);
+  };
+
   // Simulation stage auto-advance and fake agent reasoning were removed here.
   // They are being replaced by the real orchestrator's agent:event stream
   // (Phase 2+). The human approval gate must never be triggered by a timer —
@@ -553,7 +658,10 @@ export function CityProvider({ children }) {
         addToast,
         removeToast,
         isResponsibleAiModalOpen,
-        setIsResponsibleAiModalOpen
+        setIsResponsibleAiModalOpen,
+        incidents,
+        setIncidents,
+        generatePlanFromRisks
       }}
     >
       {children}

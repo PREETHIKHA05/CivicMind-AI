@@ -3,7 +3,7 @@ import { useCity } from '../context/CityContext';
 import {
   CloudRain, Waves, Car, Ambulance, MessageSquare,
   BrainCircuit, Cpu, Upload, X, AlertCircle, CheckCircle2,
-  Sparkles, Clock, Shield, Users, Zap
+  Sparkles, Clock, Shield, Users, Zap, AlertTriangle
 } from 'lucide-react';
 
 /* ─────────────────────────────────────────────────────────────────────────
@@ -93,29 +93,29 @@ const SAMPLE_FINDINGS = [
 const DOMAIN_AGENT_IDS = ['weather', 'water', 'traffic', 'emergency', 'citizen', 'memory'];
 
 const AGENT_META = {
-  weather:   { color: '#06b6d4', label: 'WEATHER',   icon: CloudRain   },
-  water:     { color: '#3b82f6', label: 'WATER',     icon: Waves       },
-  traffic:   { color: '#f59e0b', label: 'TRAFFIC',   icon: Car         },
-  emergency: { color: '#ef4444', label: 'EMERGENCY', icon: Ambulance   },
-  citizen:   { color: '#10b981', label: 'CITIZEN',   icon: MessageSquare },
-  memory:    { color: '#a855f7', label: 'MEMORY',    icon: BrainCircuit  },
+  weather: { color: '#06b6d4', label: 'WEATHER', icon: CloudRain },
+  water: { color: '#3b82f6', label: 'WATER', icon: Waves },
+  traffic: { color: '#f59e0b', label: 'TRAFFIC', icon: Car },
+  emergency: { color: '#ef4444', label: 'EMERGENCY', icon: Ambulance },
+  citizen: { color: '#10b981', label: 'CITIZEN', icon: MessageSquare },
+  memory: { color: '#a855f7', label: 'MEMORY', icon: BrainCircuit },
 };
 
 // SVG viewBox: 900 × 620. Planner at (450, 310). Agents on a hex ring, r≈230.
 const PLANNER = { cx: 450, cy: 310 };
 const AGENT_POS = {
-  weather:   { cx: 225, cy: 155 },
-  water:     { cx: 450, cy:  65 },
-  traffic:   { cx: 675, cy: 155 },
+  weather: { cx: 225, cy: 155 },
+  water: { cx: 450, cy: 65 },
+  traffic: { cx: 675, cy: 155 },
   emergency: { cx: 675, cy: 455 },
-  citizen:   { cx: 450, cy: 545 },
-  memory:    { cx: 225, cy: 455 },
+  citizen: { cx: 450, cy: 545 },
+  memory: { cx: 225, cy: 455 },
 };
 
 const SEV_STYLE = {
-  CRITICAL: { chip: 'bg-red-100 text-red-700 border border-red-200',   left: 'border-l-red-500'   },
-  HIGH:     { chip: 'bg-amber-100 text-amber-700 border border-amber-200', left: 'border-l-amber-500' },
-  MEDIUM:   { chip: 'bg-sky-100 text-sky-700 border border-sky-200',   left: 'border-l-sky-500'   },
+  CRITICAL: { chip: 'bg-red-100 text-red-700 border border-red-200', left: 'border-l-red-500' },
+  HIGH: { chip: 'bg-amber-100 text-amber-700 border border-amber-200', left: 'border-l-amber-500' },
+  MEDIUM: { chip: 'bg-sky-100 text-sky-700 border border-sky-200', left: 'border-l-sky-500' },
 };
 
 /* ─────────────────────────────────────────────────────────────────────────
@@ -212,7 +212,7 @@ function AgentNode({ agentId, loaded, synthesising }) {
       {/* Icon area via foreignObject */}
       <foreignObject x={cx - 18} y={cy - 28} width="36" height="36">
         <div xmlns="http://www.w3.org/1999/xhtml"
-          style={{ display:'flex', alignItems:'center', justifyContent:'center', width:'100%', height:'100%' }}>
+          style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: '100%', height: '100%' }}>
           <Icon size={22} color={color} />
         </div>
       </foreignObject>
@@ -243,10 +243,10 @@ function PlannerNode({ hasData, synthesising, done }) {
   const ringAnim = synthesising
     ? 'planner-active 0.9s ease-in-out infinite'
     : done
-    ? 'planner-done 2s ease-in-out infinite'
-    : hasData
-    ? 'planner-idle 2.5s ease-in-out infinite'
-    : 'none';
+      ? 'planner-done 2s ease-in-out infinite'
+      : hasData
+        ? 'planner-idle 2.5s ease-in-out infinite'
+        : 'none';
 
   return (
     <g>
@@ -271,7 +271,7 @@ function PlannerNode({ hasData, synthesising, done }) {
       {/* CPU icon via foreignObject */}
       <foreignObject x={cx - 22} y={cy - 30} width="44" height="44">
         <div xmlns="http://www.w3.org/1999/xhtml"
-          style={{ display:'flex', alignItems:'center', justifyContent:'center', width:'100%', height:'100%' }}>
+          style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: '100%', height: '100%' }}>
           <Cpu size={28} color={pColor} />
         </div>
       </foreignObject>
@@ -405,7 +405,7 @@ function ShimmerCard() {
    Main page
 ───────────────────────────────────────────────────────────────────────────*/
 export default function AgentCouncil() {
-  const { backendUrl } = useCity();
+  const { backendUrl, generatePlanFromRisks, addToast, setActivePage } = useCity();
 
   const [uploadedFiles, setUploadedFiles] = useState([]);
   const [synthesising, setSynthesising] = useState(false);
@@ -467,8 +467,8 @@ export default function AgentCouncil() {
   const canSynthesise = goodFiles.length >= 2 && !synthesising;
 
   const handleSynthesise = async () => {
-    setSynthesising(true); 
-    setRisks(null); 
+    setSynthesising(true);
+    setRisks(null);
     setSynthError(null);
 
     // Sort files to guarantee 'weather' is first, according to DOMAIN_AGENT_IDS order
@@ -486,7 +486,7 @@ export default function AgentCouncil() {
         await new Promise(r => setTimeout(r, 1000));
       }
     }
-    
+
     // Stop single agent animation, show general synthesis
     setContactingAgentId('planner_processing');
 
@@ -500,6 +500,12 @@ export default function AgentCouncil() {
       if (!res.ok || data.error) { setSynthError(data.error || `Server error ${res.status}`); }
       else {
         setRisks(data.risks || []);
+
+        // Generate incidents and response plan from risks
+        if (data.risks && data.risks.length > 0) {
+          generatePlanFromRisks(data.risks);
+        }
+
         setTimeout(() => riskRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' }), 100);
       }
     } catch (err) {
@@ -546,6 +552,18 @@ export default function AgentCouncil() {
             Upload findings
           </button>
           <input ref={fileInputRef} type="file" multiple accept=".json,.txt" onChange={handleFileInput} className="hidden" id="agent-file-input" />
+
+          {/* Load Samples button */}
+          {uploadedFiles.length === 0 && (
+            <button
+              onClick={loadSamples}
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-violet-600 hover:bg-violet-700
+                text-white text-xs font-mono font-bold cursor-pointer transition-colors shrink-0"
+            >
+              <Sparkles className="w-3.5 h-3.5" />
+              Load Sample Data
+            </button>
+          )}
 
           {/* Divider */}
           {uploadedFiles.length > 0 && <div className="w-px h-5 bg-slate-200 mx-1 shrink-0" />}
@@ -597,7 +615,7 @@ export default function AgentCouncil() {
           <svg className="absolute inset-0 w-full h-full pointer-events-none" style={{ opacity: 0.035 }}>
             <defs>
               <pattern id="grid" width="40" height="40" patternUnits="userSpaceOnUse">
-                <path d="M 40 0 L 0 0 0 40" fill="none" stroke="#6366f1" strokeWidth="1"/>
+                <path d="M 40 0 L 0 0 0 40" fill="none" stroke="#6366f1" strokeWidth="1" />
               </pattern>
             </defs>
             <rect width="100%" height="100%" fill="url(#grid)" />
@@ -680,8 +698,8 @@ export default function AgentCouncil() {
                 {synthesising
                   ? '⬤  SYNTHESISING'
                   : loadedAgentIds.size > 0
-                  ? `⬤  ${loadedAgentIds.size}/6 AGENTS READY`
-                  : '○  AWAITING INPUT'}
+                    ? `⬤  ${loadedAgentIds.size}/6 AGENTS READY`
+                    : '○  AWAITING INPUT'}
               </text>
             </g>
           </svg>
@@ -725,11 +743,43 @@ export default function AgentCouncil() {
             )}
 
             {!synthesising && risks && (
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                {risks.map((risk, i) => (
-                  <RiskCard key={i} risk={risk} index={i} />
-                ))}
-              </div>
+              <>
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                  {risks.map((risk, i) => (
+                    <RiskCard key={i} risk={risk} index={i} />
+                  ))}
+                </div>
+
+                {/* Action buttons to navigate to other pages */}
+                <div className="mt-6 p-4 rounded-xl bg-violet-50 border border-violet-200 space-y-3">
+                  <div className="flex items-center gap-2">
+                    <CheckCircle2 className="w-4 h-4 text-violet-600" />
+                    <p className="text-xs font-mono font-bold text-slate-900">
+                      Synthesis Complete — Incidents & Response Plan Generated
+                    </p>
+                  </div>
+                  <p className="text-xs text-slate-700 font-mono">
+                    {risks.length} critical risk{risks.length !== 1 ? 's' : ''} identified and converted to active incidents.
+                    Review incident details or approve the response plan.
+                  </p>
+                  <div className="flex flex-wrap gap-3">
+                    <button
+                      onClick={() => setActivePage('incident-intelligence')}
+                      className="px-4 py-2 rounded-xl bg-violet-600 hover:bg-violet-700 text-white font-mono text-xs font-bold cursor-pointer transition-colors flex items-center gap-2"
+                    >
+                      <AlertTriangle className="w-3.5 h-3.5" />
+                      View Incidents →
+                    </button>
+                    <button
+                      onClick={() => setActivePage('response-plans')}
+                      className="px-4 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-mono text-xs font-bold cursor-pointer transition-colors flex items-center gap-2"
+                    >
+                      <Shield className="w-3.5 h-3.5" />
+                      Review Response Plan →
+                    </button>
+                  </div>
+                </div>
+              </>
             )}
           </div>
         )}

@@ -53,8 +53,8 @@ export default function DepartmentDashboard() {
 
   // If logged in as a department official, default to their department
   const isDeptOfficial = currentUser && currentUser.role === 'department';
-  const activeDeptId = (isDeptOfficial && currentUser.departmentId) 
-    ? currentUser.departmentId 
+  const activeDeptId = (isDeptOfficial && currentUser.departmentId)
+    ? currentUser.departmentId
     : selectedDeptId;
 
   const currentDept = DEPARTMENTS.find(d => d.id === activeDeptId) || DEPARTMENTS[0];
@@ -165,34 +165,34 @@ export default function DepartmentDashboard() {
   const chartData = deptAnalyticsData[activeDeptId] || deptAnalyticsData.water;
 
   // Filter Causal Graph nodes relevant to this department
-  const deptCausalNodes = CAUSAL_GRAPH_NODES.filter(n => 
+  const deptCausalNodes = CAUSAL_GRAPH_NODES.filter(n =>
     n.category === activeDeptId || n.category === 'critical' || n.category === 'weather'
   );
 
   return (
     <div className="space-y-6 pb-12 font-sans">
       {/* Top Header Card */}
-      <div className="glass-panel p-6 rounded-2xl border border-slate-800 space-y-4">
+      <div className="glass-panel p-6 rounded-2xl border border-purple-200 space-y-4">
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
           <div className="flex items-center gap-4">
-            <div className="p-3 rounded-xl bg-slate-900 border border-slate-800 text-cyan-400 shrink-0">
+            <div className="p-3 rounded-xl bg-purple-50 border border-purple-200 text-purple-600 shrink-0">
               <DeptIcon className="w-7 h-7" />
             </div>
 
             <div>
               <div className="flex items-center gap-2">
-                <span className="px-2.5 py-0.5 rounded bg-slate-900 text-cyan-400 border border-slate-800 text-[10px] font-mono font-bold uppercase">
+                <span className="px-2.5 py-0.5 rounded bg-purple-100 text-purple-700 border border-purple-300 text-[10px] font-mono font-bold uppercase">
                   {currentDept.name.toUpperCase()} TERMINAL
                 </span>
-                <span className="text-xs font-mono text-slate-400">Department Operational Console</span>
+                <span className="text-xs font-mono text-slate-600">Department Operational Console</span>
               </div>
 
-              <h1 className="text-2xl font-extrabold text-white tracking-tight mt-1">
+              <h1 className="text-2xl font-extrabold text-slate-900 tracking-tight mt-1">
                 {currentDept.name} Dashboard
               </h1>
 
-              <div className="flex items-center gap-3 text-xs font-mono text-slate-400 mt-0.5">
-                <span className="text-slate-300">Official: <strong>{currentDept.official}</strong></span>
+              <div className="flex items-center gap-3 text-xs font-mono text-slate-600 mt-0.5">
+                <span className="text-slate-700">Official: <strong>{currentDept.official}</strong></span>
                 <span>•</span>
                 <span>{currentDept.email}</span>
               </div>
@@ -201,14 +201,14 @@ export default function DepartmentDashboard() {
 
           {/* Department Switcher Dropdown (If counselor or inspecting) */}
           {!isDeptOfficial && (
-            <div className="flex items-center gap-3 bg-slate-900 p-3 rounded-xl border border-slate-800 shrink-0 font-mono text-xs">
-              <Layers className="w-4 h-4 text-cyan-400" />
+            <div className="flex items-center gap-3 bg-purple-50 p-3 rounded-xl border border-purple-200 shrink-0 font-mono text-xs">
+              <Layers className="w-4 h-4 text-purple-600" />
               <div className="flex flex-col">
-                <span className="text-[10px] text-slate-400 uppercase">View Department</span>
+                <span className="text-[10px] text-slate-600 uppercase">View Department</span>
                 <select
                   value={activeDeptId}
                   onChange={(e) => setSelectedDeptId(e.target.value)}
-                  className="bg-slate-950 border border-slate-800 text-slate-200 rounded px-2 py-1 focus:outline-none focus:border-cyan-500 cursor-pointer"
+                  className="bg-white border border-purple-200 text-slate-900 rounded px-2 py-1 focus:outline-none focus:border-purple-400 cursor-pointer"
                 >
                   {DEPARTMENTS.map(d => (
                     <option key={d.id} value={d.id}>
@@ -222,19 +222,19 @@ export default function DepartmentDashboard() {
         </div>
 
         {/* Plan & Work Order Summary Strip */}
-        <div className="p-3.5 rounded-xl bg-slate-900/80 border border-slate-800 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs font-mono">
-          <div className="flex items-center gap-2.5 text-slate-300">
-            <ShieldCheck className="w-4 h-4 text-cyan-400 shrink-0" />
+        <div className="p-3.5 rounded-xl bg-purple-50 border border-purple-200 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs font-mono">
+          <div className="flex items-center gap-2.5 text-slate-700">
+            <ShieldCheck className="w-4 h-4 text-purple-600 shrink-0" />
             <span>
-              ICCC Plan Status: <strong className="text-cyan-300">{planStatus}</strong>
+              ICCC Plan Status: <strong className="text-purple-700">{planStatus}</strong>
             </span>
           </div>
 
           <div className="flex items-center gap-4">
-            <span className="text-slate-400">
-              Assigned Tasks: <strong className="text-white">{assignedTasks.length} Active</strong>
+            <span className="text-slate-600">
+              Assigned Tasks: <strong className="text-slate-900">{assignedTasks.length} Active</strong>
             </span>
-            <span className="px-2.5 py-1 rounded bg-slate-950 text-emerald-400 border border-slate-800 font-bold">
+            <span className="px-2.5 py-1 rounded bg-white text-emerald-700 border border-emerald-200 font-bold">
               Target Risk: {currentRiskScore}/100
             </span>
           </div>
@@ -242,14 +242,13 @@ export default function DepartmentDashboard() {
       </div>
 
       {/* NAVIGATION TABS */}
-      <div className="flex items-center gap-2 border-b border-slate-800 pb-2 font-mono text-xs overflow-x-auto">
+      <div className="flex items-center gap-2 border-b border-purple-200 pb-2 font-mono text-xs overflow-x-auto">
         <button
           onClick={() => setActiveTab('overview')}
-          className={`px-4 py-2 rounded-xl font-bold transition-all cursor-pointer flex items-center gap-2 ${
-            activeTab === 'overview'
-              ? 'bg-slate-800 text-white border border-cyan-500/40 shadow-sm'
-              : 'text-slate-400 hover:text-white hover:bg-slate-900'
-          }`}
+          className={`px-4 py-2 rounded-xl font-bold transition-all cursor-pointer flex items-center gap-2 ${activeTab === 'overview'
+              ? 'bg-white text-slate-900 border border-purple-300/40 shadow-sm'
+              : 'text-slate-600 hover:text-slate-900 hover:bg-purple-50'
+            }`}
         >
           <LayoutDashboard className="w-4 h-4" />
           <span>DEPARTMENT OVERVIEW</span>
@@ -257,11 +256,10 @@ export default function DepartmentDashboard() {
 
         <button
           onClick={() => setActiveTab('tasks')}
-          className={`px-4 py-2 rounded-xl font-bold transition-all cursor-pointer flex items-center gap-2 ${
-            activeTab === 'tasks'
-              ? 'bg-slate-800 text-white border border-cyan-500/40 shadow-sm'
-              : 'text-slate-400 hover:text-white hover:bg-slate-900'
-          }`}
+          className={`px-4 py-2 rounded-xl font-bold transition-all cursor-pointer flex items-center gap-2 ${activeTab === 'tasks'
+              ? 'bg-white text-slate-900 border border-purple-300/40 shadow-sm'
+              : 'text-slate-600 hover:text-slate-900 hover:bg-purple-50'
+            }`}
         >
           <FileText className="w-4 h-4" />
           <span>ASSIGNED WORK ORDERS ({assignedTasks.length})</span>
@@ -269,11 +267,10 @@ export default function DepartmentDashboard() {
 
         <button
           onClick={() => setActiveTab('analytics')}
-          className={`px-4 py-2 rounded-xl font-bold transition-all cursor-pointer flex items-center gap-2 ${
-            activeTab === 'analytics'
-              ? 'bg-slate-800 text-white border border-cyan-500/40 shadow-sm'
-              : 'text-slate-400 hover:text-white hover:bg-slate-900'
-          }`}
+          className={`px-4 py-2 rounded-xl font-bold transition-all cursor-pointer flex items-center gap-2 ${activeTab === 'analytics'
+              ? 'bg-white text-slate-900 border border-purple-300/40 shadow-sm'
+              : 'text-slate-600 hover:text-slate-900 hover:bg-purple-50'
+            }`}
         >
           <BarChart3 className="w-4 h-4" />
           <span>TELEMETRY & DATA ANALYTICS</span>
@@ -281,11 +278,10 @@ export default function DepartmentDashboard() {
 
         <button
           onClick={() => setActiveTab('protocols')}
-          className={`px-4 py-2 rounded-xl font-bold transition-all cursor-pointer flex items-center gap-2 ${
-            activeTab === 'protocols'
-              ? 'bg-slate-800 text-white border border-cyan-500/40 shadow-sm'
-              : 'text-slate-400 hover:text-white hover:bg-slate-900'
-          }`}
+          className={`px-4 py-2 rounded-xl font-bold transition-all cursor-pointer flex items-center gap-2 ${activeTab === 'protocols'
+              ? 'bg-white text-slate-900 border border-purple-300/40 shadow-sm'
+              : 'text-slate-600 hover:text-slate-900 hover:bg-purple-50'
+            }`}
         >
           <Sparkles className="w-4 h-4" />
           <span>EMERGENCY PROTOCOLS</span>
@@ -298,26 +294,25 @@ export default function DepartmentDashboard() {
           {/* Key Metric Cards */}
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
             {telemetryItems.map((item, idx) => (
-              <div key={idx} className="glass-panel p-5 rounded-2xl border border-slate-800 space-y-2">
-                <span className="text-[11px] font-mono text-slate-400 font-medium block">
+              <div key={idx} className="glass-panel p-5 rounded-2xl border border-purple-200 space-y-2">
+                <span className="text-[11px] font-mono text-slate-600 font-medium block">
                   {item.label}
                 </span>
 
                 <div className="flex items-baseline justify-between pt-1">
-                  <span className="text-xl font-extrabold font-mono text-white tracking-tight">
+                  <span className="text-xl font-extrabold font-mono text-slate-900 tracking-tight">
                     {item.val}
                   </span>
 
                   <span
-                    className={`px-2 py-0.5 rounded text-[10px] font-mono font-bold uppercase ${
-                      item.color === 'emerald'
-                        ? 'bg-emerald-950 text-emerald-300 border border-emerald-500/40'
+                    className={`px-2 py-0.5 rounded text-[10px] font-mono font-bold uppercase ${item.color === 'emerald'
+                        ? 'bg-emerald-100 text-emerald-700 border border-emerald-300'
                         : item.color === 'red'
-                        ? 'bg-red-950 text-red-300 border border-red-500/40'
-                        : item.color === 'amber'
-                        ? 'bg-amber-950 text-amber-300 border border-amber-500/40'
-                        : 'bg-cyan-950 text-cyan-300 border border-cyan-500/40'
-                    }`}
+                          ? 'bg-red-100 text-red-700 border border-red-300'
+                          : item.color === 'amber'
+                            ? 'bg-amber-100 text-amber-700 border border-amber-300'
+                            : 'bg-purple-100 text-purple-700 border border-purple-300/40'
+                      }`}
                   >
                     {item.status}
                   </span>
@@ -329,17 +324,17 @@ export default function DepartmentDashboard() {
           {/* Middle Layout: Assigned Work Orders Summary + Dept Recharts Graph */}
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
             {/* Active Work Orders Card */}
-            <div className="glass-panel p-5 rounded-2xl border border-slate-800 space-y-4">
-              <div className="flex items-center justify-between pb-3 border-b border-slate-800">
+            <div className="glass-panel p-5 rounded-2xl border border-purple-200 space-y-4">
+              <div className="flex items-center justify-between pb-3 border-b border-purple-200">
                 <div className="flex items-center gap-2">
-                  <FileText className="w-5 h-5 text-cyan-400" />
-                  <h3 className="text-sm font-extrabold text-white font-mono uppercase">
+                  <FileText className="w-5 h-5 text-purple-600" />
+                  <h3 className="text-sm font-extrabold text-slate-900 font-mono uppercase">
                     Dispatched Work Orders ({assignedTasks.length})
                   </h3>
                 </div>
                 <button
                   onClick={() => setActiveTab('tasks')}
-                  className="text-xs font-mono text-cyan-400 hover:underline flex items-center gap-1 cursor-pointer"
+                  className="text-xs font-mono text-purple-600 hover:underline flex items-center gap-1 cursor-pointer"
                 >
                   <span>View All</span>
                   <ChevronRight className="w-3.5 h-3.5" />
@@ -347,26 +342,26 @@ export default function DepartmentDashboard() {
               </div>
 
               {assignedTasks.length === 0 ? (
-                <div className="p-6 text-center rounded-xl bg-slate-900/50 border border-slate-800 space-y-2">
-                  <Clock className="w-8 h-8 text-cyan-400/60 mx-auto" />
-                  <p className="text-xs font-mono font-bold text-slate-300">
+                <div className="p-6 text-center rounded-xl bg-purple-50/50 border border-purple-200 space-y-2">
+                  <Clock className="w-8 h-8 text-purple-600/60 mx-auto" />
+                  <p className="text-xs font-mono font-bold text-slate-700">
                     Awaiting Plan Approval & Task Dispatch
                   </p>
-                  <p className="text-[11px] font-mono text-slate-400 max-w-xs mx-auto">
+                  <p className="text-[11px] font-mono text-slate-600 max-w-xs mx-auto">
                     No work orders assigned to {currentDept.name} yet. Tasks will automatically populate here when the Zone Counselor approves the Coordinated Response Plan.
                   </p>
                 </div>
               ) : (
                 <div className="space-y-3">
                   {assignedTasks.map((task) => (
-                    <div key={task.id} className="p-3.5 rounded-xl bg-slate-900 border border-slate-800 space-y-2 text-xs font-mono">
+                    <div key={task.id} className="p-3.5 rounded-xl bg-purple-50 border border-purple-200 space-y-2 text-xs font-mono">
                       <div className="flex items-center justify-between">
-                        <span className="font-bold text-white">{task.title}</span>
-                        <span className={`px-2 py-0.5 rounded text-[10px] uppercase font-bold ${task.status === 'Completed' ? 'bg-emerald-950 text-emerald-300' : 'bg-cyan-950 text-cyan-300'}`}>
+                        <span className="font-bold text-slate-900">{task.title}</span>
+                        <span className={`px-2 py-0.5 rounded text-[10px] uppercase font-bold ${task.status === 'Completed' ? 'bg-emerald-100 text-emerald-700' : 'bg-purple-100 text-purple-700'}`}>
                           {task.status}
                         </span>
                       </div>
-                      <p className="text-slate-300 text-[11px] leading-relaxed">{task.recommendation}</p>
+                      <p className="text-slate-700 text-[11px] leading-relaxed">{task.recommendation}</p>
                     </div>
                   ))}
                 </div>
@@ -374,15 +369,15 @@ export default function DepartmentDashboard() {
             </div>
 
             {/* Department Real-Time Trend Analytics Chart */}
-            <div className="glass-panel p-5 rounded-2xl border border-slate-800 space-y-4">
-              <div className="flex items-center justify-between pb-3 border-b border-slate-800">
+            <div className="glass-panel p-5 rounded-2xl border border-purple-200 space-y-4">
+              <div className="flex items-center justify-between pb-3 border-b border-purple-200">
                 <div className="flex items-center gap-2">
-                  <Activity className="w-5 h-5 text-cyan-400" />
-                  <h3 className="text-sm font-extrabold text-white font-mono uppercase">
+                  <Activity className="w-5 h-5 text-purple-600" />
+                  <h3 className="text-sm font-extrabold text-slate-900 font-mono uppercase">
                     Department Real-Time Telemetry Trend
                   </h3>
                 </div>
-                <span className="text-[10px] font-mono text-slate-400">Live Sensor Sync</span>
+                <span className="text-[10px] font-mono text-slate-600">Live Sensor Sync</span>
               </div>
 
               <div className="h-60 w-full pt-2">
@@ -406,20 +401,20 @@ export default function DepartmentDashboard() {
           </div>
 
           {/* Department Causal Node Network Summary */}
-          <div className="glass-panel p-5 rounded-2xl border border-slate-800 space-y-3 font-mono text-xs">
-            <div className="flex items-center gap-2 text-cyan-400 pb-2 border-b border-slate-800 font-bold uppercase">
+          <div className="glass-panel p-5 rounded-2xl border border-purple-200 space-y-3 font-mono text-xs">
+            <div className="flex items-center gap-2 text-purple-600 pb-2 border-b border-purple-200 font-bold uppercase">
               <BrainCircuit className="w-4 h-4" />
               <span>Causal Factors Impacting {currentDept.name}</span>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
               {deptCausalNodes.map(node => (
-                <div key={node.id} className="p-3 rounded-xl bg-slate-900 border border-slate-800 space-y-1">
-                  <div className="flex items-center justify-between text-xs font-bold text-white">
+                <div key={node.id} className="p-3 rounded-xl bg-purple-50 border border-purple-200 space-y-1">
+                  <div className="flex items-center justify-between text-xs font-bold text-slate-900">
                     <span>{node.label}</span>
-                    <span className="text-cyan-400">{node.val}/100</span>
+                    <span className="text-purple-600">{node.val}/100</span>
                   </div>
-                  <p className="text-[11px] text-slate-400">{node.detail}</p>
+                  <p className="text-[11px] text-slate-600">{node.detail}</p>
                 </div>
               ))}
             </div>
@@ -431,10 +426,10 @@ export default function DepartmentDashboard() {
       {activeTab === 'tasks' && (
         <div className="space-y-6 font-mono text-xs">
           {assignedTasks.length === 0 ? (
-            <div className="glass-panel p-12 text-center rounded-2xl border border-slate-800 space-y-3">
+            <div className="glass-panel p-12 text-center rounded-2xl border border-purple-200 space-y-3">
               <CheckCircle2 className="w-12 h-12 text-slate-600 mx-auto" />
-              <h3 className="text-lg font-bold text-slate-300 font-mono">No Active Work Orders Assigned</h3>
-              <p className="text-xs text-slate-400 font-mono max-w-md mx-auto">
+              <h3 className="text-lg font-bold text-slate-700 font-mono">No Active Work Orders Assigned</h3>
+              <p className="text-xs text-slate-600 font-mono max-w-md mx-auto">
                 When the Zone Counselor approves a Coordinated Response Plan, task orders for this department will automatically appear here.
               </p>
             </div>
@@ -443,27 +438,26 @@ export default function DepartmentDashboard() {
               {assignedTasks.map((task) => (
                 <div
                   key={task.id}
-                  className="glass-panel p-6 rounded-2xl border border-slate-800 space-y-4 hover:border-cyan-500/40 transition-colors shadow-lg"
+                  className="glass-panel p-6 rounded-2xl border border-purple-200 space-y-4 hover:border-purple-300/40 transition-colors shadow-lg"
                 >
                   {/* Task Header */}
-                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-slate-800">
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-purple-200">
                     <div>
                       <div className="flex items-center gap-2">
                         <span
-                          className={`px-2.5 py-0.5 rounded text-[10px] font-mono font-bold uppercase ${
-                            task.priority === 'CRITICAL'
-                              ? 'bg-red-950 text-red-300 border border-red-500/40'
-                              : 'bg-amber-950 text-amber-300 border border-amber-500/40'
-                          }`}
+                          className={`px-2.5 py-0.5 rounded text-[10px] font-mono font-bold uppercase ${task.priority === 'CRITICAL'
+                              ? 'bg-red-100 text-red-700 border border-red-300'
+                              : 'bg-amber-100 text-amber-700 border border-amber-300'
+                            }`}
                         >
                           {task.priority} PRIORITY
                         </span>
-                        <span className="text-xs font-mono text-slate-400">
+                        <span className="text-xs font-mono text-slate-600">
                           Assigned by: <strong>{task.assignedBy}</strong> ({task.assignedTime})
                         </span>
                       </div>
 
-                      <h3 className="text-lg font-bold text-white mt-1 font-mono">
+                      <h3 className="text-lg font-bold text-slate-900 mt-1 font-mono">
                         {task.title}
                       </h3>
                     </div>
@@ -471,13 +465,12 @@ export default function DepartmentDashboard() {
                     {/* Task Status & Actions */}
                     <div className="flex items-center gap-3">
                       <span
-                        className={`px-3 py-1 rounded-full text-xs font-mono font-bold uppercase ${
-                          task.status === 'Completed'
-                            ? 'bg-emerald-950 text-emerald-300 border border-emerald-500/50'
+                        className={`px-3 py-1 rounded-full text-xs font-mono font-bold uppercase ${task.status === 'Completed'
+                            ? 'bg-emerald-100 text-emerald-700 border border-emerald-500/50'
                             : task.status === 'In Progress'
-                            ? 'bg-cyan-950 text-cyan-300 border border-cyan-500/50 animate-pulse'
-                            : 'bg-slate-800 text-slate-300 border border-slate-700'
-                        }`}
+                              ? 'bg-purple-100 text-purple-700 border border-purple-300/50 animate-pulse'
+                              : 'bg-white text-slate-700 border border-purple-200'
+                          }`}
                       >
                         ● {task.status}
                       </span>
@@ -487,14 +480,14 @@ export default function DepartmentDashboard() {
                           {task.status === 'Assigned' && (
                             <button
                               onClick={() => updateTaskStatus(task.id, 'In Progress')}
-                              className="px-3.5 py-1.5 rounded-xl bg-cyan-600 hover:bg-cyan-500 text-white font-mono text-xs font-bold cursor-pointer transition-colors shadow-sm"
+                              className="px-3.5 py-1.5 rounded-xl bg-cyan-600 hover:bg-cyan-500 text-slate-900 font-mono text-xs font-bold cursor-pointer transition-colors shadow-sm"
                             >
                               START EXECUTION
                             </button>
                           )}
                           <button
                             onClick={() => updateTaskStatus(task.id, 'Completed')}
-                            className="px-3.5 py-1.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-mono text-xs font-bold cursor-pointer transition-colors shadow-sm"
+                            className="px-3.5 py-1.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-slate-900 font-mono text-xs font-bold cursor-pointer transition-colors shadow-sm"
                           >
                             MARK COMPLETED
                           </button>
@@ -505,8 +498,8 @@ export default function DepartmentDashboard() {
 
                   {/* Task Instructions */}
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs font-mono">
-                    <div className="p-3.5 rounded-xl bg-slate-900/70 border border-slate-800">
-                      <span className="text-[10px] text-cyan-400 font-bold block uppercase mb-1">
+                    <div className="p-3.5 rounded-xl bg-purple-50/70 border border-purple-200">
+                      <span className="text-[10px] text-purple-600 font-bold block uppercase mb-1">
                         RECOMMENDED ACTION INSTRUCTION
                       </span>
                       <p className="text-slate-200 leading-relaxed font-semibold">
@@ -514,7 +507,7 @@ export default function DepartmentDashboard() {
                       </p>
                     </div>
 
-                    <div className="p-3.5 rounded-xl bg-emerald-950/30 border border-emerald-500/30">
+                    <div className="p-3.5 rounded-xl bg-emerald-100/30 border border-emerald-500/30">
                       <span className="text-[10px] text-emerald-400 font-bold block uppercase mb-1">
                         EXPECTED CASCADING IMPACT
                       </span>
@@ -526,16 +519,16 @@ export default function DepartmentDashboard() {
 
                   {/* Field Progress Logs */}
                   <div className="pt-2 space-y-3">
-                    <span className="text-xs font-mono font-bold text-slate-400 uppercase tracking-wider block">
+                    <span className="text-xs font-mono font-bold text-slate-600 uppercase tracking-wider block">
                       FIELD OPERATIONAL LOGS ({task.logs.length})
                     </span>
 
                     <div className="space-y-2 max-h-40 overflow-y-auto pr-1">
                       {task.logs.map((log, idx) => (
-                        <div key={idx} className="p-2.5 rounded-lg bg-slate-900/60 border border-slate-800/80 text-xs font-mono flex items-start justify-between gap-3">
+                        <div key={idx} className="p-2.5 rounded-lg bg-purple-50/60 border border-purple-200/80 text-xs font-mono flex items-start justify-between gap-3">
                           <div>
-                            <span className="text-cyan-400 font-semibold">{log.author}:</span>{' '}
-                            <span className="text-slate-300">{log.note}</span>
+                            <span className="text-purple-600 font-semibold">{log.author}:</span>{' '}
+                            <span className="text-slate-700">{log.note}</span>
                           </div>
                           <span className="text-[10px] text-slate-500 shrink-0">{log.time}</span>
                         </div>
@@ -551,11 +544,11 @@ export default function DepartmentDashboard() {
                           onChange={(e) => setLogInputMap({ ...logInputMap, [task.id]: e.target.value })}
                           onKeyDown={(e) => e.key === 'Enter' && handleAddLog(task.id)}
                           placeholder="Log progress note (e.g. Mobile Pump connected at Station 4B)..."
-                          className="flex-1 px-3 py-2 rounded-xl bg-slate-950 border border-slate-800 text-xs text-slate-100 placeholder-slate-500 font-mono focus:outline-none focus:border-cyan-500/60"
+                          className="flex-1 px-3 py-2 rounded-xl bg-white border border-purple-200 text-xs text-slate-100 placeholder-slate-500 font-mono focus:outline-none focus:border-purple-300/60"
                         />
                         <button
                           onClick={() => handleAddLog(task.id)}
-                          className="px-4 py-2 rounded-xl bg-cyan-950 hover:bg-cyan-900 border border-cyan-500/40 text-cyan-300 font-mono text-xs font-bold cursor-pointer transition-colors flex items-center gap-1.5"
+                          className="px-4 py-2 rounded-xl bg-purple-100 hover:bg-cyan-900 border border-purple-300/40 text-purple-700 font-mono text-xs font-bold cursor-pointer transition-colors flex items-center gap-1.5"
                         >
                           <Send className="w-3.5 h-3.5" />
                           <span>Log Note</span>
@@ -573,8 +566,8 @@ export default function DepartmentDashboard() {
       {/* TAB 3: TELEMETRY & DATA ANALYTICS */}
       {activeTab === 'analytics' && (
         <div className="space-y-6 font-mono text-xs">
-          <div className="glass-panel p-6 rounded-2xl border border-slate-800 space-y-4">
-            <h3 className="text-sm font-bold text-cyan-400 uppercase">
+          <div className="glass-panel p-6 rounded-2xl border border-purple-200 space-y-4">
+            <h3 className="text-sm font-bold text-purple-600 uppercase">
               {currentDept.name} Historical & Real-Time Sensor Telemetry
             </h3>
 
@@ -601,41 +594,41 @@ export default function DepartmentDashboard() {
 
       {/* TAB 4: EMERGENCY PROTOCOLS */}
       {activeTab === 'protocols' && (
-        <div className="glass-panel p-6 rounded-2xl border border-slate-800 space-y-4 font-mono text-xs">
-          <h3 className="text-sm font-bold text-cyan-400 uppercase">
+        <div className="glass-panel p-6 rounded-2xl border border-purple-200 space-y-4 font-mono text-xs">
+          <h3 className="text-sm font-bold text-purple-600 uppercase">
             DIRECT DEPARTMENT EMERGENCY PROTOCOLS
           </h3>
-          <p className="text-slate-400">
+          <p className="text-slate-600">
             Emergency department-level commands synchronized with CivicMind AI Multi-Agent Engine.
           </p>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4 pt-2">
-            <button className="p-4 rounded-xl bg-slate-900/90 hover:bg-slate-800 border border-slate-800 text-left transition-all cursor-pointer space-y-2 group">
-              <div className="flex items-center justify-between text-xs font-bold text-white group-hover:text-cyan-300">
+            <button className="p-4 rounded-xl bg-purple-50/90 hover:bg-white border border-purple-200 text-left transition-all cursor-pointer space-y-2 group">
+              <div className="flex items-center justify-between text-xs font-bold text-slate-900 group-hover:text-purple-700">
                 <span>Deploy Mobile Resource Unit</span>
-                <PlusCircle className="w-4 h-4 text-cyan-400" />
+                <PlusCircle className="w-4 h-4 text-purple-600" />
               </div>
-              <p className="text-[11px] text-slate-400">
+              <p className="text-[11px] text-slate-600">
                 Dispatches high-capacity field equipment or emergency squad directly to Ward 18.
               </p>
             </button>
 
-            <button className="p-4 rounded-xl bg-slate-900/90 hover:bg-slate-800 border border-slate-800 text-left transition-all cursor-pointer space-y-2 group">
-              <div className="flex items-center justify-between text-xs font-bold text-white group-hover:text-amber-300">
+            <button className="p-4 rounded-xl bg-purple-50/90 hover:bg-white border border-purple-200 text-left transition-all cursor-pointer space-y-2 group">
+              <div className="flex items-center justify-between text-xs font-bold text-slate-900 group-hover:text-amber-700">
                 <span>Signal / Gate Manual Override</span>
                 <AlertTriangle className="w-4 h-4 text-amber-400" />
               </div>
-              <p className="text-[11px] text-slate-400">
+              <p className="text-[11px] text-slate-600">
                 Overrides default sensor rules for immediate priority routing or sluice gate lock.
               </p>
             </button>
 
-            <button className="p-4 rounded-xl bg-slate-900/90 hover:bg-slate-800 border border-slate-800 text-left transition-all cursor-pointer space-y-2 group">
-              <div className="flex items-center justify-between text-xs font-bold text-white group-hover:text-emerald-300">
+            <button className="p-4 rounded-xl bg-purple-50/90 hover:bg-white border border-purple-200 text-left transition-all cursor-pointer space-y-2 group">
+              <div className="flex items-center justify-between text-xs font-bold text-slate-900 group-hover:text-emerald-700">
                 <span>Sync with Planner Agent</span>
                 <Sparkles className="w-4 h-4 text-emerald-400" />
               </div>
-              <p className="text-[11px] text-slate-400">
+              <p className="text-[11px] text-slate-600">
                 Triggers re-evaluation of departmental recommendations based on live field telemetry.
               </p>
             </button>
@@ -645,3 +638,4 @@ export default function DepartmentDashboard() {
     </div>
   );
 }
+

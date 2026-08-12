@@ -5,93 +5,72 @@
     "incidentId": "INC-2026-081",
     "title": "Coordinated Emergency Response Plan - Ward 18 Extreme Rainfall & Inundation",
     "riskScorePre": 73,
-    "riskScorePost": 48,
+    "riskScorePost": 40,
     "confidence": 70,
-    "status": "Awaiting Human Review",
-    "operatorNote": "",
-    "approvalTime": null,
+    "status": "APPROVED BY ICCC OPERATOR",
+    "operatorNote": "Approved for immediate multi-department dispatch by Zone Counselor.",
+    "approvalTime": "03:44:42 pm",
     "actions": [
       {
-        "id": "act-1",
+        "id": "action-1786529672334-0",
+        "department": "Water Resources & Drainage",
         "departmentId": "water",
-        "department": "Water and Drainage Department",
         "deptIcon": "Droplets",
-        "enabled": true,
+        "recommendation": "Bypass Route R7 and reroute Unit 108-B4 via Canal North, which Citizen reports confirm is clear (0 flood reports) and Historical Memory shows achieved zero STEMI mortality.",
         "priority": "CRITICAL",
-        "baseRiskImpact": 16,
-        "resourceUnits": "Drainage Response Crews",
+        "resourceUnits": "Emergency Mitigation",
         "resourceCount": 2,
-        "recommendation": "Deploy emergency clearing crews to address 2 drain blockages in Ward 18 where utilisation has reached 97% against a 45 mm/hr design capacity.",
-        "reason": "Current rainfall inflow of 118 mm/hr far exceeds 45 mm/hr capacity, leading to an overflow ETA of 1 minute.",
-        "confidence": "95%",
-        "expectedImpact": "Mitigate immediate overflow severity and reduce flood accumulation across critical road nodes.",
+        "baseRiskImpact": 15,
+        "enabled": true,
+        "reason": "Unit 108-B4 with a STEMI patient has 14 minutes remaining in the critical window but faces a 31-minute ETA while stationary for 9 minutes 740 m from Ward 18 ER. Traffic agent recommends diverting via Route R7, which explicitly conflicts with Citizen reports showing knee-to-waist inundation and 6 stalled vehicles on the R7 on-ramp.",
+        "expectedImpact": "Mitigate STEMI Patient Window Breach Due to Traffic Gridlock and Flooded Diversion Route",
+        "reversible": true,
         "evidenceIds": [
-          "tool:water:drain_capacity:002",
-          "tool:water:overflow_eta:003",
-          "tool:weather:rainfall_nowcast:001"
-        ],
-        "reversible": true
+          "tool:emergency:avl_unit_b4:001",
+          "tool:traffic:loop_detector:J14",
+          "tool:citizen:nlp_cluster:W18-2026-0812"
+        ]
       },
       {
-        "id": "act-2",
-        "departmentId": "traffic",
-        "department": "Traffic Police Division",
-        "deptIcon": "Car",
-        "enabled": true,
-        "priority": "HIGH",
-        "baseRiskImpact": 30,
-        "resourceUnits": "Traffic Control Posts",
-        "resourceCount": 4,
-        "recommendation": "Execute traffic diversion diverting vehicles from route R7 to route R9, accepting a 1 minute transit cost increment.",
-        "reason": "Route R7 faces flood saturation risks; route R9 currently operates at 70% saturation with 16 km/h speed.",
-        "confidence": "90%",
-        "expectedImpact": "Keep emergency corridors open while maintaining traffic flow around inundated segments.",
-        "evidenceIds": [
-          "tool:traffic:route_status:004",
-          "tool:traffic:simulate_diversion:006"
-        ],
-        "reversible": true
-      },
-      {
-        "id": "act-3",
-        "departmentId": "emergency",
-        "department": "Emergency Medical Services",
-        "deptIcon": "Ambulance",
-        "enabled": true,
+        "id": "action-1786529672334-1",
+        "department": "Water Resources & Drainage",
+        "departmentId": "water",
+        "deptIcon": "Droplets",
+        "recommendation": "Cancel R7 diversion, activate signal override at junctions J14 and J17 to direct traffic toward Canal North, and alert transit units of R7 on-ramp stalls.",
         "priority": "CRITICAL",
-        "baseRiskImpact": 30,
-        "resourceUnits": "Ambulance Units",
-        "resourceCount": 7,
-        "recommendation": "Re-route delayed ambulance units via alternative route R9 to restore access to KMC Trauma.",
-        "reason": "Currently 7 out of 12 baseline ambulance units are delayed by an average of 57 minutes, while KMC Trauma suffers 56% access loss and 34% ER capacity strain.",
-        "confidence": "88%",
-        "expectedImpact": "Bypass flooded sections to re-establish emergency patient transfer to KMC Trauma.",
+        "resourceUnits": "Emergency Mitigation",
+        "resourceCount": 2,
+        "baseRiskImpact": 15,
+        "enabled": true,
+        "reason": "Traffic agent recommends diverting Hospital Road congestion (93% congestion, 4 km/hr) onto Route R7, which explicitly conflicts with Water agent data showing R7 outfall depth at 138 cm (exceeding 120 cm design max) and Citizen reports of 6 stalled vehicles. Injecting traffic onto R7 will trap 3 blocked emergency units and repeat the 2023 failure where R7 failed in 19 minutes.",
+        "expectedImpact": "Mitigate Compounding Gridlock via Misrouted Traffic onto Inundated Outfall Drain Network",
+        "reversible": true,
         "evidenceIds": [
-          "tool:emergency:ambulance_fleet:007",
-          "tool:health:hospital_access:008",
-          "tool:traffic:simulate_diversion:006"
-        ],
-        "reversible": true
+          "tool:traffic:cctv_flow:R7-N",
+          "tool:water:r7_outfall_sensor:014",
+          "tool:citizen:photo_verify:batch-0047",
+          "tool:memory:vector_search:ward18-flood-2023-10-18"
+        ]
       },
       {
-        "id": "act-4",
-        "departmentId": "public",
-        "department": "Public Information and Citizen Affairs",
-        "deptIcon": "Radio",
-        "enabled": true,
+        "id": "action-1786529672334-2",
+        "department": "Water Resources & Drainage",
+        "departmentId": "water",
+        "deptIcon": "Droplets",
+        "recommendation": "Dispatch manual field crew immediately to actuate Canal North gate 4N within 22 minutes to reduce primary sump utilization.",
         "priority": "HIGH",
-        "baseRiskImpact": 8,
-        "resourceUnits": "Public Emergency Broadcast Systems",
-        "resourceCount": 1,
-        "recommendation": "Issue targeted public safety advisories detailing safe transit routes and inundation alerts across Ward 18.",
-        "reason": "Report volume activation is elevated at 71 and panic index activation is at 56 amidst 118 mm/hr rainfall and 708 mm projected 6-hour accumulation.",
-        "confidence": "85%",
-        "expectedImpact": "Inform citizens, prevent uncoordinated travel onto inundated routes, and reduce panic.",
+        "resourceUnits": "Emergency Mitigation",
+        "resourceCount": 2,
+        "baseRiskImpact": 15,
+        "enabled": true,
+        "reason": "Weather agent reports a stationary convective cell delivering 118 mm/hr rainfall (exceeding 45 mm/hr drain capacity) for 40 minutes. This will cause Water agent's primary sump (96% utilization) to overflow in 22 minutes due to 138 cm outfall depth back-pressure, requiring manual actuation of Canal North gate 4N which Memory agent notes reduced historical sump level by 34% in 15 minutes.",
+        "expectedImpact": "Mitigate Primary Sump Overflow and Drainage Back-Pressure Escalation",
+        "reversible": true,
         "evidenceIds": [
-          "tool:citizen:causal_snapshot:001",
-          "tool:weather:rainfall_nowcast:001"
-        ],
-        "reversible": true
+          "tool:weather:doppler_cell:001",
+          "tool:water:drain_capacity:001",
+          "tool:memory:vector_search:ward18-flood-2023-10-18"
+        ]
       }
     ],
     "runId": "run-1786525942084",
@@ -234,9 +213,70 @@
       }
     ],
     "createdAt": "2026-08-12T05:51:03.192Z",
-    "updatedAt": "2026-08-12T05:51:03.192Z",
+    "updatedAt": "2026-08-12T09:13:17.615Z",
     "__v": 0
   },
-  "workOrders": [],
-  "lastSavedAt": "2026-08-12T09:13:17.608Z"
+  "workOrders": [
+    {
+      "taskId": "task-1786529682283-0",
+      "actionId": "action-1786529672334-0",
+      "departmentId": "water",
+      "departmentName": "Water Resources & Drainage",
+      "title": "Water Resources & Drainage Action: Emergency Mitigation",
+      "recommendation": "Bypass Route R7 and reroute Unit 108-B4 via Canal North, which Citizen reports confirm is clear (0 flood reports) and Historical Memory shows achieved zero STEMI mortality.",
+      "priority": "CRITICAL",
+      "assignedBy": "Zone Counselor",
+      "assignedTime": "03:44:42 pm",
+      "status": "Assigned",
+      "expectedImpact": "Mitigate STEMI Patient Window Breach Due to Traffic Gridlock and Flooded Diversion Route",
+      "logs": [
+        {
+          "time": "03:44:42 pm",
+          "author": "Zone Counselor",
+          "note": "Work Order issued via Approved Plan."
+        }
+      ]
+    },
+    {
+      "taskId": "task-1786529682283-1",
+      "actionId": "action-1786529672334-1",
+      "departmentId": "water",
+      "departmentName": "Water Resources & Drainage",
+      "title": "Water Resources & Drainage Action: Emergency Mitigation",
+      "recommendation": "Cancel R7 diversion, activate signal override at junctions J14 and J17 to direct traffic toward Canal North, and alert transit units of R7 on-ramp stalls.",
+      "priority": "CRITICAL",
+      "assignedBy": "Zone Counselor",
+      "assignedTime": "03:44:42 pm",
+      "status": "Assigned",
+      "expectedImpact": "Mitigate Compounding Gridlock via Misrouted Traffic onto Inundated Outfall Drain Network",
+      "logs": [
+        {
+          "time": "03:44:42 pm",
+          "author": "Zone Counselor",
+          "note": "Work Order issued via Approved Plan."
+        }
+      ]
+    },
+    {
+      "taskId": "task-1786529682283-2",
+      "actionId": "action-1786529672334-2",
+      "departmentId": "water",
+      "departmentName": "Water Resources & Drainage",
+      "title": "Water Resources & Drainage Action: Emergency Mitigation",
+      "recommendation": "Dispatch manual field crew immediately to actuate Canal North gate 4N within 22 minutes to reduce primary sump utilization.",
+      "priority": "HIGH",
+      "assignedBy": "Zone Counselor",
+      "assignedTime": "03:44:42 pm",
+      "status": "Assigned",
+      "expectedImpact": "Mitigate Primary Sump Overflow and Drainage Back-Pressure Escalation",
+      "logs": [
+        {
+          "time": "03:44:42 pm",
+          "author": "Zone Counselor",
+          "note": "Work Order issued via Approved Plan."
+        }
+      ]
+    }
+  ],
+  "lastSavedAt": "2026-08-12T10:14:42.284Z"
 }
