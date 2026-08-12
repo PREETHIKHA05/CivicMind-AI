@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { useCity } from '../context/CityContext';
 import { USER_ROLES, DEPARTMENTS } from '../data/mockData';
 import {
+  ShieldCheck,
   Cpu,
   Building2,
   UserCheck,
