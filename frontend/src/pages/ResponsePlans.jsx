@@ -99,7 +99,7 @@ export default function ResponsePlans() {
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-2 border-b border-slate-800">
         <div>
           <div className="flex items-center gap-2">
-            <span className="text-xs font-mono font-bold text-cyan-400 uppercase tracking-widest">
+            <span className="eyebrow text-xs font-mono font-bold text-cyan-400 uppercase tracking-widest">
               HUMAN-IN-THE-LOOP DECISION MATRIX
             </span>
             <span className="px-2 py-0.5 rounded bg-cyan-950 text-cyan-300 border border-cyan-500/40 text-[10px] font-mono font-bold">
@@ -132,7 +132,7 @@ export default function ResponsePlans() {
       </div>
 
       {/* DYNAMIC PROJECT RISK SUMMARY CARD */}
-      <div className="glass-panel p-6 rounded-2xl border border-cyan-500/30 space-y-4 shadow-xl">
+      <div className="panel-focus glass-panel p-6 rounded-2xl border border-cyan-500/30 space-y-4 shadow-xl">
         <div className="flex flex-col lg:flex-row items-start lg:items-center justify-between gap-6">
           <div>
             <div className="flex items-center gap-2">
@@ -315,8 +315,12 @@ export default function ResponsePlans() {
                         <span
                           className={`px-2.5 py-0.5 rounded text-[10px] font-mono font-bold uppercase shrink-0 ${
                             act.priority === 'CRITICAL'
-                              ? 'bg-red-950 text-red-300 border border-red-500/40'
-                              : 'bg-amber-950 text-amber-300 border border-amber-500/40'
+                              ? 'chip-critical bg-red-950 text-red-300 border border-red-500/40'
+                              : act.priority === 'HIGH'
+                              ? 'chip-high bg-amber-950 text-amber-300 border border-amber-500/40'
+                              : act.priority === 'MEDIUM'
+                              ? 'chip-medium bg-cyan-950 text-cyan-300 border border-cyan-500/40'
+                              : 'chip-ok bg-emerald-950 text-emerald-300 border border-emerald-500/40'
                           }`}
                         >
                           {act.priority}

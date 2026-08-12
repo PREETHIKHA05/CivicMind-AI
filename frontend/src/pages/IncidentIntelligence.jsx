@@ -45,10 +45,10 @@ export default function IncidentIntelligence() {
                     <span
                       className={`px-2 py-0.5 rounded text-[10px] font-mono font-bold uppercase ${
                         inc.severity === 'critical'
-                          ? 'bg-red-950 text-red-300 border border-red-500/40'
+                          ? 'chip-critical bg-red-950 text-red-300 border border-red-500/40'
                           : inc.severity === 'high'
-                          ? 'bg-orange-950 text-orange-300 border border-orange-500/40'
-                          : 'bg-amber-950 text-amber-300 border border-amber-500/40'
+                          ? 'chip-high bg-orange-950 text-orange-300 border border-orange-500/40'
+                          : 'chip-medium bg-amber-950 text-amber-300 border border-amber-500/40'
                       }`}
                     >
                       {inc.severity}

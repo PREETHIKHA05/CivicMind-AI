@@ -50,17 +50,17 @@ export default function HeaderBar() {
   }, []);
 
   return (
-    <header className="relative z-20 bg-[#0b101d]/90 backdrop-blur-md border-b border-slate-800/80 px-4 py-3 flex flex-wrap items-center justify-between gap-4">
+    <header className="header relative z-20 bg-[#0b101d]/90 backdrop-blur-md border-b border-slate-800/80 px-4 py-3 flex flex-wrap items-center justify-between gap-4">
       {/* Left: Location & System Live Status */}
       <div className="flex items-center gap-4">
-        <div className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-slate-900 border border-slate-800 text-xs font-mono">
+        <div className="header-pill flex items-center gap-2 px-3 py-1.5 rounded-lg bg-slate-900 border border-slate-800 text-xs font-mono">
           <MapPin className="w-4 h-4 text-cyan-400" />
           <span className="font-semibold text-slate-200">{CITY_METADATA.name}</span>
           <span className="text-slate-500">|</span>
           <span className="text-slate-400">{CITY_METADATA.region}</span>
         </div>
 
-        <div className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-cyan-950/60 border border-cyan-500/30 text-xs font-mono font-semibold text-cyan-300">
+        <div className="header-pill flex items-center gap-2 px-3 py-1.5 rounded-lg bg-cyan-950/60 border border-cyan-500/30 text-xs font-mono font-semibold text-cyan-300">
           <span className="relative flex h-2.5 w-2.5">
             <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-cyan-400 opacity-75"></span>
             <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-cyan-500"></span>
@@ -70,17 +70,17 @@ export default function HeaderBar() {
 
         {/* Telemetry Chips */}
         <div className="hidden lg:flex items-center gap-3 text-xs font-mono text-slate-400">
-          <div className="flex items-center gap-1.5 bg-slate-900/60 px-2.5 py-1 rounded-md border border-slate-800">
+          <div className="header-pill flex items-center gap-1.5 bg-slate-900/60 px-2.5 py-1 rounded-md border border-slate-800">
             <Clock className="w-3.5 h-3.5 text-cyan-400" />
-            <span className="text-slate-200">{currentTime || '07:05:22 AM'}</span>
+            <span className="mono text-slate-200">{currentTime || '07:05:22 AM'}</span>
           </div>
 
-          <div className="flex items-center gap-1.5 bg-slate-900/60 px-2.5 py-1 rounded-md border border-slate-800">
+          <div className="header-pill flex items-center gap-1.5 bg-slate-900/60 px-2.5 py-1 rounded-md border border-slate-800">
             <CloudRain className="w-3.5 h-3.5 text-blue-400" />
             <span className="text-blue-300 font-medium">{CITY_METADATA.weather.rainfall}</span>
           </div>
 
-          <div className="flex items-center gap-1.5 bg-slate-900/60 px-2.5 py-1 rounded-md border border-slate-800">
+          <div className="header-pill flex items-center gap-1.5 bg-slate-900/60 px-2.5 py-1 rounded-md border border-slate-800">
             <Thermometer className="w-3.5 h-3.5 text-amber-400" />
             <span className="text-slate-300">{CITY_METADATA.weather.temp}</span>
           </div>

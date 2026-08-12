@@ -38,7 +38,7 @@ export default function AgentCouncil() {
       {/* Page Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-2 border-b border-slate-800">
         <div>
-          <span className="text-xs font-mono font-bold text-cyan-400 uppercase tracking-widest">
+          <span className="eyebrow text-xs font-mono font-bold text-cyan-400 uppercase tracking-widest">
             MULTI-AGENT COLLABORATION NETWORK
           </span>
           <h1 className="text-2xl font-extrabold text-white tracking-tight">AGENT COUNCIL</h1>
@@ -58,7 +58,7 @@ export default function AgentCouncil() {
       </div>
 
       {/* WOW MOMENT 2: AGENT COLLABORATION VISUALIZATION DIAGRAM */}
-      <div className="glass-panel p-6 rounded-2xl border border-purple-500/30 shadow-2xl relative overflow-hidden">
+      <div className="panel-focus glass-panel p-6 rounded-2xl border border-purple-500/30 shadow-2xl relative overflow-hidden">
         <div className="flex items-center justify-between pb-4 border-b border-slate-800">
           <div className="flex items-center gap-2.5">
             <GitMerge className="w-5 h-5 text-purple-400" />

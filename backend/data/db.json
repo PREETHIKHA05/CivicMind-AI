@@ -3,121 +3,377 @@
     "_id": "6a7b384d72320a5dd4fd15bc",
     "planId": "active-crp-01",
     "incidentId": "INC-2026-081",
-    "title": "Ward 18 Hospital Corridor Coordinated Emergency Mitigation",
-    "riskScorePre": 92,
-    "riskScorePost": 40,
-    "confidence": 94,
-    "status": "APPROVED BY ICCC OPERATOR",
-    "operatorNote": "Approved for immediate multi-department dispatch by Zone Counselor.",
-    "approvalTime": "08:29:19 pm",
+    "title": "Fallback Coordinated Response Plan",
+    "riskScorePre": 73,
+    "riskScorePost": 46,
+    "confidence": 75,
+    "status": "Awaiting Human Review",
+    "operatorNote": "",
+    "approvalTime": null,
     "actions": [
       {
         "id": "act-1",
         "departmentId": "water",
-        "department": "Water Resources & Drainage",
+        "department": "water",
         "deptIcon": "Droplets",
         "enabled": true,
         "priority": "HIGH",
-        "baseRiskImpact": 22,
-        "resourceUnits": "2 Mobile Pumps",
-        "resourceCount": 2,
-        "recommendation": "Deploy 2x High-Capacity Mobile Pumps to Ward 18 Low-Point Sump (Station 4B).",
-        "reason": "Ward 18 primary drain capacity depleted to 28%. Backwater effect detected at Gate 2.",
-        "confidence": "96%",
-        "expectedImpact": "Reduces water accumulation by 65% in 20 minutes; lowers flood risk score by 22 pts.",
-        "workOrderStatus": "Pending Dispatch"
+        "baseRiskImpact": 8,
+        "resourceUnits": "Response Unit",
+        "resourceCount": 1,
+        "recommendation": "Deploy mobile pumps and prioritize drain/outfall clearance in the affected sump.",
+        "reason": "Drain utilisation at 97% against 45mm/hr design capacity; overflow expected in ~1 min.",
+        "confidence": "55%",
+        "expectedImpact": "Not computed — Gemini unavailable, deterministic fallback plan.",
+        "evidenceIds": [
+          "tool:water:drain_capacity:002",
+          "tool:water:overflow_eta:003"
+        ],
+        "reversible": true
       },
       {
         "id": "act-2",
-        "departmentId": "traffic",
-        "department": "Traffic Management Bureau",
-        "deptIcon": "Car",
+        "departmentId": "public",
+        "department": "citizen",
+        "deptIcon": "Radio",
         "enabled": true,
         "priority": "HIGH",
-        "baseRiskImpact": 15,
-        "resourceUnits": "Route B Green-Wave Sync",
+        "baseRiskImpact": 8,
+        "resourceUnits": "Response Unit",
         "resourceCount": 1,
-        "recommendation": "Activate Green-Wave Traffic Signal Timing on Route B (EVR Periyar Salai) and restrict Gate 1 to emergency transit.",
-        "reason": "Hospital Road speed dropped to 6 km/h. Bottleneck forming at Trauma Center Gate 1.",
-        "confidence": "94%",
-        "expectedImpact": "Clears 80% of non-essential traffic away from hospital corridor within 8 minutes.",
-        "workOrderStatus": "Pending Dispatch"
+        "recommendation": "Issue a public SMS/broadcast advisory for residents in the affected area.",
+        "reason": "Report volume activation at 71; panic index at 56.",
+        "confidence": "55%",
+        "expectedImpact": "Not computed — Gemini unavailable, deterministic fallback plan.",
+        "evidenceIds": [
+          "tool:citizen:causal_snapshot:001"
+        ],
+        "reversible": true
       },
       {
         "id": "act-3",
-        "departmentId": "emergency",
-        "department": "Emergency Services (108)",
-        "deptIcon": "Ambulance",
+        "departmentId": "traffic",
+        "department": "traffic",
+        "deptIcon": "Car",
         "enabled": true,
-        "priority": "CRITICAL",
-        "baseRiskImpact": 10,
-        "resourceUnits": "3 Ambulances Rerouted",
-        "resourceCount": 3,
-        "recommendation": "Reroute Ambulance #108-B4 and all incoming trauma units to Route B via EVR Periyar Salai.",
-        "reason": "Ambulance #108-B4 carrying critical cardiac patient stuck 800m from ER entrance.",
-        "confidence": "98%",
-        "expectedImpact": "Guarantees direct ER access in 11 minutes (saving 18 minutes of transit time).",
-        "workOrderStatus": "Pending Dispatch"
+        "priority": "HIGH",
+        "baseRiskImpact": 8,
+        "resourceUnits": "Response Unit",
+        "resourceCount": 1,
+        "recommendation": "Activate signal and route diversion away from the saturated corridor.",
+        "reason": "Corridor R7 carrying primary transit load; recommend Green-Wave signal timing to hold speed above congestion threshold.",
+        "confidence": "60%",
+        "expectedImpact": "Not computed — Gemini unavailable, deterministic fallback plan.",
+        "evidenceIds": [
+          "tool:traffic:route_status:004",
+          "tool:traffic:simulate_diversion:006"
+        ],
+        "reversible": true
       },
       {
         "id": "act-4",
-        "departmentId": "public",
-        "department": "Public Information & Advisory",
-        "deptIcon": "Radio",
+        "departmentId": "emergency",
+        "department": "emergency",
+        "deptIcon": "Ambulance",
         "enabled": true,
-        "priority": "MEDIUM",
-        "baseRiskImpact": 4,
-        "resourceUnits": "Zone SMS Broadcast",
+        "priority": "HIGH",
+        "baseRiskImpact": 8,
+        "resourceUnits": "Response Unit",
         "resourceCount": 1,
-        "recommendation": "Issue localized civic alert via SMS & Radio for Ward 18 drivers to bypass Hospital Road.",
-        "reason": "38 geotagged reports of knee-deep water on Hospital Road verified within 15 mins.",
-        "confidence": "88%",
-        "expectedImpact": "Diverts approximately 35% of incoming commuter traffic.",
-        "workOrderStatus": "Pending Dispatch"
+        "recommendation": "Reroute ambulance units to maintain hospital/ER access on the clearest available corridor.",
+        "reason": "7/12 ambulance units delayed (~57min); hospital access loss at 56%.",
+        "confidence": "65%",
+        "expectedImpact": "Not computed — Gemini unavailable, deterministic fallback plan.",
+        "evidenceIds": [
+          "tool:emergency:ambulance_fleet:007",
+          "tool:health:hospital_access:008"
+        ],
+        "reversible": true
       }
     ],
     "createdAt": "2026-08-11T14:57:17.973Z",
-    "updatedAt": "2026-08-11T14:59:19.534Z",
-    "__v": 0
+    "updatedAt": "2026-08-12T01:08:04.268Z",
+    "__v": 0,
+    "causalRiskIndex": 73.39233221603159,
+    "causalTerminals": [
+      {
+        "id": "hospital_access_loss",
+        "label": "Hospital access loss",
+        "activation": 56.45564016617814,
+        "arrivalMin": 73
+      },
+      {
+        "id": "power_outage_risk",
+        "label": "Power outage risk",
+        "activation": 46.675787104647995,
+        "arrivalMin": 40
+      },
+      {
+        "id": "hospital_er_capacity_strain",
+        "label": "Hospital ER capacity strain",
+        "activation": 33.87338409970688,
+        "arrivalMin": 88
+      },
+      {
+        "id": "water_supply_contamination",
+        "label": "Water supply contamination",
+        "activation": 29.1885744,
+        "arrivalMin": 65
+      },
+      {
+        "id": "citizen_evacuation_trigger",
+        "label": "Citizen evacuation trigger",
+        "activation": 25.929183591999994,
+        "arrivalMin": 95
+      }
+    ],
+    "confidenceBreakdown": {
+      "evidenceCoverage": 1,
+      "dataFreshness": 0.9920130257061169,
+      "pathStrength": 0.392305056,
+      "memorySupport": 0.44,
+      "agentAgreement": 0.75
+    },
+    "conflictsResolved": [
+      {
+        "route": "R7",
+        "adoptedRoute": "R9",
+        "cost": "rejected R7, adopted R9 (+1 min transit cost)"
+      }
+    ],
+    "evidencePool": [
+      {
+        "id": "tool:weather:rainfall_nowcast:001",
+        "data": {
+          "wardId": "ward18",
+          "horizonHours": 6,
+          "currentIntensityMmHr": 118,
+          "projectedAccumulationMm": 708,
+          "imdCategory": "extremely heavy"
+        }
+      },
+      {
+        "id": "tool:water:drain_capacity:002",
+        "data": {
+          "wardId": "ward18",
+          "designCapacityMmHr": 45,
+          "utilisationPct": 97,
+          "blockages": 2,
+          "outfallStatus": "clear"
+        }
+      },
+      {
+        "id": "tool:water:overflow_eta:003",
+        "data": {
+          "inflowMmHr": 118,
+          "capacityMmHr": 45,
+          "currentPct": 97,
+          "etaMinutes": 1
+        }
+      },
+      {
+        "id": "tool:citizen:causal_snapshot:001",
+        "data": {
+          "reportVolumeActivation": 71,
+          "panicIndexActivation": 56
+        }
+      },
+      {
+        "id": "tool:traffic:route_status:004",
+        "data": {
+          "routes": [
+            {
+              "routeId": "R7",
+              "saturationPct": 57,
+              "speedKmh": 21
+            },
+            {
+              "routeId": "R9",
+              "saturationPct": 70,
+              "speedKmh": 16
+            }
+          ]
+        }
+      },
+      {
+        "id": "tool:traffic:simulate_diversion:006",
+        "data": {
+          "fromRoute": "R7",
+          "toRoute": "R9",
+          "fromSaturationPct": 57,
+          "toSaturationPct": 70,
+          "transitCostMin": 1
+        }
+      },
+      {
+        "id": "tool:emergency:ambulance_fleet:007",
+        "data": {
+          "zone": "ward18",
+          "fleetBaseline": 12,
+          "delayedUnits": 7,
+          "avgDelayMin": 57
+        }
+      },
+      {
+        "id": "tool:health:hospital_access:008",
+        "data": {
+          "hospitalId": "kmc-trauma",
+          "accessLossPct": 56,
+          "erCapacityStrainPct": 34,
+          "status": "access at risk"
+        }
+      },
+      {
+        "id": "tool:memory:retrieve:001",
+        "data": [
+          {
+            "id": "HIST-2021-11-MEMORY-MATCH",
+            "title": "Ward 18 2021 Flood — Full Incident Retrospective",
+            "date": "2021-11-07",
+            "outcome": "PARTIAL_FAILURE",
+            "outcomeSummary": "Overall response reduced projected risk by roughly 40%, but the single highest-cost failure was the pump/outfall mismatch (see HIST-2021-11-W18) — the traffic and emergency response components performed well in isolation.",
+            "lessonLearned": "A coordinated response can still underperform if even one department's action targets the wrong constraint — partial success on 3 of 4 fronts is not the same as success.",
+            "riskReductionPct": 40,
+            "tags": [
+              "ward18",
+              "drain_saturation",
+              "hospital_access",
+              "ambulance_delay",
+              "partial_failure"
+            ],
+            "similarity": 0.44
+          },
+          {
+            "id": "HIST-2021-11-W18",
+            "title": "Ward 18 Flash Flood & Hospital Road Paralysis",
+            "date": "2021-11-07",
+            "outcome": "PARTIAL_FAILURE",
+            "outcomeSummary": "Mobile pumps deployed to Ward 18 in 2021, but risk was reduced only 8% because the storm drain outfall was already submerged by canal backflow — the pumps had nowhere to discharge to.",
+            "lessonLearned": "Pump deployment is ineffective once the outfall is submerged — check outfall status before committing pump units, not just drain saturation.",
+            "riskReductionPct": 8,
+            "tags": [
+              "ward18",
+              "drain_saturation",
+              "pump_deployment",
+              "hospital_access",
+              "partial_failure"
+            ],
+            "similarity": 0.42
+          },
+          {
+            "id": "HIST-2023-12-MICHAUNG",
+            "title": "Cyclone Michaung — Coastal Ward Storm Surge + Rainfall",
+            "date": "2023-12-04",
+            "outcome": "FAILURE",
+            "outcomeSummary": "Airport and multiple hospital access roads flooded; power outages disabled traffic signals city-wide for 14+ hours, compounding gridlock during evacuation.",
+            "lessonLearned": "Power infrastructure stress must trigger traffic-signal contingency planning before outage occurs, not after — signal failure during evacuation is a compounding, not independent, risk.",
+            "riskReductionPct": 5,
+            "tags": [
+              "cyclone",
+              "power_outage",
+              "hospital_access",
+              "evacuation",
+              "failure"
+            ],
+            "similarity": 0.36
+          }
+        ]
+      },
+      {
+        "id": "memory:HIST-2021-11-MEMORY-MATCH",
+        "data": {
+          "title": "Ward 18 2021 Flood — Full Incident Retrospective",
+          "outcome": "PARTIAL_FAILURE",
+          "similarity": 0.44
+        }
+      },
+      {
+        "id": "memory:HIST-2021-11-W18",
+        "data": {
+          "title": "Ward 18 Flash Flood & Hospital Road Paralysis",
+          "outcome": "PARTIAL_FAILURE",
+          "similarity": 0.42
+        }
+      },
+      {
+        "id": "memory:HIST-2023-12-MICHAUNG",
+        "data": {
+          "title": "Cyclone Michaung — Coastal Ward Storm Surge + Rainfall",
+          "outcome": "FAILURE",
+          "similarity": 0.36
+        }
+      }
+    ],
+    "gate": "HUMAN_APPROVAL",
+    "gateReason": "Confidence 75/100 — within range but not high enough, or not low-cost enough, for auto-execution.",
+    "revisionHistory": 0,
+    "runId": "run-1786509817445",
+    "unresolved": [
+      "Gemini unavailable this run — plan drafted deterministically from templated actions, not critiqued for phrasing gaps."
+    ]
   },
   "workOrders": [
     {
-      "_id": "6a7b38c772320a5dd4fd15c3",
-      "taskId": "task-1786460359529-1",
-      "actionId": "act-2",
-      "departmentId": "traffic",
-      "departmentName": "Traffic Management Bureau",
-      "title": "Traffic Management Bureau Action: Route B Green-Wave Sync",
-      "recommendation": "Activate Green-Wave Traffic Signal Timing on Route B (EVR Periyar Salai) and restrict Gate 1 to emergency transit.",
+      "_id": "6a7bc55bd920095da107c08e",
+      "taskId": "task-1786496347552-3",
+      "actionId": "act-4",
+      "departmentId": "emergency",
+      "departmentName": "emergency",
+      "title": "emergency Action: Response Unit",
+      "recommendation": "Reroute ambulance units to maintain hospital/ER access on the clearest available corridor.",
       "priority": "HIGH",
       "assignedBy": "Zone Counselor",
-      "assignedTime": "08:29:19 pm",
+      "assignedTime": "06:29:07 am",
       "status": "Assigned",
-      "expectedImpact": "Clears 80% of non-essential traffic away from hospital corridor within 8 minutes.",
+      "expectedImpact": "Not computed — Gemini unavailable, deterministic fallback plan.",
       "logs": [
         {
-          "time": "08:29:19 pm",
+          "time": "06:29:07 am",
           "author": "Zone Counselor",
           "note": "Work Order issued via Approved Plan."
         }
       ],
-      "createdAt": "2026-08-11T14:59:19.664Z",
-      "updatedAt": "2026-08-11T14:59:19.664Z",
+      "createdAt": "2026-08-12T00:59:07.857Z",
+      "updatedAt": "2026-08-12T00:59:07.857Z",
       "__v": 0
     },
     {
-      "_id": "6a7b38c772320a5dd4fd15c1",
-      "taskId": "task-1786460359529-0",
-      "actionId": "act-1",
-      "departmentId": "water",
-      "departmentName": "Water Resources & Drainage",
-      "title": "Water Resources & Drainage Action: 2 Mobile Pumps",
-      "recommendation": "Deploy 2x High-Capacity Mobile Pumps to Ward 18 Low-Point Sump (Station 4B).",
+      "_id": "6a7bc55bd920095da107c08c",
+      "taskId": "task-1786496347552-2",
+      "actionId": "act-3",
+      "departmentId": "traffic",
+      "departmentName": "traffic",
+      "title": "traffic Action: Response Unit",
+      "recommendation": "Activate signal and route diversion away from the saturated corridor.",
       "priority": "HIGH",
       "assignedBy": "Zone Counselor",
-      "assignedTime": "08:29:19 pm",
+      "assignedTime": "06:29:07 am",
       "status": "Assigned",
-      "expectedImpact": "Reduces water accumulation by 65% in 20 minutes; lowers flood risk score by 22 pts.",
+      "expectedImpact": "Not computed — Gemini unavailable, deterministic fallback plan.",
+      "logs": [
+        {
+          "time": "06:29:07 am",
+          "author": "Zone Counselor",
+          "note": "Work Order issued via Approved Plan."
+        }
+      ],
+      "createdAt": "2026-08-12T00:59:07.793Z",
+      "updatedAt": "2026-08-12T00:59:07.793Z",
+      "__v": 0
+    },
+    {
+      "_id": "6a7bc55bd920095da107c08a",
+      "taskId": "task-1786460359529-1",
+      "actionId": "act-2",
+      "departmentId": "public",
+      "departmentName": "citizen",
+      "title": "citizen Action: Response Unit",
+      "recommendation": "Issue a public SMS/broadcast advisory for residents in the affected area.",
+      "priority": "HIGH",
+      "assignedBy": "Zone Counselor",
+      "assignedTime": "06:29:07 am",
+      "status": "Assigned",
+      "expectedImpact": "Not computed — Gemini unavailable, deterministic fallback plan.",
       "logs": [
         {
           "time": "08:29:19 pm",
@@ -125,10 +381,34 @@
           "note": "Work Order issued via Approved Plan."
         }
       ],
-      "createdAt": "2026-08-11T14:59:19.629Z",
-      "updatedAt": "2026-08-11T14:59:19.629Z",
+      "createdAt": "2026-08-12T00:59:07.738Z",
+      "updatedAt": "2026-08-12T00:59:07.738Z",
+      "__v": 0
+    },
+    {
+      "_id": "6a7bc55bd920095da107c088",
+      "taskId": "task-1786460359529-0",
+      "actionId": "act-1",
+      "departmentId": "water",
+      "departmentName": "water",
+      "title": "water Action: Response Unit",
+      "recommendation": "Deploy mobile pumps and prioritize drain/outfall clearance in the affected sump.",
+      "priority": "HIGH",
+      "assignedBy": "Zone Counselor",
+      "assignedTime": "06:29:07 am",
+      "status": "Assigned",
+      "expectedImpact": "Not computed — Gemini unavailable, deterministic fallback plan.",
+      "logs": [
+        {
+          "time": "08:29:19 pm",
+          "author": "Zone Counselor",
+          "note": "Work Order issued via Approved Plan."
+        }
+      ],
+      "createdAt": "2026-08-12T00:59:07.673Z",
+      "updatedAt": "2026-08-12T00:59:07.673Z",
       "__v": 0
     }
   ],
-  "lastSavedAt": "2026-08-11T15:00:07.981Z"
+  "lastSavedAt": "2026-08-12T04:43:50.829Z"
 }

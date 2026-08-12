@@ -43,7 +43,7 @@ export default function CommandCenter() {
       {/* Page Title & Status Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-2 border-b border-slate-800">
         <div>
-          <span className="text-xs font-mono font-bold text-cyan-400 uppercase tracking-widest">
+          <span className="eyebrow text-xs font-mono font-bold text-cyan-400 uppercase tracking-widest">
             ICCC REAL-TIME COMMAND BOARD
           </span>
           <h1 className="text-2xl font-extrabold text-white tracking-tight">CITY COMMAND CENTER</h1>
@@ -76,13 +76,17 @@ export default function CommandCenter() {
             key={idx}
             className={`glass-panel-interactive p-3.5 rounded-xl border ${kpi.border} flex flex-col justify-between`}
           >
-            <span className="text-[10px] font-mono font-bold text-slate-400 uppercase tracking-wider block">
+            <span className="metric-label text-[10px] font-mono font-bold text-slate-400 uppercase tracking-wider block">
               {kpi.title}
             </span>
-            <div className={`text-xl font-extrabold font-mono my-1 ${kpi.color}`}>
+            <div className={`metric-value text-xl font-extrabold font-mono my-1 ${kpi.color} ${
+              kpi.value === '02' ? 'is-critical' : 
+              kpi.value === '07' ? 'is-warning' : 
+              kpi.value.includes('100%') ? 'is-ok' : ''
+            }`}>
               {kpi.value}
             </div>
-            <span className="text-[10px] text-slate-400 truncate">{kpi.subtitle}</span>
+            <span className="metric-sub text-[10px] text-slate-400 truncate">{kpi.subtitle}</span>
           </div>
         ))}
       </div>

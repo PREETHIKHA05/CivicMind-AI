@@ -60,7 +60,7 @@ export default function Sidebar() {
 
   return (
     <aside
-      className={`relative z-30 h-screen bg-[#090e1a] border-r border-slate-800/80 flex flex-col justify-between transition-all duration-300 ${
+      className={`sidebar relative z-30 h-screen bg-[#090e1a] border-r border-slate-800/80 flex flex-col justify-between transition-all duration-300 ${
         isCollapsed ? 'w-20' : 'w-64'
       }`}
     >
@@ -124,7 +124,7 @@ export default function Sidebar() {
                 }}
                 className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-xl font-medium text-sm transition-all cursor-pointer group relative ${
                   isActive
-                    ? 'bg-slate-800/90 text-white border border-cyan-500/40 shadow-md shadow-cyan-950/40'
+                    ? 'active bg-slate-800/90 text-white border border-cyan-500/40 shadow-md shadow-cyan-950/40'
                     : 'text-slate-400 hover:text-slate-200 hover:bg-slate-900/50 border border-transparent'
                 } ${isCollapsed ? 'justify-center px-0' : ''}`}
                 title={isCollapsed ? item.label : undefined}

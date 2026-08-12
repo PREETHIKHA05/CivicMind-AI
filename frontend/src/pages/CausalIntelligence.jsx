@@ -11,7 +11,7 @@ export default function CausalIntelligence() {
     <div className="space-y-8 pb-12">
       {/* Header */}
       <div className="pb-2 border-b border-slate-800">
-        <span className="text-xs font-mono font-bold text-cyan-400 uppercase tracking-widest">
+        <span className="eyebrow text-xs font-mono font-bold text-cyan-400 uppercase tracking-widest">
           PROBABILISTIC CAUSAL DISCOVERY ENGINE
         </span>
         <h1 className="text-2xl font-extrabold text-white tracking-tight">URBAN CAUSAL INTELLIGENCE GRAPH</h1>
@@ -40,9 +40,9 @@ export default function CausalIntelligence() {
                 <React.Fragment key={node.id}>
                   <button
                     onClick={() => setSelectedNode(node)}
-                    className={`w-full p-4 rounded-xl border text-left transition-all cursor-pointer flex items-center justify-between ${
+                    className={`cascade-node w-full p-4 rounded-xl border text-left transition-all cursor-pointer flex items-center justify-between ${
                       isSelected
-                        ? 'bg-cyan-950/80 border-cyan-400 shadow-xl shadow-cyan-950/80 text-white scale-[1.01]'
+                        ? 'is-selected bg-cyan-950/80 border-cyan-400 shadow-xl shadow-cyan-950/80 text-white scale-[1.01]'
                         : 'bg-slate-900/60 border-slate-800 hover:bg-slate-800/60 text-slate-300'
                     }`}
                   >
@@ -51,12 +51,14 @@ export default function CausalIntelligence() {
                         0{idx + 1}
                       </span>
                       <div>
-                        <h4 className="text-sm font-extrabold font-mono uppercase">{node.label}</h4>
-                        <span className="text-[11px] text-slate-400 truncate max-w-md block">{node.detail}</span>
+                        <h4 className="cascade-node-name text-sm font-extrabold font-mono uppercase">{node.label}</h4>
+                        <span className="cascade-node-meta text-[11px] text-slate-400 truncate max-w-md block">{node.detail}</span>
                       </div>
                     </div>
 
-                    <span className="text-xs font-mono font-semibold text-cyan-300 shrink-0">
+                    <span className={`cascade-node-value text-xs font-mono font-semibold text-cyan-300 shrink-0 ${
+                      node.val > 70 ? 'sev-high' : node.val > 40 ? 'sev-mid' : 'sev-low'
+                    }`}>
                       Value: {node.val}%
                     </span>
                   </button>
