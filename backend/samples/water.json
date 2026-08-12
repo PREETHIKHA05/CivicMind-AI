@@ -1,0 +1,24 @@
+{
+  "agent": "water",
+  "conclusion": "Ward 18 primary sump will overflow in approximately 22 minutes at current inflow. The R7 outfall channel is already submerged — back-pressure renders pumping alone insufficient. Secondary diversion via Canal North is the only viable pressure-relief path, but gate 4N requires manual actuation.",
+  "signals": {
+    "drain_capacity_mm_hr": 45,
+    "utilisation_pct": 96,
+    "minutes_to_overflow": 22,
+    "r7_outfall_depth_cm": 138,
+    "r7_design_max_cm": 120,
+    "pump_unit_output_m3_hr": 210,
+    "inflow_rate_m3_hr": 390
+  },
+  "evidenceIds": [
+    "tool:water:drain_capacity:001",
+    "tool:water:r7_outfall_sensor:014",
+    "tool:water:pump_telemetry:W18-P3"
+  ],
+  "selfConfidence": 0.91,
+  "flags": [
+    "route_R7_saturated",
+    "overflow_imminent_22min",
+    "manual_gate_4N_required"
+  ]
+}

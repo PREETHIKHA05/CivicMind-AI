@@ -1,0 +1,23 @@
+{
+  "agent": "citizen",
+  "conclusion": "41 geotagged civic reports confirm knee-to-waist-deep inundation along Hospital Road and the R7 junction approach within the past 18 minutes. Sentiment analysis of 108 helpline calls shows escalating panic; 6 callers specifically reported vehicles stalling in floodwater at the R7 on-ramp. No reports yet from Canal North — that corridor appears passable.",
+  "signals": {
+    "geotagged_reports_count": 41,
+    "reports_per_15_min": 38,
+    "r7_onramp_stall_reports": 6,
+    "canal_north_reports": 0,
+    "average_sentiment_score": -0.71,
+    "cluster_ward": "Ward 18",
+    "photo_verified_flooding_spots": 9
+  },
+  "evidenceIds": [
+    "tool:citizen:nlp_cluster:W18-2026-0812",
+    "tool:citizen:photo_verify:batch-0047"
+  ],
+  "selfConfidence": 0.83,
+  "flags": [
+    "r7_onramp_flooded_citizen_verified",
+    "canal_north_clear",
+    "high_public_distress"
+  ]
+}

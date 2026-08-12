@@ -1,0 +1,20 @@
+{
+  "agent": "weather",
+  "conclusion": "A quasi-stationary convective cell is pinned over Ward 18. Sustained intensity is 118 mm/hr — above the 90th-percentile threshold for this micro-watershed. No movement expected for the next 40 minutes; total accumulation will exceed 80 mm before the cell drifts east.",
+  "signals": {
+    "rainfall_intensity_mm_hr": 118,
+    "cell_movement_km_hr": 2.1,
+    "estimated_duration_min": 40,
+    "accumulated_mm_so_far": 47,
+    "ward18_peak_gust_km_hr": 31
+  },
+  "evidenceIds": [
+    "tool:weather:doppler_cell:001",
+    "tool:weather:imdd_alert:W18-2026-0812"
+  ],
+  "selfConfidence": 0.94,
+  "flags": [
+    "cell_stationary_over_ward18",
+    "intensity_above_drain_design_spec"
+  ]
+}
