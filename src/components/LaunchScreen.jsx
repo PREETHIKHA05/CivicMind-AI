@@ -47,8 +47,6 @@ export default function LaunchScreen() {
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-white text-slate-900 font-sans overflow-y-auto p-4 sm:p-6">
-      {/* Background Subtle Grid */}
-      <div className="absolute inset-0 bg-[linear-gradient(to_right,#e2e8f00a_1px,transparent_1px),linear-gradient(to_bottom,#e2e8f00a_1px,transparent_1px)] bg-[size:3rem_3rem] pointer-events-none" />
 
       <div className="relative z-10 max-w-3xl w-full mx-auto my-auto p-6 md:p-8 bg-[#1e3a5f] rounded-2xl border border-purple-500/30 shadow-2xl">
         {/* Header Bar */}
