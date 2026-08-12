@@ -8,19 +8,13 @@ import {
   BrainCircuit,
   FileCheck2,
   History,
-  BarChart3,
   Cpu,
   ChevronLeft,
   ChevronRight,
-  ShieldAlert,
-  Server,
-  UserCheck,
-  Bot,
   Layers,
   FileText,
   Activity,
-  Sparkles,
-  ShieldCheck
+  Sparkles
 } from 'lucide-react';
 
 export default function Sidebar() {
@@ -43,8 +37,7 @@ export default function Sidebar() {
     { id: 'causal-intelligence', label: '5. Causal Intelligence', shortLabel: 'Causal Graph', icon: BrainCircuit },
     { id: 'response-plans', label: '6. Response Plans', shortLabel: 'Plans', icon: FileCheck2, badge: 'Editable' },
     { id: 'department-dashboard', label: '7. Dept Dashboards', shortLabel: 'Work Orders', icon: Layers, badge: `${myDeptTasks.length} Tasks` },
-    { id: 'city-memory', label: '8. City Memory', shortLabel: 'Memory', icon: History },
-    { id: 'analytics', label: '9. Analytics', shortLabel: 'Analytics', icon: BarChart3 }
+    { id: 'city-memory', label: '8. City Memory', shortLabel: 'Memory', icon: History }
   ];
 
   const departmentNavItems = [
@@ -162,43 +155,7 @@ export default function Sidebar() {
       </div>
 
       {/* Bottom Status Panel */}
-      <div className="p-3 border-t border-slate-800/80 bg-slate-950/60 text-xs">
-        {isCollapsed ? (
-          <div className="flex flex-col items-center gap-3 text-slate-400">
-            <Server className="w-4 h-4 text-emerald-400" title="All Systems Operational" />
-            <Bot className="w-4 h-4 text-purple-400" title="7 Agents Active" />
-            <UserCheck className="w-4 h-4 text-cyan-400" title={currentUser?.name || "Zone Counselor"} />
-          </div>
-        ) : (
-          <div className="space-y-2 font-mono text-[11px]">
-            <div className="flex items-center justify-between text-slate-300">
-              <span className="text-slate-500 flex items-center gap-1.5">
-                <Server className="w-3.5 h-3.5 text-emerald-400" />
-                System Status
-              </span>
-              <span className="text-emerald-400 font-semibold">Operational</span>
-            </div>
-
-            <div className="flex items-center justify-between text-slate-300">
-              <span className="text-slate-500 flex items-center gap-1.5">
-                <Bot className="w-3.5 h-3.5 text-purple-400" />
-                AI Consensus
-              </span>
-              <span className="text-purple-300 font-semibold">95% Sync</span>
-            </div>
-
-            <div className="flex items-center justify-between pt-1 border-t border-slate-800/60 text-slate-300">
-              <span className="text-slate-500 flex items-center gap-1.5">
-                <UserCheck className="w-3.5 h-3.5 text-cyan-400" />
-                Logged User
-              </span>
-              <span className="text-cyan-300 font-semibold truncate max-w-[100px]" title={currentUser?.name}>
-                {currentUser?.name?.split(' ')[0] || 'Counselor'}
-              </span>
-            </div>
-          </div>
-        )}
-      </div>
+      <div className="p-3 border-t border-slate-800/80 bg-slate-950/60"></div>
     </aside>
   );
 }

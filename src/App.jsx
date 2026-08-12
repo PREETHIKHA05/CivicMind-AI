@@ -15,7 +15,6 @@ import CausalIntelligence from './pages/CausalIntelligence';
 import ResponsePlans from './pages/ResponsePlans';
 import DepartmentDashboard from './pages/DepartmentDashboard';
 import CityMemory from './pages/CityMemory';
-import Analytics from './pages/Analytics';
 
 import { X, AlertTriangle, CheckCircle2, Info, AlertCircle } from 'lucide-react';
 
@@ -44,8 +43,6 @@ function MainLayout() {
         return <DepartmentDashboard />;
       case 'city-memory':
         return <CityMemory />;
-      case 'analytics':
-        return <Analytics />;
       default:
         return <CommandCenter />;
     }
