@@ -252,7 +252,7 @@ export default function DepartmentDashboard() {
           }`}
         >
           <LayoutDashboard className="w-4 h-4" />
-          <span>DEPARTMENT OVERVIEW</span>
+          <span>Department Overview</span>
         </button>
 
         <button
@@ -264,7 +264,7 @@ export default function DepartmentDashboard() {
           }`}
         >
           <FileText className="w-4 h-4" />
-          <span>ASSIGNED WORK ORDERS ({assignedTasks.length})</span>
+          <span>Assigned Work Orders ({assignedTasks.length})</span>
         </button>
 
         <button
@@ -276,7 +276,7 @@ export default function DepartmentDashboard() {
           }`}
         >
           <BarChart3 className="w-4 h-4" />
-          <span>TELEMETRY & DATA ANALYTICS</span>
+          <span>Telemetry & Data Analytics</span>
         </button>
 
         <button
@@ -288,7 +288,7 @@ export default function DepartmentDashboard() {
           }`}
         >
           <Sparkles className="w-4 h-4" />
-          <span>EMERGENCY PROTOCOLS</span>
+          <span>Emergency Protocols</span>
         </button>
       </div>
 
@@ -427,7 +427,7 @@ export default function DepartmentDashboard() {
         </div>
       )}
 
-      {/* TAB 2: ASSIGNED WORK ORDERS */}
+      {/* TAB 2: Assigned Work Orders */}
       {activeTab === 'tasks' && (
         <div className="space-y-6 font-mono text-xs">
           {assignedTasks.length === 0 ? (
@@ -489,14 +489,14 @@ export default function DepartmentDashboard() {
                               onClick={() => updateTaskStatus(task.id, 'In Progress')}
                               className="px-3.5 py-1.5 rounded-xl bg-purple-600 hover:bg-purple-700 text-white font-mono text-xs font-bold cursor-pointer transition-colors shadow-sm"
                             >
-                              START EXECUTION
+                              Start Execution
                             </button>
                           )}
                           <button
                             onClick={() => updateTaskStatus(task.id, 'Completed')}
                             className="px-3.5 py-1.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-mono text-xs font-bold cursor-pointer transition-colors shadow-sm"
                           >
-                            MARK COMPLETED
+                            Mark Completed
                           </button>
                         </div>
                       )}
@@ -507,7 +507,7 @@ export default function DepartmentDashboard() {
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs font-mono">
                     <div className="p-3.5 rounded-xl bg-slate-50 border border-slate-100">
                       <span className="text-[10px] text-cyan-800 font-bold block mb-1">
-                        RECOMMENDED ACTION INSTRUCTION
+                        Recommended Action Instruction
                       </span>
                       <p className="text-slate-700 leading-relaxed font-semibold">
                         {task.recommendation}
@@ -516,7 +516,7 @@ export default function DepartmentDashboard() {
 
                     <div className="p-3.5 rounded-xl bg-emerald-50 border border-emerald-200">
                       <span className="text-[10px] text-emerald-800 font-bold block mb-1">
-                        EXPECTED CASCADING IMPACT
+                        Expected Cascading Impact
                       </span>
                       <p className="text-emerald-950 leading-relaxed font-semibold">
                         {task.expectedImpact}
@@ -527,7 +527,7 @@ export default function DepartmentDashboard() {
                   {/* Field Progress Logs */}
                   <div className="pt-2 space-y-3">
                     <span className="text-xs font-mono font-bold text-slate-500 tracking-wider block">
-                      FIELD OPERATIONAL LOGS ({task.logs.length})
+                      Field Operational Logs ({task.logs.length})
                     </span>
 
                     <div className="space-y-2 max-h-40 overflow-y-auto pr-1">
@@ -570,7 +570,7 @@ export default function DepartmentDashboard() {
         </div>
       )}
 
-      {/* TAB 3: TELEMETRY & DATA ANALYTICS */}
+      {/* TAB 3: Telemetry & Data Analytics */}
       {activeTab === 'analytics' && (
         <div className="space-y-6 font-mono text-xs">
           <div className="glass-panel p-6 rounded-2xl border border-purple-100 space-y-4 shadow-sm">
@@ -599,11 +599,11 @@ export default function DepartmentDashboard() {
         </div>
       )}
 
-      {/* TAB 4: EMERGENCY PROTOCOLS */}
+      {/* TAB 4: Emergency Protocols */}
       {activeTab === 'protocols' && (
         <div className="glass-panel p-6 rounded-2xl border border-purple-100 space-y-4 font-mono text-xs shadow-sm">
           <h3 className="text-sm font-bold text-purple-950">
-            DIRECT DEPARTMENT EMERGENCY PROTOCOLS
+            Direct Department Emergency Protocols
           </h3>
           <p className="text-slate-650">
             Emergency department-level commands synchronized with CivicMind AI Multi-Agent Engine.

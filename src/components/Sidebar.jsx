@@ -18,7 +18,7 @@ import {
 } from 'lucide-react';
 
 export default function Sidebar() {
-  const { activePage, setActivePage, currentUser, departmentTasks } = useCity();
+  const { activePage, setActivePage, currentUser, departmentTasks, setIsAiDrawerOpen } = useCity();
   const [isCollapsed, setIsCollapsed] = useState(false);
 
   const isDeptRole = currentUser && currentUser.role === 'department';
@@ -28,7 +28,7 @@ export default function Sidebar() {
     ? departmentTasks.filter(t => t.departmentId === currentUser.departmentId && t.status !== 'Completed')
     : departmentTasks.filter(t => t.status !== 'Completed');
 
-  // Counselors see all 9 pages. Department Officials see department-tailored pages.
+  // Counselors see all 8 pages. Department Officials see department-tailored pages.
   const counselorNavItems = [
     { id: 'command-center', label: '1. Command Center', shortLabel: 'Command', icon: LayoutDashboard },
     { id: 'city-intelligence', label: '2. City Intelligence', shortLabel: 'City Data', icon: Building2 },
@@ -155,7 +155,25 @@ export default function Sidebar() {
       </div>
 
       {/* Bottom Status Panel */}
-      <div className="p-3 border-t border-purple-100 bg-purple-50/10"></div>
+      <div className="p-3 border-t border-purple-100 bg-purple-50/10 flex flex-col gap-2">
+        {!isCollapsed ? (
+          <button
+            onClick={() => setIsAiDrawerOpen(true)}
+            className="w-full flex items-center justify-center gap-2 px-3 py-2.5 rounded-xl font-medium text-sm bg-purple-600 hover:bg-purple-700 text-white transition-all cursor-pointer shadow-md shadow-purple-600/10 group"
+          >
+            <Sparkles className="w-4 h-4 text-white group-hover:scale-110 transition-transform" />
+            <span>Ask AI Agent (Chat Bot)</span>
+          </button>
+        ) : (
+          <button
+            onClick={() => setIsAiDrawerOpen(true)}
+            className="w-full flex items-center justify-center p-2 rounded-xl bg-purple-600 hover:bg-purple-700 text-white transition-all cursor-pointer group"
+            title="Ask AI Agent (Chat Bot)"
+          >
+            <Sparkles className="w-5 h-5 text-white group-hover:scale-110 transition-transform" />
+          </button>
+        )}
+      </div>
     </aside>
   );
 }

@@ -9,15 +9,9 @@ import {
   ShieldCheck,
   Play,
   RotateCcw,
-  Bot,
-  Search,
-  Bell,
   Sparkles,
-  HelpCircle,
-  Activity,
   UserCheck,
   LogOut,
-  Building2,
   ChevronDown
 } from 'lucide-react';
 
@@ -29,10 +23,7 @@ export default function HeaderBar() {
     setIsAiDrawerOpen,
     isSimulating,
     resetSimulation,
-    currentRiskScore,
-    planStatus,
     setIsResponsibleAiModalOpen,
-    toasts,
     runStatus,
     startAgentRun
   } = useCity();
@@ -156,7 +147,7 @@ export default function HeaderBar() {
           </span>
         </button>
 
-        {/* PROMINENT SIMULATION BUTTON — triggers the real orchestrator run, not a timer */}
+        {/* PROMINENT SIMULATION BUTTON — triggers the real orchestrator run */}
         <div className="flex items-center gap-1.5">
           {!isSimulating ? (
             <button

@@ -115,10 +115,10 @@ export default function ResponsePlans() {
         <div className="glass-panel p-6 rounded-2xl border border-purple-200 flex flex-col md:flex-row md:items-center justify-between gap-4">
           <div>
             <span className="text-xs font-mono font-bold text-cyan-700 tracking-widest">
-              HUMAN-IN-THE-LOOP DECISION MATRIX
+              Human-in-the-Loop Decision Matrix
             </span>
             <h1 className="text-2xl font-extrabold text-purple-950 tracking-tight mt-1">
-              COORDINATED RESPONSE PLAN (CRP)
+              Coordinated Response Plan (CRP)
             </h1>
           </div>
         </div>
@@ -141,14 +141,14 @@ export default function ResponsePlans() {
         <div>
           <div className="flex items-center gap-2">
             <span className="text-xs font-mono font-bold text-cyan-700 tracking-widest">
-              HUMAN-IN-THE-LOOP DECISION MATRIX
+              Human-in-the-Loop Decision Matrix
             </span>
             <span className="px-2 py-0.5 rounded bg-cyan-50 text-cyan-700 border border-cyan-200 text-[10px] font-mono font-bold">
               {isCounselor ? 'Role: Zone Counselor (Admin)' : `Role: ${currentUser?.deptName || 'Department Official'}`}
             </span>
           </div>
           <h1 className="text-2xl font-extrabold text-purple-950 tracking-tight mt-1">
-            COORDINATED RESPONSE PLAN (CRP)
+            Coordinated Response Plan (CRP)
           </h1>
           <p className="text-xs text-slate-600 font-mono">
             Multi-department recommendations synthesized by CivicMind AI. Zone Counselor can customize department actions and approve work orders.
@@ -178,7 +178,7 @@ export default function ResponsePlans() {
           <div>
             <div className="flex items-center gap-2">
               <span className="px-2.5 py-0.5 rounded bg-red-50 text-red-700 border border-red-200 text-xs font-mono font-bold">
-                CRITICAL TARGET RISK
+                Critical Target Risk
               </span>
               <span className="text-xs font-mono text-slate-500">Incident: INC-2026-081 (Ward 18)</span>
             </div>
@@ -193,14 +193,14 @@ export default function ResponsePlans() {
           {/* Dynamic Risk Gauge Box */}
           <div className="flex items-center gap-4 bg-slate-50 p-4 rounded-2xl border border-purple-100 font-mono text-center shrink-0">
             <div>
-              <span className="text-[10px] text-slate-500 block font-semibold">PRE-INTERVENTION</span>
+              <span className="text-[10px] text-slate-500 block font-semibold">Pre-Intervention</span>
               <span className="text-xl font-extrabold text-red-750">92/100</span>
             </div>
 
             <div className="w-px h-10 bg-slate-200" />
 
             <div>
-              <span className="text-[10px] text-cyan-800 block font-semibold">DYNAMIC PROJECTED RISK</span>
+              <span className="text-[10px] text-cyan-800 block font-semibold">Dynamic Projected Risk</span>
               <div className="flex items-center justify-center gap-1.5">
                 <span className={`text-2xl font-extrabold ${dynamicRisk <= 45 ? 'text-emerald-700' : dynamicRisk <= 65 ? 'text-amber-700' : 'text-red-700'}`}>
                   {dynamicRisk}/100
@@ -216,7 +216,7 @@ export default function ResponsePlans() {
             <div className="w-px h-10 bg-slate-200" />
 
             <div>
-              <span className="text-[10px] text-slate-500 block font-semibold">CONFIDENCE</span>
+              <span className="text-[10px] text-slate-500 block font-semibold">Confidence</span>
               <span className="text-lg font-bold text-cyan-800">94%</span>
             </div>
           </div>
@@ -247,7 +247,7 @@ export default function ResponsePlans() {
                 className="px-5 py-2.5 rounded-xl bg-amber-550/10 hover:bg-amber-550/20 text-amber-800 border border-amber-500/50 font-mono text-xs font-bold cursor-pointer transition-all flex items-center gap-2 shadow-sm"
               >
                 <RotateCcw className="w-4 h-4 text-amber-600" />
-                <span>REVERT TO UNAPPROVED DRAFT</span>
+                <span>Revert to Unapproved Draft</span>
               </button>
             ) : (
               <>
@@ -255,14 +255,14 @@ export default function ResponsePlans() {
                   onClick={() => setShowChangesModal(true)}
                   className="px-4 py-2 rounded-xl bg-white hover:bg-slate-50 text-slate-700 font-mono text-xs font-semibold cursor-pointer transition-colors border border-slate-200"
                 >
-                  REQUEST CHANGES
+                  Request Changes
                 </button>
 
                 <button
                   onClick={dismissPlan}
                   className="px-4 py-2 rounded-xl bg-white hover:bg-red-50 text-slate-500 hover:text-red-600 font-mono text-xs cursor-pointer transition-colors border border-slate-200"
                 >
-                  DISMISS
+                  Dismiss
                 </button>
 
                 <button
@@ -270,7 +270,7 @@ export default function ResponsePlans() {
                   className="px-6 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-mono text-xs font-bold shadow-lg shadow-emerald-600/10 cursor-pointer transition-all border border-emerald-500/20 flex items-center gap-2"
                 >
                   <Send className="w-4 h-4" />
-                  <span>APPROVE & DISPATCH WORK ORDERS</span>
+                  <span>Approve & Dispatch Work Orders</span>
                 </button>
               </>
             )}
@@ -278,7 +278,7 @@ export default function ResponsePlans() {
         </div>
       </div>
 
-      {/* AI GOVERNANCE: GATE + CONFIDENCE BREAKDOWN — populated once a real orchestrator run has produced this plan */}
+      {/* AI GOVERNANCE: GATE + Confidence BREAKDOWN — populated once a real orchestrator run has produced this plan */}
       {planRunId && (
         <div className="bg-white p-6 rounded-2xl border border-purple-100 space-y-5 shadow-sm">
           <div className="flex flex-col md:flex-row md:items-center justify-between gap-3">
@@ -387,7 +387,7 @@ export default function ResponsePlans() {
             <div>
               <div className="flex items-center gap-2">
                 <span className="px-2.5 py-0.5 rounded bg-emerald-50 text-emerald-700 border border-emerald-200 text-[10px] font-mono font-bold tracking-wider">
-                  LIVE FIELD EXECUTION PROGRESS
+                  Live Field Execution Progress
                 </span>
                 <span className="text-xs font-mono text-slate-500 font-semibold">Real-Time Department Sync</span>
               </div>
@@ -467,7 +467,7 @@ export default function ResponsePlans() {
       <div className="space-y-4">
         <div className="flex items-center justify-between">
           <h3 className="text-xs font-mono font-bold text-slate-500 tracking-wider">
-            SYNTHESIZED DEPARTMENTAL ACTIONS ({planActions.length})
+            Synthesized Departmental Actions ({planActions.length})
           </h3>
           <span className="text-xs font-mono text-purple-600 font-semibold">
             Zone Counselor can edit actions & parameters below
@@ -610,13 +610,13 @@ export default function ResponsePlans() {
                           className="px-3 py-1.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-mono text-xs font-bold cursor-pointer transition-colors flex items-center gap-1"
                         >
                           <Check className="w-3.5 h-3.5" />
-                          <span>SAVE</span>
+                          <span>Save</span>
                         </button>
                         <button
                           onClick={handleCancelEdit}
                           className="px-3 py-1.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-mono text-xs cursor-pointer border border-slate-200 transition-colors"
                         >
-                          CANCEL
+                          Cancel
                         </button>
                       </div>
                     ) : (
@@ -626,7 +626,7 @@ export default function ResponsePlans() {
                           className="px-3 py-1.5 rounded-xl bg-purple-50 hover:bg-purple-100/80 text-purple-700 border border-purple-200/50 font-mono text-xs font-bold cursor-pointer transition-colors flex items-center gap-1.5"
                         >
                           <Edit3 className="w-3.5 h-3.5" />
-                          <span>EDIT ACTION</span>
+                          <span>Edit Action</span>
                         </button>
                       )
                     )}
@@ -694,7 +694,7 @@ export default function ResponsePlans() {
                 onClick={() => setShowConfirmModal(false)}
                 className="px-4 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold cursor-pointer border border-slate-200"
               >
-                CANCEL
+                Cancel
               </button>
 
               <button
@@ -702,14 +702,14 @@ export default function ResponsePlans() {
                 className="px-5 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold cursor-pointer shadow-lg flex items-center gap-1.5"
               >
                 <Send className="w-4 h-4" />
-                <span>CONFIRM & DISPATCH WORK ORDERS</span>
+                <span>Confirm & Dispatch Work Orders</span>
               </button>
             </div>
           </div>
         </div>
       )}
 
-      {/* REQUEST CHANGES MODAL */}
+      {/* Request Changes MODAL */}
       {showChangesModal && (
         <div className="fixed inset-0 z-50 bg-black/40 backdrop-blur-md flex items-center justify-center p-4">
           <div className="bg-white p-6 rounded-2xl border border-amber-200 max-w-lg w-full space-y-4 shadow-2xl">
@@ -742,14 +742,14 @@ export default function ResponsePlans() {
                 onClick={() => setShowChangesModal(false)}
                 className="px-4 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold cursor-pointer border border-slate-200"
               >
-                CANCEL
+                Cancel
               </button>
 
               <button
                 onClick={handleConfirmChanges}
                 className="px-5 py-2 rounded-xl bg-amber-600 hover:bg-amber-500 text-white font-bold cursor-pointer shadow-lg"
               >
-                SUBMIT REQUEST
+                Submit Request
               </button>
             </div>
           </div>

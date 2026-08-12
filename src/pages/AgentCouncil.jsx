@@ -135,6 +135,19 @@ function agentIdFromParsed(parsed, filename) {
   return DOMAIN_AGENT_IDS.find(id => name.includes(id)) || null;
 }
 
+function getEdgeCoords(cx1, cy1, r1, cx2, cy2, r2) {
+  const dx = cx2 - cx1;
+  const dy = cy2 - cy1;
+  const dist = Math.sqrt(dx*dx + dy*dy);
+  if (dist === 0) return { x1: cx1, y1: cy1, x2: cx2, y2: cy2 };
+  return {
+    x1: cx1 + (dx/dist)*r1,
+    y1: cy1 + (dy/dist)*r1,
+    x2: cx2 - (dx/dist)*r2,
+    y2: cy2 - (dy/dist)*r2,
+  };
+}
+
 /* ─────────────────────────────────────────────────────────────────────────
    SVG sub-components
 ───────────────────────────────────────────────────────────────────────────*/
@@ -145,9 +158,10 @@ function DataPackets({ agentId, towardPlanner, active }) {
   const pos = AGENT_POS[agentId];
   const { cx: ax, cy: ay } = pos;
   const { cx: px, cy: py } = PLANNER;
+  const edges = getEdgeCoords(ax, ay, 46, px, py, 58);
   const pathD = towardPlanner
-    ? `M ${ax} ${ay} L ${px} ${py}`
-    : `M ${px} ${py} L ${ax} ${ay}`;
+    ? `M ${edges.x1} ${edges.y1} L ${edges.x2} ${edges.y2}`
+    : `M ${edges.x2} ${edges.y2} L ${edges.x1} ${edges.y1}`;
   const color = AGENT_META[agentId]?.color || '#94a3b8';
   const dur = 1.6;
 
@@ -533,44 +547,44 @@ export default function AgentCouncil() {
           onDrop={handleDrop}
           onDragOver={handleDragOver}
           onDragLeave={handleDragLeave}
-          className={`flex flex-wrap items-center gap-2 px-4 py-2.5 rounded-xl border mb-4 transition-colors
+          className={`flex flex-wrap items-center gap-4 px-6 py-4 rounded-xl border mb-4 transition-colors
             ${isDragging ? 'border-violet-400 bg-violet-50' : 'border-slate-200 bg-white'}`}
         >
           {/* Upload button */}
           <button
             onClick={() => fileInputRef.current?.click()}
-            className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-slate-900 hover:bg-slate-700
-              text-white text-xs font-mono font-bold cursor-pointer transition-colors shrink-0"
+            className="flex items-center gap-2 px-4 py-2 rounded-lg bg-slate-900 hover:bg-slate-700
+              text-white text-sm font-mono font-bold cursor-pointer transition-colors shrink-0"
           >
-            <Upload className="w-3.5 h-3.5" />
+            <Upload className="w-4 h-4" />
             Upload findings
           </button>
           <input ref={fileInputRef} type="file" multiple accept=".json,.txt" onChange={handleFileInput} className="hidden" id="agent-file-input" />
 
           {/* Divider */}
-          {uploadedFiles.length > 0 && <div className="w-px h-5 bg-slate-200 mx-1 shrink-0" />}
+          {uploadedFiles.length > 0 && <div className="w-px h-6 bg-slate-200 mx-1 shrink-0" />}
 
           {/* File chips */}
-          <div className="flex flex-wrap gap-1.5 flex-1 min-w-0">
+          <div className="flex flex-wrap gap-2 flex-1 min-w-0">
             {uploadedFiles.map(entry => {
               const color = entry.agentId ? AGENT_META[entry.agentId]?.color : '#94a3b8';
               return (
                 <span key={entry.id}
-                  className="inline-flex items-center gap-1.5 pl-2 pr-1 py-0.5 rounded-full border text-[11px] font-mono font-semibold text-black"
+                  className="inline-flex items-center gap-1.5 pl-2 pr-1 py-1 rounded-full border text-xs font-mono font-semibold text-black"
                   style={{ backgroundColor: `${color}15`, borderColor: `${color}55` }}>
                   {entry.status === 'ok'
-                    ? <CheckCircle2 className="w-3 h-3" style={{ color }} />
-                    : <AlertCircle className="w-3 h-3 text-red-500" />}
+                    ? <CheckCircle2 className="w-3.5 h-3.5" style={{ color }} />
+                    : <AlertCircle className="w-3.5 h-3.5 text-red-500" />}
                   {entry.agentName}
                   <button onClick={() => removeFile(entry.id)}
                     className="w-4 h-4 rounded-full flex items-center justify-center hover:bg-black/10 cursor-pointer ml-0.5">
-                    <X className="w-2.5 h-2.5" />
+                    <X className="w-3 h-3" />
                   </button>
                 </span>
               );
             })}
             {uploadedFiles.length === 0 && (
-              <span className="text-xs font-mono text-slate-400">Drop agent .json files here or click Upload</span>
+              <span className="text-sm font-mono text-black font-semibold">Drop agent .json files here or click Upload</span>
             )}
           </div>
 
@@ -579,12 +593,12 @@ export default function AgentCouncil() {
             onClick={handleSynthesise}
             disabled={!canSynthesise}
             id="synthesise-btn"
-            className={`flex items-center gap-1.5 px-4 py-1.5 rounded-lg font-mono text-xs font-bold transition-all shrink-0
+            className={`flex items-center gap-2 px-6 py-2.5 rounded-lg font-mono text-sm font-bold transition-all shrink-0
               ${canSynthesise
                 ? 'bg-violet-600 hover:bg-violet-700 text-white cursor-pointer shadow-md shadow-violet-200'
                 : 'bg-slate-100 text-slate-400 cursor-not-allowed'}`}
           >
-            <Sparkles className={`w-3.5 h-3.5 ${synthesising ? 'animate-spin' : ''}`} />
+            <Sparkles className={`w-4 h-4 ${synthesising ? 'animate-spin' : ''}`} />
             {synthesising ? 'Synthesising…' : 'Synthesise'}
           </button>
         </div>
@@ -615,9 +629,10 @@ export default function AgentCouncil() {
               const pos = AGENT_POS[id];
               const loaded = loadedAgentIds.has(id);
               const c = lineColor(id);
+              const edges = getEdgeCoords(pos.cx, pos.cy, 46, PLANNER.cx, PLANNER.cy, 58);
               return (
                 <line key={id}
-                  x1={pos.cx} y1={pos.cy} x2={PLANNER.cx} y2={PLANNER.cy}
+                  x1={edges.x1} y1={edges.y1} x2={edges.x2} y2={edges.y2}
                   stroke={c}
                   strokeWidth={loaded ? 1.8 : 1}
                   strokeDasharray={loaded ? 'none' : '5 5'}

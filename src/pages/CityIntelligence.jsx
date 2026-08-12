@@ -142,7 +142,7 @@ export default function CityIntelligence() {
         <span className="text-xs font-mono font-bold text-cyan-700 tracking-widest">
           CROSS-DEPARTMENT DATA AGGREGATOR
         </span>
-        <h1 className="text-2xl font-extrabold text-purple-950 tracking-tight">CITY INTELLIGENCE</h1>
+        <h1 className="text-2xl font-extrabold text-purple-950 tracking-tight">City Intelligence</h1>
         <p className="text-xs text-slate-600 font-mono">
           Unified real-time telemetry across municipal operational silos in Chennai.
         </p>

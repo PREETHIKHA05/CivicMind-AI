@@ -16,9 +16,9 @@ export default function CityMemory() {
       {/* Header */}
       <div className="pb-2 border-b border-purple-200/60">
         <span className="text-xs font-mono font-bold text-cyan-700 tracking-widest">
-          VECTORIZED HISTORICAL INCIDENT REPOSITORY
+          Vectorized Historical Incident Repository
         </span>
-        <h1 className="text-2xl font-extrabold text-purple-950 tracking-tight">URBAN MEMORY</h1>
+        <h1 className="text-2xl font-extrabold text-purple-950 tracking-tight">Urban Memory</h1>
         <p className="text-xs text-slate-600 font-mono">
           Search past municipal disasters, action profiles, and spatial recurrence vectors.
         </p>
@@ -79,22 +79,22 @@ export default function CityMemory() {
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs font-mono">
               <div className="p-3.5 rounded-xl bg-slate-50 border border-slate-100">
-                <span className="text-[10px] text-slate-500 block font-bold mb-1">CONDITIONS & CAUSE</span>
+                <span className="text-[10px] text-slate-500 block font-bold mb-1">Conditions & Cause</span>
                 <p className="text-slate-700 leading-relaxed font-semibold">{mem.conditions}</p>
               </div>
 
               <div className="p-3.5 rounded-xl bg-red-50/50 border border-red-200/60">
-                <span className="text-[10px] text-red-750 block font-bold mb-1">IMPACT & OUTCOME</span>
+                <span className="text-[10px] text-red-750 block font-bold mb-1">Impact & Outcome</span>
                 <p className="text-red-900 leading-relaxed font-semibold">{mem.outcome}</p>
               </div>
 
               <div className="p-3.5 rounded-xl bg-slate-50 border border-slate-100">
-                <span className="text-[10px] text-slate-500 block font-bold mb-1">ACTIONS TAKEN</span>
+                <span className="text-[10px] text-slate-500 block font-bold mb-1">Actions Taken</span>
                 <p className="text-slate-700 leading-relaxed font-semibold">{mem.actionsTaken}</p>
               </div>
 
               <div className="p-3.5 rounded-xl bg-emerald-50/50 border border-emerald-200/60">
-                <span className="text-[10px] text-emerald-750 block font-bold mb-1">LESSON LEARNED & POLICY MEMORY</span>
+                <span className="text-[10px] text-emerald-750 block font-bold mb-1">Lesson Learned & Policy Memory</span>
                 <p className="text-emerald-900 leading-relaxed font-semibold">{mem.lessonLearned}</p>
               </div>
             </div>

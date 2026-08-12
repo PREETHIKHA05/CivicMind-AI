@@ -11,9 +11,9 @@ export default function IncidentIntelligence() {
       {/* Header */}
       <div className="pb-2 border-b border-purple-200/60">
         <span className="text-xs font-mono font-bold text-cyan-700 tracking-widest">
-          DEEP INCIDENT DIAGNOSTICS & CASCADE DETECTOR
+          DEEP INCIDENT Diagnostics & Cascade Detector
         </span>
-        <h1 className="text-2xl font-extrabold text-purple-950 tracking-tight">INCIDENT INTELLIGENCE</h1>
+        <h1 className="text-2xl font-extrabold text-purple-950 tracking-tight">Incident Intelligence</h1>
         <p className="text-xs text-slate-600 font-mono">
           Investigate urban root causes, multi-department telemetry, and cascading threat vectors.
         </p>
