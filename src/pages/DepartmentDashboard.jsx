@@ -251,7 +251,7 @@ export default function DepartmentDashboard() {
             }`}
         >
           <LayoutDashboard className="w-4 h-4" />
-          <span>DEPARTMENT OVERVIEW</span>
+          <span>Department Overview</span>
         </button>
 
         <button
@@ -262,7 +262,7 @@ export default function DepartmentDashboard() {
             }`}
         >
           <FileText className="w-4 h-4" />
-          <span>ASSIGNED WORK ORDERS ({assignedTasks.length})</span>
+          <span>Assigned Work Orders ({assignedTasks.length})</span>
         </button>
 
         <button
@@ -273,7 +273,7 @@ export default function DepartmentDashboard() {
             }`}
         >
           <BarChart3 className="w-4 h-4" />
-          <span>TELEMETRY & DATA ANALYTICS</span>
+          <span>Telemetry & Data Analytics</span>
         </button>
 
         <button
@@ -284,7 +284,7 @@ export default function DepartmentDashboard() {
             }`}
         >
           <Sparkles className="w-4 h-4" />
-          <span>EMERGENCY PROTOCOLS</span>
+          <span>Emergency Protocols</span>
         </button>
       </div>
 
@@ -300,6 +300,7 @@ export default function DepartmentDashboard() {
                 </span>
 
                 <div className="flex items-baseline justify-between pt-1">
+                  <span className="text-xl font-extrabold font-mono text-slate-900 tracking-tight">
                   <span className="text-xl font-extrabold font-mono text-slate-900 tracking-tight">
                     {item.val}
                   </span>
@@ -385,15 +386,15 @@ export default function DepartmentDashboard() {
                   <AreaChart data={chartData}>
                     <defs>
                       <linearGradient id="deptGrad" x1="0" y1="0" x2="0" y2="1">
-                        <stop offset="5%" stopColor="#06b6d4" stopOpacity={0.4} />
-                        <stop offset="95%" stopColor="#06b6d4" stopOpacity={0} />
+                        <stop offset="5%" stopColor="#7c3aed" stopOpacity={0.4} />
+                        <stop offset="95%" stopColor="#7c3aed" stopOpacity={0} />
                       </linearGradient>
                     </defs>
-                    <CartesianGrid strokeDasharray="3 3" stroke="#1e293b" />
+                    <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" />
                     <XAxis dataKey="time" stroke="#64748b" tick={{ fontSize: 10 }} />
                     <YAxis stroke="#64748b" tick={{ fontSize: 10 }} />
-                    <Tooltip contentStyle={{ backgroundColor: '#0f172a', borderColor: '#334155', borderRadius: '8px', fontSize: '11px' }} />
-                    <Area type="monotone" dataKey={activeDeptId === 'traffic' ? 'speed' : activeDeptId === 'water' ? 'pumpOutput' : activeDeptId === 'emergency' ? 'transitMins' : 'smsDelivered'} stroke="#06b6d4" fillOpacity={1} fill="url(#deptGrad)" />
+                    <Tooltip contentStyle={{ backgroundColor: '#ffffff', borderColor: '#e2e8f0', borderRadius: '8px', fontSize: '11px' }} />
+                    <Area type="monotone" dataKey={activeDeptId === 'traffic' ? 'speed' : activeDeptId === 'water' ? 'pumpOutput' : activeDeptId === 'emergency' ? 'transitMins' : 'smsDelivered'} stroke="#7c3aed" fillOpacity={1} fill="url(#deptGrad)" />
                   </AreaChart>
                 </ResponsiveContainer>
               </div>
@@ -422,7 +423,7 @@ export default function DepartmentDashboard() {
         </div>
       )}
 
-      {/* TAB 2: ASSIGNED WORK ORDERS */}
+      {/* TAB 2: Assigned Work Orders */}
       {activeTab === 'tasks' && (
         <div className="space-y-6 font-mono text-xs">
           {assignedTasks.length === 0 ? (
@@ -482,14 +483,14 @@ export default function DepartmentDashboard() {
                               onClick={() => updateTaskStatus(task.id, 'In Progress')}
                               className="px-3.5 py-1.5 rounded-xl bg-cyan-600 hover:bg-cyan-500 text-slate-900 font-mono text-xs font-bold cursor-pointer transition-colors shadow-sm"
                             >
-                              START EXECUTION
+                              Start Execution
                             </button>
                           )}
                           <button
                             onClick={() => updateTaskStatus(task.id, 'Completed')}
                             className="px-3.5 py-1.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-slate-900 font-mono text-xs font-bold cursor-pointer transition-colors shadow-sm"
                           >
-                            MARK COMPLETED
+                            Mark Completed
                           </button>
                         </div>
                       )}
@@ -502,7 +503,7 @@ export default function DepartmentDashboard() {
                       <span className="text-[10px] text-purple-600 font-bold block uppercase mb-1">
                         RECOMMENDED ACTION INSTRUCTION
                       </span>
-                      <p className="text-slate-200 leading-relaxed font-semibold">
+                      <p className="text-slate-700 leading-relaxed font-semibold">
                         {task.recommendation}
                       </p>
                     </div>
@@ -511,7 +512,7 @@ export default function DepartmentDashboard() {
                       <span className="text-[10px] text-emerald-400 font-bold block uppercase mb-1">
                         EXPECTED CASCADING IMPACT
                       </span>
-                      <p className="text-emerald-200 leading-relaxed font-semibold">
+                      <p className="text-emerald-950 leading-relaxed font-semibold">
                         {task.expectedImpact}
                       </p>
                     </div>
@@ -563,7 +564,7 @@ export default function DepartmentDashboard() {
         </div>
       )}
 
-      {/* TAB 3: TELEMETRY & DATA ANALYTICS */}
+      {/* TAB 3: Telemetry & Data Analytics */}
       {activeTab === 'analytics' && (
         <div className="space-y-6 font-mono text-xs">
           <div className="glass-panel p-6 rounded-2xl border border-purple-200 space-y-4">
@@ -576,15 +577,15 @@ export default function DepartmentDashboard() {
                 <AreaChart data={chartData}>
                   <defs>
                     <linearGradient id="fullGrad" x1="0" y1="0" x2="0" y2="1">
-                      <stop offset="5%" stopColor="#06b6d4" stopOpacity={0.5} />
-                      <stop offset="95%" stopColor="#06b6d4" stopOpacity={0} />
+                      <stop offset="5%" stopColor="#7c3aed" stopOpacity={0.5} />
+                      <stop offset="95%" stopColor="#7c3aed" stopOpacity={0} />
                     </linearGradient>
                   </defs>
-                  <CartesianGrid strokeDasharray="3 3" stroke="#1e293b" />
+                  <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" />
                   <XAxis dataKey="time" stroke="#64748b" />
                   <YAxis stroke="#64748b" />
-                  <Tooltip contentStyle={{ backgroundColor: '#0f172a', borderColor: '#334155' }} />
-                  <Area type="monotone" dataKey={activeDeptId === 'traffic' ? 'speed' : activeDeptId === 'water' ? 'pumpOutput' : 'transitMins'} stroke="#06b6d4" fillOpacity={1} fill="url(#fullGrad)" />
+                  <Tooltip contentStyle={{ backgroundColor: '#ffffff', borderColor: '#e2e8f0', borderRadius: '8px' }} />
+                  <Area type="monotone" dataKey={activeDeptId === 'traffic' ? 'speed' : activeDeptId === 'water' ? 'pumpOutput' : 'transitMins'} stroke="#7c3aed" fillOpacity={1} fill="url(#fullGrad)" />
                 </AreaChart>
               </ResponsiveContainer>
             </div>
@@ -592,7 +593,7 @@ export default function DepartmentDashboard() {
         </div>
       )}
 
-      {/* TAB 4: EMERGENCY PROTOCOLS */}
+      {/* TAB 4: Emergency Protocols */}
       {activeTab === 'protocols' && (
         <div className="glass-panel p-6 rounded-2xl border border-purple-200 space-y-4 font-mono text-xs">
           <h3 className="text-sm font-bold text-purple-600 uppercase">
@@ -607,6 +608,7 @@ export default function DepartmentDashboard() {
               <div className="flex items-center justify-between text-xs font-bold text-slate-900 group-hover:text-purple-700">
                 <span>Deploy Mobile Resource Unit</span>
                 <PlusCircle className="w-4 h-4 text-purple-600" />
+                <PlusCircle className="w-4 h-4 text-purple-600" />
               </div>
               <p className="text-[11px] text-slate-600">
                 Dispatches high-capacity field equipment or emergency squad directly to Ward 18.
@@ -616,7 +618,7 @@ export default function DepartmentDashboard() {
             <button className="p-4 rounded-xl bg-purple-50/90 hover:bg-white border border-purple-200 text-left transition-all cursor-pointer space-y-2 group">
               <div className="flex items-center justify-between text-xs font-bold text-slate-900 group-hover:text-amber-700">
                 <span>Signal / Gate Manual Override</span>
-                <AlertTriangle className="w-4 h-4 text-amber-400" />
+                <AlertTriangle className="w-4 h-4 text-amber-600" />
               </div>
               <p className="text-[11px] text-slate-600">
                 Overrides default sensor rules for immediate priority routing or sluice gate lock.
@@ -626,7 +628,7 @@ export default function DepartmentDashboard() {
             <button className="p-4 rounded-xl bg-purple-50/90 hover:bg-white border border-purple-200 text-left transition-all cursor-pointer space-y-2 group">
               <div className="flex items-center justify-between text-xs font-bold text-slate-900 group-hover:text-emerald-700">
                 <span>Sync with Planner Agent</span>
-                <Sparkles className="w-4 h-4 text-emerald-400" />
+                <Sparkles className="w-4 h-4 text-emerald-600" />
               </div>
               <p className="text-[11px] text-slate-600">
                 Triggers re-evaluation of departmental recommendations based on live field telemetry.

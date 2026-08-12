@@ -212,7 +212,7 @@ export default function LaunchScreen() {
             {/* Department Dropdown (shown only when Department Official is selected) */}
             {selectedRoleType === 'department' && (
               <div className="relative space-y-1.5">
-                <label className="block text-xs font-bold text-white uppercase tracking-wider">
+                <label className="block text-xs font-bold text-white tracking-wider">
                   Department
                 </label>
                 <div className="relative">
@@ -257,7 +257,7 @@ export default function LaunchScreen() {
 
             {/* Email Field */}
             <div className="space-y-1.5">
-              <label className="block text-xs font-bold text-white uppercase tracking-wider">
+              <label className="block text-xs font-bold text-white tracking-wider">
                 Email address
               </label>
               <div className="relative">
@@ -276,7 +276,7 @@ export default function LaunchScreen() {
 
             {/* Password Field */}
             <div className="space-y-1.5">
-              <label className="block text-xs font-bold text-white uppercase tracking-wider">
+              <label className="block text-xs font-bold text-white tracking-wider">
                 Password
               </label>
               <div className="relative">

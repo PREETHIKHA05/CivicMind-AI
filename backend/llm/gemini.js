@@ -40,20 +40,12 @@ const __dirname = path.dirname(__filename);
 const CACHE_DIR = path.join(__dirname, '..', '.cache', 'llm');
 if (!fs.existsSync(CACHE_DIR)) fs.mkdirSync(CACHE_DIR, { recursive: true });
 
-const DEMO_MODE = process.env.DEMO_MODE === 'true';
+const isDemoMode = () => process.env.DEMO_MODE === 'true';
 
-// Defaults reproduce exactly what this file did before this refactor: talk
-// to Gemini. Verified live against the configured key: gemini-1.5-* is
-// retired and gemini-2.5-flash/-pro return 404 "no longer available to new
-// users" on this key's tier; gemini-flash-latest works and is free-tier
-// accessible, gemini-pro-latest resolves to a model with a free-tier quota
-// of 0 (needs billing). Using the same accessible model for both tiers
-// rather than silently pointing STRONG at a broken model — swap
-// LLM_MODEL_STRONG to 'gemini-pro-latest' once billing is enabled.
-const BASE_URL = process.env.LLM_BASE_URL || 'https://generativelanguage.googleapis.com/v1beta/openai';
-const API_KEY = process.env.LLM_API_KEY || process.env.GEMINI_API_KEY;
-const MODEL_FAST = process.env.LLM_MODEL_FAST || 'gemini-flash-latest';
-const MODEL_STRONG = process.env.LLM_MODEL_STRONG || 'gemini-flash-latest';
+const getBaseUrl = () => process.env.LLM_BASE_URL || 'https://generativelanguage.googleapis.com/v1beta/openai';
+const getApiKey = () => process.env.LLM_API_KEY || process.env.GEMINI_API_KEY;
+const getModelFast = () => process.env.LLM_MODEL_FAST || 'gemini-flash-latest';
+const getModelStrong = () => process.env.LLM_MODEL_STRONG || 'gemini-flash-latest';
 
 function cacheKey(model, schema, prompt) {
   return crypto.createHash('sha256').update(`${model}::${JSON.stringify(schema)}::${prompt}`).digest('hex');
@@ -123,7 +115,19 @@ function extractJson(text) {
  *  - opts.fallback: value or () => value used when the LLM is unavailable/fails
  */
 export async function callGemini(prompt, schema, opts = {}) {
-  const model = opts.model || MODEL_FAST;
+  // Dynamically reload environment variables on every request to pick up user's saved .env key without server restart
+  try {
+    const dotenv = await import('dotenv');
+    dotenv.config({ override: true });
+  } catch (e) {
+    // ignore
+  }
+
+  const demoMode = isDemoMode();
+  const apiKey = getApiKey();
+  const baseUrl = getBaseUrl();
+  const model = opts.model === 'gemini-pro-latest' ? getModelStrong() : getModelFast();
+
   const maxRetries = opts.maxRetries ?? 2;
   const key = cacheKey(model, schema, prompt);
 
@@ -133,12 +137,12 @@ export async function callGemini(prompt, schema, opts = {}) {
     return { ...cached, fromCache: true };
   }
 
-  if (DEMO_MODE) {
+  if (demoMode) {
     // No cache hit and demo mode forbids network calls — degrade immediately, don't hang the run.
     return buildFallback(opts.fallback, 'DEMO_MODE=true with no cached response for this prompt');
   }
 
-  if (!API_KEY) {
+  if (!apiKey) {
     return buildFallback(opts.fallback, 'LLM_API_KEY/GEMINI_API_KEY not configured');
   }
 
@@ -149,11 +153,11 @@ export async function callGemini(prompt, schema, opts = {}) {
   let lastError = null;
   for (let attempt = 0; attempt <= maxRetries; attempt++) {
     try {
-      const res = await fetch(`${BASE_URL}/chat/completions`, {
+      const res = await fetch(`${baseUrl}/chat/completions`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          Authorization: `Bearer ${API_KEY}`
+          Authorization: `Bearer ${apiKey}`
         },
         body: JSON.stringify({
           model,
@@ -197,6 +201,6 @@ export async function callGemini(prompt, schema, opts = {}) {
 }
 
 export const MODELS = {
-  FAST: MODEL_FAST,
-  STRONG: MODEL_STRONG
+  FAST: 'gemini-flash-latest',
+  STRONG: 'gemini-pro-latest'
 };

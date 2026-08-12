@@ -39,7 +39,7 @@ export default function SimulationBar() {
           </div>
           <div>
             <div className="flex items-center gap-2">
-              <span className="text-xs font-mono font-bold text-purple-600 uppercase tracking-wider">
+              <span className="text-xs font-mono font-bold text-purple-600 tracking-wider">
                 SIMULATION SCENARIO:
               </span>
               <span className="text-xs font-semibold text-slate-800">Heavy Rainfall Emergency (Ward 18)</span>

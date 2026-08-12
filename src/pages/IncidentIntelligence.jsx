@@ -106,6 +106,7 @@ export default function IncidentIntelligence() {
         <div className="lg:col-span-8 space-y-5">
           {selectedIncident && (
             <div className="glass-panel p-6 rounded-2xl border border-purple-200 space-y-6">
+            <div className="glass-panel p-6 rounded-2xl border border-purple-200 space-y-6">
               {/* Incident Title & Meta Header */}
               <div className="pb-4 border-b border-purple-200 space-y-2">
                 <div className="flex flex-wrap items-center justify-between gap-2">
@@ -118,7 +119,7 @@ export default function IncidentIntelligence() {
 
                   <div className="flex items-center gap-3 text-xs font-mono text-slate-600">
                     <span className="flex items-center gap-1">
-                      <Clock className="w-3.5 h-3.5 text-slate-500" />
+                      <Clock className="w-3.5 h-3.5 text-slate-450" />
                       {selectedIncident.time}
                     </span>
                     <span>Confidence: <strong className="text-purple-700">{selectedIncident.confidence}%</strong></span>

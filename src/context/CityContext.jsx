@@ -326,6 +326,38 @@ export function CityProvider({ children }) {
   };
 
   // Plan Approval Action — Saves to MongoDB Atlas & Broadcasts via WebSockets!
+  const broadcastCitizenMessage = async (message, recipients = []) => {
+    const safeRecipients = recipients.length > 0 ? recipients.slice(0, 4) : [
+      '+919360198178'
+    ];
+
+    const payload = {
+      message: message || 'Ward 18 emergency advisory: follow the official diversion route and stay alert for on-ground updates.',
+      recipients: safeRecipients
+    };
+
+    try {
+      const response = await fetch(`${backendUrl}/api/plan/broadcast-message`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+      });
+
+      const data = await response.json();
+
+      if (data && data.success) {
+        addToast('success', 'Broadcast Sent', `Email sent to ${data.sentCount} recipients.`);
+      } else {
+        addToast('warning', 'Broadcast Failed', data?.summary || 'Email broadcast was rejected by the backend.');
+      }
+
+      return data;
+    } catch (error) {
+      addToast('warning', 'Broadcast Failed', 'Could not reach the backend demo SMS service.');
+      return null;
+    }
+  };
+
   const approvePlan = (note = '') => {
     const newRisk = calculateProjectedRisk(planActions);
     const nowTime = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' });
@@ -627,6 +659,7 @@ export function CityProvider({ children }) {
         updateTaskStatus,
         addTaskLog,
         approvePlan,
+        broadcastCitizenMessage,
         requestPlanChanges,
         dismissPlan,
         resetPlanToUnapproved,

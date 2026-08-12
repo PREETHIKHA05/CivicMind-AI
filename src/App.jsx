@@ -16,10 +16,10 @@ import ResponsePlans from './pages/ResponsePlans';
 import DepartmentDashboard from './pages/DepartmentDashboard';
 import CityMemory from './pages/CityMemory';
 
-import { X, AlertTriangle, CheckCircle2, Info, AlertCircle } from 'lucide-react';
+import { X, AlertTriangle, CheckCircle2, Info, AlertCircle, UserCheck, Sparkles } from 'lucide-react';
 
 function MainLayout() {
-  const { activePage, hasLaunched, toasts, removeToast } = useCity();
+  const { activePage, hasLaunched, toasts, removeToast, setIsAiDrawerOpen } = useCity();
 
   if (!hasLaunched) {
     return <LaunchScreen />;
@@ -62,8 +62,13 @@ function MainLayout() {
         <SimulationBar />
 
         {/* Dynamic Page Container */}
-        <main className="flex-1 overflow-y-auto p-4 md:p-6 lg:p-8 bg-[#f6f5f9] bg-[radial-gradient(ellipse_80%_80%_at_50%_-20%,rgba(124,58,237,0.06),rgba(255,255,255,0))]">
-          <div className="max-w-7xl mx-auto">
+        <main className="flex-1 overflow-y-auto p-4 md:p-6 lg:p-8 bg-[#f6f5f9] relative">
+          {/* Subtle Ambient Background Animation */}
+          <div className="absolute inset-0 pointer-events-none overflow-hidden z-0 bg-[#f6f5f9]">
+            <div className="absolute top-[-10%] left-[-10%] w-[55%] h-[55%] rounded-full bg-purple-500/4 blur-[120px] animate-ambient-glow" />
+            <div className="absolute bottom-[-10%] right-[-10%] w-[55%] h-[55%] rounded-full bg-violet-500/4 blur-[120px] animate-ambient-glow-delayed" />
+          </div>
+          <div className="max-w-7xl mx-auto relative z-10">
             {renderPage()}
           </div>
         </main>

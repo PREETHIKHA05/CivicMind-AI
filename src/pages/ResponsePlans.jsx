@@ -38,6 +38,7 @@ export default function ResponsePlans() {
     planActions,
     updatePlanAction,
     togglePlanAction,
+    broadcastCitizenMessage,
     calculateProjectedRisk,
     planRunId,
     planConfidenceBreakdown,
@@ -71,7 +72,12 @@ export default function ResponsePlans() {
   // Modal State
   const [showConfirmModal, setShowConfirmModal] = useState(false);
   const [showChangesModal, setShowChangesModal] = useState(false);
+  const [showBroadcastModal, setShowBroadcastModal] = useState(false);
   const [customNoteInput, setCustomNoteInput] = useState('');
+  const [broadcastMessage, setBroadcastMessage] = useState('Ward 18 emergency advisory: follow the official diversion route and stay alert for on-ground updates.');
+  const [broadcastRecipients, setBroadcastRecipients] = useState([
+    '+919360198178'
+  ]);
 
   const iconMap = {
     Droplets,
