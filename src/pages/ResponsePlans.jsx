@@ -35,7 +35,6 @@ export default function ResponsePlans() {
     resetPlanToUnapproved,
     operatorNote,
     approvalTime,
-    currentRiskScore,
     planActions,
     updatePlanAction,
     togglePlanAction,
@@ -45,8 +44,15 @@ export default function ResponsePlans() {
     planGate,
     planGateReason,
     planUnresolved,
-    planConflictsResolved
+    planConflictsResolved,
+    departmentTasks,
+    setActivePage
   } = useCity();
+
+  const totalTasks = departmentTasks ? departmentTasks.length : 0;
+  const completedTasks = departmentTasks ? departmentTasks.filter(t => t.status === 'Completed').length : 0;
+  const inProgressTasks = departmentTasks ? departmentTasks.filter(t => t.status === 'In Progress').length : 0;
+  const progressPercent = totalTasks > 0 ? Math.round((completedTasks / totalTasks) * 100) : 0;
 
   const isCounselor = currentUser && currentUser.role === 'counselor';
   const dynamicRisk = calculateProjectedRisk(planActions);
@@ -223,7 +229,7 @@ export default function ResponsePlans() {
               <div className="flex items-center gap-2 text-emerald-400 font-semibold">
                 <CheckCircle2 className="w-5 h-5 shrink-0" />
                 <span>
-                  APPROVED BY ZONE COUNSELOR at {approvalTime || '07:12 AM'}. Work orders dispatched to department dashboards.
+                  APPROVED BY ZONE COUNSELOR at {approvalTime || '07:12 AM'}. Work orders dispatched to 4 department dashboards.
                 </span>
               </div>
             ) : (
@@ -274,24 +280,24 @@ export default function ResponsePlans() {
 
       {/* AI GOVERNANCE: GATE + CONFIDENCE BREAKDOWN — populated once a real orchestrator run has produced this plan */}
       {planRunId && (
-        <div className="glass-panel p-6 rounded-2xl border border-purple-500/30 space-y-5">
+        <div className="bg-white p-6 rounded-2xl border border-purple-100 space-y-5 shadow-sm">
           <div className="flex flex-col md:flex-row md:items-center justify-between gap-3">
             <div>
-              <span className="text-xs font-mono font-bold text-purple-400 uppercase tracking-widest">
+              <span className="text-xs font-mono font-bold text-purple-600 uppercase tracking-widest">
                 ORCHESTRATOR GOVERNANCE — RUN {planRunId}
               </span>
-              <p className="text-xs text-slate-400 font-mono mt-1">
-                Gate decision and confidence are plain arithmetic — Gemini never self-reports this number.
+              <p className="text-xs text-slate-500 font-mono mt-1">
+                Gate decision and confidence components.
               </p>
             </div>
             {planGate && (
               <span
                 className={`px-3 py-1.5 rounded-full text-xs font-mono font-bold uppercase border shrink-0 ${
                   planGate === 'AUTO_EXECUTE'
-                    ? 'bg-emerald-950 text-emerald-300 border-emerald-500/50'
+                    ? 'bg-emerald-50 text-emerald-700 border-emerald-200'
                     : planGate === 'ESCALATE'
-                    ? 'bg-red-950 text-red-300 border-red-500/50'
-                    : 'bg-amber-950 text-amber-300 border-amber-500/50'
+                    ? 'bg-red-50 text-red-700 border-red-200'
+                    : 'bg-amber-50 text-amber-700 border-amber-200'
                 }`}
               >
                 {planGate}
@@ -300,7 +306,7 @@ export default function ResponsePlans() {
           </div>
 
           {planGateReason && (
-            <p className="text-xs font-mono text-slate-300 bg-slate-900/80 border border-slate-800 rounded-xl p-3">
+            <p className="text-xs font-mono text-slate-600 bg-purple-50/50 border border-purple-100/60 rounded-xl p-3">
               {planGateReason}
             </p>
           )}
@@ -308,12 +314,12 @@ export default function ResponsePlans() {
           {/* Confidence stacked bar */}
           {planConfidenceBreakdown && (
             <div className="space-y-2">
-              <span className="text-[10px] font-mono font-bold text-slate-400 uppercase tracking-wider block">
+              <span className="text-[10px] font-mono font-bold text-slate-500 uppercase tracking-wider block">
                 Confidence Components
               </span>
-              <div className="w-full h-4 rounded-full overflow-hidden flex bg-slate-900 border border-slate-800">
+              <div className="w-full h-4 rounded-full overflow-hidden flex bg-purple-50 border border-purple-100">
                 {[
-                  { key: 'evidenceCoverage', label: 'Evidence', color: '#06b6d4', weight: 0.30 },
+                  { key: 'evidenceCoverage', label: 'Evidence', color: '#8b5cf6', weight: 0.30 },
                   { key: 'dataFreshness', label: 'Freshness', color: '#3b82f6', weight: 0.20 },
                   { key: 'pathStrength', label: 'Path Strength', color: '#a855f7', weight: 0.25 },
                   { key: 'memorySupport', label: 'Memory', color: '#f59e0b', weight: 0.10 },
@@ -329,14 +335,14 @@ export default function ResponsePlans() {
               </div>
               <div className="grid grid-cols-2 sm:grid-cols-5 gap-2 text-[10px] font-mono">
                 {[
-                  { key: 'evidenceCoverage', label: 'Evidence (30%)', color: 'text-cyan-400' },
-                  { key: 'dataFreshness', label: 'Freshness (20%)', color: 'text-blue-400' },
-                  { key: 'pathStrength', label: 'Path Strength (25%)', color: 'text-purple-400' },
-                  { key: 'memorySupport', label: 'Memory (10%)', color: 'text-amber-400' },
-                  { key: 'agentAgreement', label: 'Agreement (15%)', color: 'text-emerald-400' }
+                  { key: 'evidenceCoverage', label: 'Evidence (30%)', color: 'text-purple-600' },
+                  { key: 'dataFreshness', label: 'Freshness (20%)', color: 'text-blue-600' },
+                  { key: 'pathStrength', label: 'Path Strength (25%)', color: 'text-purple-600' },
+                  { key: 'memorySupport', label: 'Memory (10%)', color: 'text-amber-600' },
+                  { key: 'agentAgreement', label: 'Agreement (15%)', color: 'text-emerald-600' }
                 ].map((c) => (
-                  <div key={c.key} className="flex items-center justify-between bg-slate-900/60 border border-slate-800 rounded-lg px-2 py-1">
-                    <span className="text-slate-400">{c.label}</span>
+                  <div key={c.key} className="flex items-center justify-between bg-white border border-purple-100/60 rounded-lg px-2 py-1">
+                    <span className="text-slate-500">{c.label}</span>
                     <span className={`font-bold ${c.color}`}>{((planConfidenceBreakdown[c.key] ?? 0) * 100).toFixed(0)}%</span>
                   </div>
                 ))}
@@ -347,11 +353,11 @@ export default function ResponsePlans() {
           {/* Conflicts resolved */}
           {planConflictsResolved && planConflictsResolved.length > 0 && (
             <div className="space-y-1.5">
-              <span className="text-[10px] font-mono font-bold text-amber-400 uppercase tracking-wider block">
+              <span className="text-[10px] font-mono font-bold text-amber-600 uppercase tracking-wider block">
                 Conflicts Resolved ({planConflictsResolved.length})
               </span>
               {planConflictsResolved.map((c, i) => (
-                <div key={i} className="text-xs font-mono text-amber-200 bg-amber-950/30 border border-amber-500/30 rounded-xl p-2.5">
+                <div key={i} className="text-xs font-mono text-amber-800 bg-amber-50 border border-amber-200 rounded-xl p-2.5">
                   Rejected <strong>{c.route}</strong> — {c.cost}
                 </div>
               ))}
@@ -361,16 +367,99 @@ export default function ResponsePlans() {
           {/* Unresolved */}
           {planUnresolved && planUnresolved.length > 0 && (
             <div className="space-y-1.5">
-              <span className="text-[10px] font-mono font-bold text-slate-400 uppercase tracking-wider block">
+              <span className="text-[10px] font-mono font-bold text-slate-500 uppercase tracking-wider block">
                 Unresolved / Known Gaps
               </span>
               {planUnresolved.map((u, i) => (
-                <div key={i} className="text-xs font-mono text-slate-300 bg-slate-900/60 border border-slate-800 rounded-xl p-2.5">
+                <div key={i} className="text-xs font-mono text-slate-600 bg-white border border-purple-100/60 rounded-xl p-2.5">
                   {u}
                 </div>
               ))}
             </div>
           )}
+        </div>
+      )}
+
+      {/* LIVE MULTI-DEPARTMENT WORK ORDER EXECUTION PROGRESS CARD */}
+      {planStatus === 'APPROVED BY ICCC OPERATOR' && (
+        <div className="bg-white p-6 rounded-2xl border border-emerald-200 space-y-4 shadow-sm">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-3 border-b border-purple-100">
+            <div>
+              <div className="flex items-center gap-2">
+                <span className="px-2.5 py-0.5 rounded bg-emerald-50 text-emerald-700 border border-emerald-200 text-[10px] font-mono font-bold uppercase tracking-wider">
+                  LIVE FIELD EXECUTION PROGRESS
+                </span>
+                <span className="text-xs font-mono text-slate-500 font-semibold">Real-Time Department Sync</span>
+              </div>
+              <h3 className="text-lg font-extrabold text-slate-800 font-mono mt-1">
+                Department Work Order Execution Tracker
+              </h3>
+            </div>
+
+            <div className="flex items-center gap-3 font-mono text-xs shrink-0">
+              <div className="px-3 py-1.5 rounded-xl bg-emerald-50 border border-emerald-200 text-emerald-700 font-bold">
+                ● {completedTasks} / {totalTasks} Completed
+              </div>
+              <div className="px-3 py-1.5 rounded-xl bg-purple-50 border border-purple-200/60 text-purple-700 font-bold">
+                ● {inProgressTasks} In Progress
+              </div>
+            </div>
+          </div>
+
+          {/* PROGRESS BAR */}
+          <div className="space-y-2">
+            <div className="flex items-center justify-between text-xs font-mono">
+              <span className="text-slate-600 font-bold">Overall Department Completion Progress:</span>
+              <span className="text-emerald-600 font-extrabold text-sm font-mono">{progressPercent}%</span>
+            </div>
+
+            <div className="w-full h-3.5 bg-purple-50 rounded-full overflow-hidden p-0.5 border border-purple-100 flex">
+              <div 
+                className="h-full bg-gradient-to-r from-emerald-500 to-teal-500 rounded-full transition-all duration-700 shadow-sm"
+                style={{ width: `${progressPercent}%` }}
+              />
+            </div>
+          </div>
+
+          {/* Individual Department Task Cards Grid */}
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3 pt-2 font-mono">
+            {departmentTasks.map((task) => (
+              <div 
+                key={task.id || task.taskId}
+                className={`p-3.5 rounded-xl border text-xs space-y-2 transition-all ${
+                  task.status === 'Completed'
+                    ? 'bg-emerald-50/30 border-emerald-200'
+                    : task.status === 'In Progress'
+                    ? 'bg-purple-50/30 border-purple-200/60'
+                    : 'bg-white border-purple-100/60'
+                }`}
+              >
+                <div className="flex items-center justify-between gap-2">
+                  <span className="font-bold text-slate-800 truncate">{task.departmentName}</span>
+                  <span className={`px-2 py-0.5 rounded text-[10px] font-bold uppercase shrink-0 ${
+                    task.status === 'Completed'
+                      ? 'bg-emerald-50 text-emerald-700 border border-emerald-200'
+                      : task.status === 'In Progress'
+                      ? 'bg-purple-50 text-purple-700 border border-purple-200/60 animate-pulse'
+                      : 'bg-white text-slate-500 border border-purple-100/60'
+                  }`}>
+                    {task.status}
+                  </span>
+                </div>
+
+                <p className="text-[11px] text-slate-600 font-medium leading-tight line-clamp-2">
+                  {task.title}
+                </p>
+
+                {task.logs && task.logs.length > 0 && (
+                  <div className="pt-1.5 border-t border-purple-100/60 text-[10px] text-slate-500 font-mono">
+                    <span className="text-purple-600 font-bold">Latest Log:</span>{' '}
+                    <span className="text-slate-600 truncate block">{task.logs[task.logs.length - 1].note}</span>
+                  </div>
+                )}
+              </div>
+            ))}
+          </div>
         </div>
       )}
 
