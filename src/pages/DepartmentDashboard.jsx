@@ -301,7 +301,6 @@ export default function DepartmentDashboard() {
 
                 <div className="flex items-baseline justify-between pt-1">
                   <span className="text-xl font-extrabold font-mono text-slate-900 tracking-tight">
-                  <span className="text-xl font-extrabold font-mono text-slate-900 tracking-tight">
                     {item.val}
                   </span>
 

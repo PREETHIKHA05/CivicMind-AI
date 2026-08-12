@@ -734,6 +734,43 @@ Return JSON only, no markdown fences:
   }
 });
 
+// POST Chatbot assistant route — calls Gemini
+app.post('/api/chat', async (req, res) => {
+  const { prompt, history } = req.body;
+
+  const CHAT_SCHEMA = {
+    type: 'object',
+    properties: {
+      response: { type: 'string' }
+    },
+    required: ['response']
+  };
+
+  const systemInstruction = `You are CivicMind AI, Chennai's Integrated City Command & Control Centre (ICCC) decision intelligence assistant.
+Be extremely concise, data-driven, and clear. Help the zone counselor with emergency, traffic, and water risks.
+Current Ward 18 Corridor has active rainfall of 118 mm/hr with critical risk (92/100).`;
+
+  const conversationContext = Array.isArray(history)
+    ? history.map(h => `${h.sender === 'user' ? 'User' : 'AI'}: ${h.text}`).join('\n')
+    : '';
+
+  const fullPrompt = `${systemInstruction}\n\n${conversationContext}\nUser: ${prompt}`;
+
+  try {
+    const llmResult = await callGemini(fullPrompt, CHAT_SCHEMA, {
+      model: MODELS.FAST,
+      maxRetries: 2,
+      fallback: { response: "I am currently running in offline mode. Ward 18 has a critical waterlogging risk (92/100) due to heavy rainfall (118 mm/hr)." }
+    });
+
+    return res.json({ response: llmResult.data?.response || llmResult.data || "Error processing request." });
+  } catch (err) {
+    console.error('[/api/chat] Unexpected error:', err);
+    return res.status(500).json({ response: "Error reaching the AI service." });
+  }
+});
+
+
 // Start Server
 
 server.listen(PORT, '0.0.0.0', () => {

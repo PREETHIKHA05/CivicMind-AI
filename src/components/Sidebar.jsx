@@ -28,25 +28,23 @@ export default function Sidebar() {
     ? departmentTasks.filter(t => t.departmentId === currentUser.departmentId && t.status !== 'Completed')
     : departmentTasks.filter(t => t.status !== 'Completed');
 
-  // Counselors see all 8 pages. Department Officials see department-tailored pages.
+  // Counselors see all pages. Department Officials see department-tailored pages.
   const counselorNavItems = [
-    { id: 'command-center', label: '1. Command Center', shortLabel: 'Command', icon: LayoutDashboard },
-    { id: 'city-intelligence', label: '2. City Intelligence', shortLabel: 'City Data', icon: Building2 },
-    { id: 'incident-intelligence', label: '3. Incident Intelligence', shortLabel: 'Incidents', icon: AlertTriangle, badge: '7 Active' },
-    { id: 'agent-council', label: '4. Agent Council', shortLabel: 'Agents', icon: GitMerge, badge: '7 Online' },
-    { id: 'causal-intelligence', label: '5. Causal Intelligence', shortLabel: 'Causal Graph', icon: BrainCircuit },
-    { id: 'response-plans', label: '6. Response Plans', shortLabel: 'Plans', icon: FileCheck2, badge: 'Editable' },
-    { id: 'department-dashboard', label: '7. Dept Dashboards', shortLabel: 'Work Orders', icon: Layers, badge: `${myDeptTasks.length} Tasks` },
-    { id: 'city-memory', label: '8. City Memory', shortLabel: 'Memory', icon: History }
+    { id: 'command-center', label: 'Command Center', shortLabel: 'Command', icon: LayoutDashboard },
+    { id: 'city-intelligence', label: 'City Intelligence', shortLabel: 'City Data', icon: Building2 },
+    { id: 'incident-intelligence', label: 'Incident Intelligence', shortLabel: 'Incidents', icon: AlertTriangle },
+    { id: 'agent-council', label: 'Agent Council', shortLabel: 'Agents', icon: GitMerge },
+    { id: 'response-plans', label: 'Response Plans', shortLabel: 'Plans', icon: FileCheck2 },
+    { id: 'department-dashboard', label: 'Dept Dashboards', shortLabel: 'Work Orders', icon: Layers },
+    { id: 'city-memory', label: 'City Memory', shortLabel: 'Memory', icon: History }
   ];
 
   const departmentNavItems = [
-    { id: 'department-dashboard', label: '1. Dept Command Overview', shortLabel: 'Overview', icon: LayoutDashboard },
-    { id: 'department-dashboard-tasks', label: '2. Assigned Work Orders', shortLabel: 'Work Orders', icon: FileText, badge: `${myDeptTasks.length} Active` },
-    { id: 'department-dashboard-telemetry', label: '3. Sensors & Telemetry', shortLabel: 'Telemetry', icon: Activity },
-    { id: 'causal-intelligence', label: '4. City Causal Impact', shortLabel: 'Causal Graph', icon: BrainCircuit },
-    { id: 'department-dashboard-protocols', label: '5. Emergency Protocols', shortLabel: 'Protocols', icon: Sparkles },
-    { id: 'city-intelligence', label: '6. City-Wide Feed', shortLabel: 'City Feed', icon: Building2 }
+    { id: 'department-dashboard', label: 'Dept Command Overview', shortLabel: 'Overview', icon: LayoutDashboard },
+    { id: 'department-dashboard-tasks', label: 'Assigned Work Orders', shortLabel: 'Work Orders', icon: FileText },
+    { id: 'department-dashboard-telemetry', label: 'Sensors & Telemetry', shortLabel: 'Telemetry', icon: Activity },
+    { id: 'department-dashboard-protocols', label: 'Emergency Protocols', shortLabel: 'Protocols', icon: Sparkles },
+    { id: 'city-intelligence', label: 'City-Wide Feed', shortLabel: 'City Feed', icon: Building2 }
   ];
 
   const navItems = isDeptRole ? departmentNavItems : counselorNavItems;

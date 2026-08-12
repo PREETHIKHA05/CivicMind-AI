@@ -1,25 +1,49 @@
-import React, { useState } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { useCity } from '../context/CityContext';
-import { MOCK_INTELLIGENCE_QA } from '../data/mockData';
-import { Bot, Send, X, Sparkles, User, Cpu, ShieldCheck } from 'lucide-react';
+import { Bot, Send, X, Cpu, User, Sparkles, Loader2 } from 'lucide-react';
+
+const GEMINI_API_KEY = 'AIzaSyCj3yk2IYU-N3F0A1e0_cDg_jdnpGsM5h4';
+const GEMINI_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${GEMINI_API_KEY}`;
+
+const SYSTEM_CONTEXT = `You are CivicMind AI, an urban intelligence assistant for Chennai's Integrated City Command & Control Centre (ICCC).
+
+You assist Zone Counselors and Department Officials with:
+- Real-time urban risk analysis (floods, traffic, emergencies)
+- Multi-agent AI coordination across departments (Water, Traffic, Emergency 108, Public Advisory, Weather)
+- Cascading risk identification and response plan recommendations
+- Work order management and department coordination
+
+Current scenario context:
+- Ward 18 Hospital Road: Critical flooding risk (92/100 risk index)
+- Rainfall: 118-120mm/hr, drain capacity at 28%
+- Emergency ambulance Unit 108-B4 delayed (STEMI patient, 31min ETA vs 90min window)
+- Agents active: Weather, Water, Traffic, Emergency, Citizen Voice
+
+Be concise, data-driven, and action-oriented. Keep responses under 150 words unless asked for detail.`;
+
+const quickPrompts = [
+  "What is the highest risk right now?",
+  "Why is Ward 18 critical?",
+  "What departments are affected?",
+  "What is the recommended response?",
+  "Summarize the active incidents"
+];
 
 export default function AiChatDrawer() {
-  const { isAiDrawerOpen, setIsAiDrawerOpen, aiMessages, setAiMessages } = useCity();
+  const { isAiDrawerOpen, setIsAiDrawerOpen, aiMessages, setAiMessages, backendUrl } = useCity();
   const [inputText, setInputText] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
+  const messagesEndRef = useRef(null);
+
+  useEffect(() => {
+    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+  }, [aiMessages, isLoading]);
 
   if (!isAiDrawerOpen) return null;
 
-  const quickPrompts = [
-    "What is the highest risk right now?",
-    "Why is Ward 18 critical?",
-    "What departments are affected?",
-    "What happened in 2024?",
-    "What is the recommended response?"
-  ];
-
-  const handleSend = (query) => {
-    const qText = query || inputText;
-    if (!qText.trim()) return;
+  const handleSend = async (query) => {
+    const qText = (query || inputText).trim();
+    if (!qText || isLoading) return;
 
     const userMsg = {
       sender: 'user',
@@ -29,68 +53,84 @@ export default function AiChatDrawer() {
 
     setAiMessages(prev => [...prev, userMsg]);
     setInputText('');
+    setIsLoading(true);
 
-    // Find matching response in mock Q&A
-    setTimeout(() => {
-      const lowerQuery = qText.toLowerCase();
-      let matchedAns = MOCK_INTELLIGENCE_QA.find(qa =>
-        qa.keywords.some(kw => lowerQuery.includes(kw))
-      );
+    try {
+      const res = await fetch(`${backendUrl}/api/chat`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          prompt: qText,
+          history: aiMessages
+        })
+      });
 
-      const aiText = matchedAns
-        ? matchedAns.response
-        : `CivicMind AI analyzed query: "${qText}". Currently, Ward 18 Hospital Road represents the primary urban risk (92/100). Rain: 120mm/h, Drain Capacity: 28%, Emergency ambulance transit delayed by 18 minutes. Coordinated response plan recommended.`;
+      const data = await res.json();
+      const aiText = data?.response || 'Unable to get a response. Please try again.';
 
-      const aiMsg = {
+      setAiMessages(prev => [...prev, {
         sender: 'ai',
         text: aiText,
         time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
-      };
-
-      setAiMessages(prev => [...prev, aiMsg]);
-    }, 600);
+      }]);
+    } catch (err) {
+      setAiMessages(prev => [...prev, {
+        sender: 'ai',
+        text: 'Network error — could not reach CivicMind AI assistant. Please check your connection and try again.',
+        time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+        isError: true
+      }]);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
-    <div className="fixed inset-y-0 right-0 z-50 w-full sm:w-[420px] bg-[#0b101d] border-l border-slate-800 shadow-2xl flex flex-col justify-between">
+    <div className="fixed inset-y-0 right-0 z-50 w-full sm:w-[420px] bg-white border-l border-purple-100 shadow-2xl flex flex-col">
       {/* Header */}
-      <div className="p-4 border-b border-slate-800/80 bg-slate-950/80 flex items-center justify-between">
+      <div className="p-4 border-b border-purple-100 bg-white flex items-center justify-between">
         <div className="flex items-center gap-2.5">
-          <div className="p-2 rounded-xl bg-purple-950/80 border border-purple-500/30 text-purple-400">
-            <Bot className="w-5 h-5 animate-pulse-subtle" />
+          <div className="p-2 rounded-xl bg-purple-100 border border-purple-200 text-purple-600">
+            <Bot className="w-5 h-5" />
           </div>
           <div>
-            <h3 className="text-sm font-bold text-white flex items-center gap-2">
+            <h3 className="text-sm font-bold text-slate-900 flex items-center gap-2">
               CivicMind AI Assistant
-              <span className="px-2 py-0.5 rounded-full bg-purple-950 text-purple-300 border border-purple-800 text-[10px] font-mono">
-                Active
+              <span className="px-2 py-0.5 rounded-full bg-purple-100 text-purple-700 border border-purple-200 text-[10px] font-mono">
+                Gemini
               </span>
             </h3>
-            <p className="text-[11px] text-slate-400 font-mono">
-              Smart City Decision Intelligence Layer
-            </p>
+            <p className="text-[11px] text-slate-500">Smart City Decision Intelligence</p>
           </div>
         </div>
 
         <button
           onClick={() => setIsAiDrawerOpen(false)}
-          className="p-1.5 rounded-lg bg-slate-900 hover:bg-slate-800 text-slate-400 hover:text-white cursor-pointer"
+          className="p-1.5 rounded-lg hover:bg-slate-100 text-slate-400 hover:text-slate-600 cursor-pointer transition-colors"
         >
           <X className="w-5 h-5" />
         </button>
       </div>
 
       {/* Messages Area */}
-      <div className="p-4 flex-1 overflow-y-auto space-y-4">
+      <div className="flex-1 overflow-y-auto p-4 space-y-4 bg-slate-50/50">
+        {aiMessages.length === 0 && (
+          <div className="flex flex-col items-center justify-center h-full text-center gap-3 py-10">
+            <div className="p-4 rounded-2xl bg-purple-50 border border-purple-100">
+              <Sparkles className="w-8 h-8 text-purple-500" />
+            </div>
+            <p className="text-sm font-semibold text-slate-600">Ask me anything about the city</p>
+            <p className="text-xs text-slate-400 max-w-[250px]">Real-time risk analysis, incident details, response recommendations and more.</p>
+          </div>
+        )}
+
         {aiMessages.map((msg, idx) => (
           <div
             key={idx}
-            className={`flex gap-3 text-xs leading-relaxed ${
-              msg.sender === 'user' ? 'justify-end' : 'justify-start'
-            }`}
+            className={`flex gap-3 text-xs leading-relaxed ${msg.sender === 'user' ? 'justify-end' : 'justify-start'}`}
           >
             {msg.sender === 'ai' && (
-              <div className="w-7 h-7 rounded-lg bg-purple-950 border border-purple-500/40 text-purple-300 flex items-center justify-center shrink-0 mt-0.5">
+              <div className="w-7 h-7 rounded-lg bg-purple-100 border border-purple-200 text-purple-600 flex items-center justify-center shrink-0 mt-0.5">
                 <Cpu className="w-4 h-4" />
               </div>
             )}
@@ -98,34 +138,51 @@ export default function AiChatDrawer() {
             <div
               className={`max-w-[82%] p-3 rounded-2xl ${
                 msg.sender === 'user'
-                  ? 'bg-cyan-600/90 text-white rounded-tr-none shadow-md shadow-cyan-950'
-                  : 'bg-slate-900/90 border border-slate-800 text-slate-200 rounded-tl-none font-sans'
+                  ? 'bg-purple-600 text-white rounded-tr-none shadow-md'
+                  : msg.isError
+                    ? 'bg-red-50 border border-red-200 text-red-700 rounded-tl-none'
+                    : 'bg-white border border-purple-100 text-slate-700 rounded-tl-none shadow-sm'
               }`}
             >
-              <div className="text-[10px] font-mono opacity-60 mb-1">{msg.time}</div>
-              <p>{msg.text}</p>
+              <div className={`text-[10px] font-mono mb-1 ${msg.sender === 'user' ? 'opacity-70' : 'text-slate-400'}`}>
+                {msg.time}
+              </div>
+              <p className="whitespace-pre-wrap">{msg.text}</p>
             </div>
 
             {msg.sender === 'user' && (
-              <div className="w-7 h-7 rounded-lg bg-cyan-950 border border-cyan-500/40 text-cyan-300 flex items-center justify-center shrink-0 mt-0.5">
+              <div className="w-7 h-7 rounded-lg bg-purple-100 border border-purple-200 text-purple-600 flex items-center justify-center shrink-0 mt-0.5">
                 <User className="w-4 h-4" />
               </div>
             )}
           </div>
         ))}
+
+        {isLoading && (
+          <div className="flex gap-3 justify-start">
+            <div className="w-7 h-7 rounded-lg bg-purple-100 border border-purple-200 text-purple-600 flex items-center justify-center shrink-0">
+              <Cpu className="w-4 h-4" />
+            </div>
+            <div className="bg-white border border-purple-100 rounded-2xl rounded-tl-none p-3 shadow-sm flex items-center gap-2 text-slate-500 text-xs">
+              <Loader2 className="w-3.5 h-3.5 animate-spin text-purple-500" />
+              <span>Thinking...</span>
+            </div>
+          </div>
+        )}
+
+        <div ref={messagesEndRef} />
       </div>
 
       {/* Quick Prompts */}
-      <div className="px-4 py-2 border-t border-slate-800/60 bg-slate-950/40">
-        <div className="text-[10px] font-mono text-slate-500 mb-1.5 font-bold tracking-wider">
-          Suggested Queries:
-        </div>
+      <div className="px-4 py-2 border-t border-purple-100 bg-white">
+        <div className="text-[10px] font-mono text-slate-400 mb-1.5 tracking-wider">Suggested:</div>
         <div className="flex flex-wrap gap-1.5">
           {quickPrompts.map((qp, i) => (
             <button
               key={i}
               onClick={() => handleSend(qp)}
-              className="px-2.5 py-1 rounded-lg bg-slate-900 hover:bg-slate-800 border border-slate-800 hover:border-cyan-500/40 text-[11px] text-slate-300 hover:text-cyan-300 transition-colors cursor-pointer text-left"
+              disabled={isLoading}
+              className="px-2.5 py-1 rounded-lg bg-purple-50 hover:bg-purple-100 border border-purple-100 hover:border-purple-300 text-[11px] text-purple-700 transition-colors cursor-pointer text-left disabled:opacity-50"
             >
               {qp}
             </button>
@@ -133,27 +190,26 @@ export default function AiChatDrawer() {
         </div>
       </div>
 
-      {/* Input Form */}
-      <div className="p-3 border-t border-slate-800 bg-slate-950/90">
+      {/* Input */}
+      <div className="p-3 border-t border-purple-100 bg-white">
         <form
-          onSubmit={(e) => {
-            e.preventDefault();
-            handleSend();
-          }}
+          onSubmit={(e) => { e.preventDefault(); handleSend(); }}
           className="flex items-center gap-2"
         >
           <input
             type="text"
             value={inputText}
             onChange={(e) => setInputText(e.target.value)}
-            placeholder="Ask CivicMind about city risks, data, history..."
-            className="flex-1 bg-slate-900 border border-slate-800 rounded-xl px-3 py-2 text-xs text-slate-100 placeholder-slate-500 focus:outline-none focus:border-cyan-500/60"
+            placeholder="Ask about city risks, incidents, response plans..."
+            disabled={isLoading}
+            className="flex-1 bg-slate-50 border border-purple-200 rounded-xl px-3 py-2 text-xs text-slate-800 placeholder-slate-400 focus:outline-none focus:border-purple-400 disabled:opacity-60"
           />
           <button
             type="submit"
-            className="p-2.5 rounded-xl bg-cyan-600 hover:bg-cyan-500 text-white transition-colors cursor-pointer"
+            disabled={isLoading || !inputText.trim()}
+            className="p-2.5 rounded-xl bg-purple-600 hover:bg-purple-700 disabled:bg-purple-300 text-white transition-colors cursor-pointer disabled:cursor-not-allowed"
           >
-            <Send className="w-4 h-4" />
+            {isLoading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Send className="w-4 h-4" />}
           </button>
         </form>
       </div>

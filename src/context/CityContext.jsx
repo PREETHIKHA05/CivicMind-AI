@@ -26,6 +26,11 @@ export function CityProvider({ children }) {
   // Active Incidents List (populated by Agent Council synthesis)
   const [incidents, setIncidents] = useState([]);
 
+  // Agent Council persistent state — survives tab switches
+  const [agentUploadedFiles, setAgentUploadedFiles] = useState([]);
+  const [agentRisks, setAgentRisks] = useState(null);
+  const [agentSynthError, setAgentSynthError] = useState(null);
+
   // Response Plan State & Dynamic Action Editing — starts empty; the backend is
   // authoritative (see 'initialData'/'planGenerated' socket handlers below).
   // Never seed this from mockData: pre-connection state must be the honest
@@ -694,7 +699,13 @@ export function CityProvider({ children }) {
         setIsResponsibleAiModalOpen,
         incidents,
         setIncidents,
-        generatePlanFromRisks
+        generatePlanFromRisks,
+        agentUploadedFiles,
+        setAgentUploadedFiles,
+        agentRisks,
+        setAgentRisks,
+        agentSynthError,
+        setAgentSynthError
       }}
     >
       {children}

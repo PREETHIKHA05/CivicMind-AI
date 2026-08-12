@@ -419,13 +419,14 @@ function ShimmerCard() {
    Main page
 ───────────────────────────────────────────────────────────────────────────*/
 export default function AgentCouncil() {
-  const { backendUrl, generatePlanFromRisks, addToast, setActivePage } = useCity();
+  const { backendUrl, generatePlanFromRisks, addToast, setActivePage,
+    agentUploadedFiles: uploadedFiles, setAgentUploadedFiles: setUploadedFiles,
+    agentRisks: risks, setAgentRisks: setRisks,
+    agentSynthError: synthError, setAgentSynthError: setSynthError
+  } = useCity();
 
-  const [uploadedFiles, setUploadedFiles] = useState([]);
   const [synthesising, setSynthesising] = useState(false);
   const [contactingAgentId, setContactingAgentId] = useState(null);
-  const [risks, setRisks] = useState(null);
-  const [synthError, setSynthError] = useState(null);
   const [isDragging, setIsDragging] = useState(false);
 
   const fileInputRef = useRef(null);

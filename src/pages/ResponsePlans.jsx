@@ -333,6 +333,14 @@ export default function ResponsePlans() {
                         </button>
 
                         <button
+                          onClick={() => setShowBroadcastModal(true)}
+                          className="px-4 py-2.5 rounded-xl bg-white hover:bg-purple-50 text-purple-700 font-mono text-xs font-bold cursor-pointer transition-all border border-purple-300 flex items-center gap-2 shadow-sm"
+                        >
+                          <Radio className="w-4 h-4 text-purple-600" />
+                          <span>BROADCAST</span>
+                        </button>
+
+                        <button
                           onClick={() => setShowConfirmModal(true)}
                           className="px-6 py-2.5 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-400 hover:to-teal-500 text-white font-mono text-xs font-bold shadow-lg cursor-pointer transition-all border border-emerald-400/40 animate-pulse-subtle flex items-center gap-2"
                         >
@@ -820,6 +828,67 @@ export default function ResponsePlans() {
           )}
         </div>
       </div>
+
+      {/* BROADCAST MODAL */}
+      {showBroadcastModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4">
+          <div className="bg-white rounded-2xl border border-purple-200 shadow-2xl w-full max-w-lg space-y-5 p-6">
+            <div className="flex items-center justify-between pb-3 border-b border-purple-100">
+              <div className="flex items-center gap-2">
+                <Radio className="w-5 h-5 text-purple-600" />
+                <h3 className="text-sm font-bold text-slate-900 font-mono uppercase tracking-wider">Broadcast Emergency Advisory</h3>
+              </div>
+              <button
+                onClick={() => setShowBroadcastModal(false)}
+                className="p-1.5 rounded-lg hover:bg-slate-100 text-slate-400 hover:text-slate-600 cursor-pointer"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+
+            <div className="space-y-4">
+              <div>
+                <label className="text-xs font-mono font-bold text-slate-600 uppercase tracking-wider block mb-1.5">Message</label>
+                <textarea
+                  value={broadcastMessage}
+                  onChange={(e) => setBroadcastMessage(e.target.value)}
+                  rows={4}
+                  className="w-full border border-purple-200 rounded-xl px-3 py-2 text-sm text-slate-800 focus:outline-none focus:border-purple-400 resize-none font-mono"
+                />
+              </div>
+
+              <div>
+                <label className="text-xs font-mono font-bold text-slate-600 uppercase tracking-wider block mb-1.5">Recipients (phone numbers, one per line)</label>
+                <textarea
+                  value={broadcastRecipients.join('\n')}
+                  onChange={(e) => setBroadcastRecipients(e.target.value.split('\n').filter(Boolean))}
+                  rows={3}
+                  className="w-full border border-purple-200 rounded-xl px-3 py-2 text-sm text-slate-800 focus:outline-none focus:border-purple-400 resize-none font-mono"
+                />
+              </div>
+            </div>
+
+            <div className="flex items-center justify-end gap-3 pt-2 font-mono text-xs">
+              <button
+                onClick={() => setShowBroadcastModal(false)}
+                className="px-4 py-2 rounded-xl bg-white hover:bg-slate-50 text-slate-700 font-bold cursor-pointer border border-purple-200"
+              >
+                CANCEL
+              </button>
+              <button
+                onClick={async () => {
+                  setShowBroadcastModal(false);
+                  await broadcastCitizenMessage(broadcastMessage, broadcastRecipients);
+                }}
+                className="px-5 py-2 rounded-xl bg-purple-600 hover:bg-purple-700 text-white font-bold cursor-pointer shadow-lg flex items-center gap-2"
+              >
+                <Radio className="w-4 h-4" />
+                SEND BROADCAST
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

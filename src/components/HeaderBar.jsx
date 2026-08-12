@@ -142,36 +142,6 @@ export default function HeaderBar() {
           </span>
         </button>
 
-        {/* PROMINENT SIMULATION BUTTON — triggers the real orchestrator run */}
-        <div className="flex items-center gap-1.5">
-          {!isSimulating ? (
-            <button
-              onClick={() => startAgentRun({ seedNode: 'rainfall_intensity', magnitude: 118, horizonMin: 180 })}
-              disabled={runStatus === 'running'}
-              className="px-4 h-9 rounded-xl bg-purple-600 hover:bg-purple-700 text-white font-bold text-xs font-mono shadow-lg shadow-purple-600/20 transition-all cursor-pointer flex items-center gap-2 border border-purple-500/20 disabled:opacity-50 disabled:cursor-not-allowed"
-            >
-              <Play className="w-4 h-4 fill-current text-purple-100" />
-              <span>{runStatus === 'running' ? 'Running…' : 'Run Simulation'}</span>
-            </button>
-          ) : (
-            <button
-              onClick={resetSimulation}
-              className="px-3 h-9 rounded-xl bg-white hover:bg-purple-50/50 border border-purple-200/60 text-purple-700 text-xs font-mono font-bold transition-all cursor-pointer flex items-center gap-2"
-            >
-              <RotateCcw className="w-4 h-4 text-purple-600" />
-              <span>Reset Sim</span>
-            </button>
-          )}
-        </div>
-
-        {/* Responsible AI Button */}
-        <button
-          onClick={() => setIsResponsibleAiModalOpen(true)}
-          className="w-9 h-9 rounded-xl bg-white hover:bg-purple-50/50 border border-purple-200/60 text-slate-500 hover:text-purple-600 transition-colors cursor-pointer shadow-sm flex items-center justify-center"
-          title="Responsible AI & Human Approval Governance"
-        >
-          <ShieldCheck className="w-4 h-4 text-emerald-600" />
-        </button>
       </div>
     </header>
   );

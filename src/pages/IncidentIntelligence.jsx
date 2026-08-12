@@ -106,7 +106,6 @@ export default function IncidentIntelligence() {
         <div className="lg:col-span-8 space-y-5">
           {selectedIncident && (
             <div className="glass-panel p-6 rounded-2xl border border-purple-200 space-y-6">
-            <div className="glass-panel p-6 rounded-2xl border border-purple-200 space-y-6">
               {/* Incident Title & Meta Header */}
               <div className="pb-4 border-b border-purple-200 space-y-2">
                 <div className="flex flex-wrap items-center justify-between gap-2">

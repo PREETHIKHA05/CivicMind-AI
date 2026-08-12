@@ -117,59 +117,8 @@ export default function CommandCenter() {
       {/* Page Title & Status Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-2 border-b border-purple-100">
         <div>
-          <span className="text-xs font-mono font-bold text-purple-600 tracking-widest">
-            ICCC Real-Time Command Board
-          </span>
-          <h1 className="text-2xl font-black text-slate-800 tracking-tight">City Command Center</h1>
-          <p className="text-xs text-slate-500 font-semibold font-mono">Location: {CITY_METADATA.name} — Ward 18 Corridor Focus</p>
-        </div>
-
-        <div className="flex items-center gap-3">
-          <button
-            onClick={() => setActivePage('agent-council')}
-            className="px-3.5 py-2 rounded-xl bg-white hover:bg-purple-50/50 border border-purple-200/60 text-purple-700 font-mono text-xs font-bold flex items-center gap-2 cursor-pointer transition-colors shadow-sm"
-          >
-            <GitMerge className="w-4 h-4 text-purple-600" />
-            <span>Agent Council</span>
-          </button>
-
-          <button
-            onClick={() => setActivePage('response-plans')}
-            className="px-4 py-2 rounded-xl bg-purple-600 hover:bg-purple-700 text-white font-mono text-xs font-bold flex items-center gap-2 shadow-lg shadow-purple-600/10 cursor-pointer transition-all border border-purple-500/20"
-          >
-            <ShieldAlert className="w-4 h-4" />
-            <span>View Coordinated Response Plan</span>
-          </button>
-        </div>
-      </div>
-
-      {/* Scenario Dial — deterministic causal engine, no LLM in this path */}
-      <div className="bg-white p-4 rounded-2xl border border-purple-100 space-y-2 shadow-sm">
-        <div className="flex items-center justify-between">
-          <span className="text-xs font-mono font-bold text-slate-700 tracking-wider flex items-center gap-2">
-            <Activity className="w-4 h-4 text-purple-600" /> Scenario Dial — Rainfall Intensity
-          </span>
-          <span className="text-sm font-extrabold font-mono text-purple-600">{rainfall} mm/hr</span>
-        </div>
-        <input
-          type="range"
-          min="0"
-          max="200"
-          step="1"
-          value={rainfall}
-          onChange={(e) => setRainfall(Number(e.target.value))}
-          className="w-full accent-purple-600 cursor-pointer"
-        />
-        <div className="flex items-center gap-4 text-xs font-mono pt-1">
-          <span className="text-slate-500">Causal Risk Index:</span>
-          <span className={`text-base font-extrabold ${
-            !causalResult ? 'text-slate-500' : causalResult.riskIndex > 60 ? 'text-red-600' : causalResult.riskIndex > 0 ? 'text-amber-600' : 'text-emerald-600'
-          }`}>
-            {causalResult ? `${causalResult.riskIndex.toFixed(0)} / 100` : '—'}
-          </span>
-          <span className="text-slate-500 font-semibold">
-            {causalResult ? `${causalResult.terminals.length} terminal node(s) reached` : 'computing…'}
-          </span>
+          <h1 className="text-3xl font-black text-black tracking-tight">City Command Center</h1>
+          <p className="text-sm text-black font-semibold">Location: {CITY_METADATA.name} — Ward 18 Corridor Focus</p>
         </div>
       </div>
 
@@ -180,7 +129,7 @@ export default function CommandCenter() {
             key={idx}
             className={`bg-white p-3.5 rounded-xl border ${kpi.border} flex flex-col justify-between shadow-sm`}
           >
-            <span className="text-[10px] font-mono font-bold text-slate-500 tracking-wider block">
+            <span className="text-xs font-bold text-black tracking-wider block">
               {kpi.title}
             </span>
             <div className={`text-2xl font-black my-1 ${kpi.color}`}>
@@ -197,7 +146,7 @@ export default function CommandCenter() {
         {/* Left Column: Critical Urban Risks (7 Cols) */}
         <div className="lg:col-span-7 space-y-4">
           <div className="flex items-center justify-between pb-1">
-            <h2 className="text-sm font-mono font-bold text-slate-800 flex items-center gap-2 tracking-wider">
+            <h2 className="text-base font-bold text-black flex items-center gap-2 tracking-wider">
               <AlertTriangle className="w-4 h-4 text-purple-600" />
               <span>Critical Urban Risks & Active Issues</span>
             </h2>
@@ -213,7 +162,7 @@ export default function CommandCenter() {
               >
                 <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-3 border-b border-purple-100/60">
                   <div className="flex items-center gap-2.5">
-                    <span className={`px-2.5 py-0.5 rounded text-[10px] font-mono font-bold tracking-wider border ${
+                    <span className={`px-2.5 py-0.5 rounded text-xs font-bold tracking-wider border ${
                       inc.severity === 'critical' 
                         ? 'bg-red-50 text-red-700 border-red-200' 
                         : 'bg-amber-50 text-amber-700 border-amber-200'
@@ -234,7 +183,7 @@ export default function CommandCenter() {
                 {/* Roots & Cascading Details */}
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4 p-3 bg-purple-50/40 border border-purple-100/60 rounded-xl text-sm">
                   <div>
-                    <span className="text-[10px] font-mono font-bold text-slate-500 tracking-wider block mb-1">
+                    <span className="text-xs font-bold text-black tracking-wider block mb-1">
                       Root Causes
                     </span>
                     <ul className="list-disc list-inside space-y-1 text-black text-xs">
@@ -244,7 +193,7 @@ export default function CommandCenter() {
                     </ul>
                   </div>
                   <div>
-                    <span className="text-[10px] font-mono font-bold text-slate-500 tracking-wider block mb-1">
+                    <span className="text-xs font-bold text-black tracking-wider block mb-1">
                       Cascading Risk Effects
                     </span>
                     <ul className="list-disc list-inside space-y-1 text-black text-xs">
@@ -259,7 +208,7 @@ export default function CommandCenter() {
                 <div className="mt-4 p-3.5 rounded-xl bg-purple-50 border border-purple-200/60 flex items-start gap-3">
                   <Cpu className="w-5 h-5 text-purple-600 shrink-0 mt-0.5" />
                   <div className="flex-1">
-                    <span className="text-[10px] font-mono font-bold text-purple-700 tracking-wider block mb-0.5">
+                    <span className="text-xs font-bold text-purple-700 tracking-wider block mb-0.5">
                       Ai Assessment
                     </span>
                     <p className="text-sm text-purple-900 leading-relaxed font-bold">
@@ -300,7 +249,7 @@ export default function CommandCenter() {
         <div className="lg:col-span-5 space-y-5">
           <div className="space-y-4">
             <div className="flex items-center justify-between pb-1">
-              <h2 className="text-sm font-mono font-bold text-slate-800 flex items-center gap-2 tracking-wider">
+              <h2 className="text-base font-bold text-black flex items-center gap-2 tracking-wider">
                 <Activity className="w-4 h-4 text-purple-600" />
                 <span>Live Spatial Map</span>
               </h2>
@@ -313,7 +262,7 @@ export default function CommandCenter() {
           {/* AI REASONING TIMELINE */}
           <div className="bg-white p-5 rounded-2xl border border-purple-100 space-y-3 shadow-sm">
             <div className="flex items-center justify-between pb-2 border-b border-purple-100">
-              <h3 className="text-xs font-mono font-bold text-slate-800 flex items-center gap-2 tracking-wider">
+              <h3 className="text-sm font-bold text-black flex items-center gap-2 tracking-wider">
                 <BrainCircuit className="w-4 h-4 text-purple-600" />
                 <span>Ai Reasoning Timeline</span>
               </h3>
