@@ -1,6 +1,6 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { io } from 'socket.io-client';
-import { CITY_METADATA, AI_AGENTS, INCIDENTS_LIST, COORDINATED_RESPONSE_PLAN, MAP_MARKERS, USER_ROLES, DEPARTMENTS } from '../data/mockData';
+import { CITY_METADATA, AI_AGENTS, INCIDENTS_LIST, MAP_MARKERS, USER_ROLES, DEPARTMENTS } from '../data/mockData';
 
 const CityContext = createContext();
 
@@ -23,13 +23,16 @@ export function CityProvider({ children }) {
   const [selectedAgent, setSelectedAgent] = useState(AI_AGENTS[0]);
   const [selectedMarker, setSelectedMarker] = useState(MAP_MARKERS[0]);
 
-  // Response Plan State & Dynamic Action Editing
-  const [planStatus, setPlanStatus] = useState(COORDINATED_RESPONSE_PLAN.status);
+  // Response Plan State & Dynamic Action Editing — starts empty; the backend is
+  // authoritative (see 'initialData'/'planGenerated' socket handlers below).
+  // Never seed this from mockData: pre-connection state must be the honest
+  // empty state, not a fabricated plan.
+  const [planStatus, setPlanStatus] = useState('no_run_yet');
   const [operatorNote, setOperatorNote] = useState('');
   const [approvalTime, setApprovalTime] = useState(null);
-  
+
   // Editable Response Plan Actions
-  const [planActions, setPlanActions] = useState(COORDINATED_RESPONSE_PLAN.actions);
+  const [planActions, setPlanActions] = useState([]);
 
   // Fields populated by a real orchestrator run (backend/orchestrator/run.js) — additive,
   // null/empty until the first live run completes.

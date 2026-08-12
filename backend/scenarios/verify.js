@@ -11,6 +11,8 @@ import path from 'path';
 import { fileURLToPath } from 'url';
 import assert from 'node:assert/strict';
 import { runAgents } from '../orchestrator/run.js';
+// dotenv is loaded as a side effect of importing llm/gemini.js (transitively,
+// via orchestrator/run.js) — see the comment at the top of that file.
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);

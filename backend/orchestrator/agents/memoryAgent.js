@@ -34,6 +34,11 @@ function tagsFromCausal(causal) {
 }
 
 let idCounter = 0;
+// See resetToolIdCounter() in tools/index.js — same rationale, reset per run
+// so identical scenarios produce identical prompt text and cache keys.
+export function resetMemoryIdCounter() {
+  idCounter = 0;
+}
 function wrapHitsAsToolResult(hits, ok) {
   idCounter += 1;
   return {

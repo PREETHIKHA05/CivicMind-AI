@@ -21,6 +21,11 @@ Return JSON: { agent: "citizen", conclusion, signals, evidenceIds, selfConfidenc
 }
 
 let idCounter = 0;
+// See resetToolIdCounter() in tools/index.js — same rationale, reset per run
+// so identical scenarios produce identical prompt text and cache keys.
+export function resetCitizenIdCounter() {
+  idCounter = 0;
+}
 
 /**
  * There's no dedicated citizen-reports tool in backend/tools/index.js — this

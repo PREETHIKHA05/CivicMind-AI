@@ -14,6 +14,17 @@ function nextId(dept, name) {
   return `tool:${dept}:${name}:${String(idCounter).padStart(3, '0')}`;
 }
 
+// Called once at the start of each orchestrator run (see run.js). Without
+// this, tool-result ids keep incrementing for the lifetime of the process,
+// so the SAME scenario run twice produces DIFFERENT ids embedded in the
+// agent prompts — different prompt text means a different sha256 cache key,
+// so a "warm" cache from an earlier run of the identical scenario would
+// never hit. Resetting per run makes identical scenarios produce identical
+// prompts, which is what makes DEMO_MODE's cache replay actually work.
+export function resetToolIdCounter() {
+  idCounter = 0;
+}
+
 function envelope({ dept, name, ok, data, confidence, notes, forced }) {
   return {
     id: nextId(dept, name),

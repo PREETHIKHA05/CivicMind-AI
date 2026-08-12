@@ -22,15 +22,18 @@ const ActionSchema = new mongoose.Schema({
 
 const ResponsePlanSchema = new mongoose.Schema({
   planId: { type: String, required: true, unique: true, default: 'active-crp-01' },
-  incidentId: { type: String, default: 'INC-2026-081' },
-  title: { type: String, default: 'Ward 18 Hospital Corridor Coordinated Emergency Mitigation' },
-  riskScorePre: { type: Number, default: 92 },
-  riskScorePost: { type: Number, default: 41 },
-  confidence: { type: Number, default: 94 },
-  status: { 
-    type: String, 
-    enum: ['Awaiting Human Review', 'APPROVED BY ICCC OPERATOR', 'Changes Requested', 'Dismissed'],
-    default: 'Awaiting Human Review' 
+  // Defaults are the empty state, not a fabricated plan — a document created without
+  // explicit fields (there should be none; see buildEmptyStatePlan() in server.js)
+  // must never surface fake numbers.
+  incidentId: { type: String, default: null },
+  title: { type: String, default: 'No active plan' },
+  riskScorePre: { type: Number, default: null },
+  riskScorePost: { type: Number, default: null },
+  confidence: { type: Number, default: null },
+  status: {
+    type: String,
+    enum: ['no_run_yet', 'Awaiting Human Review', 'APPROVED BY ICCC OPERATOR', 'Changes Requested', 'Dismissed'],
+    default: 'no_run_yet'
   },
   operatorNote: { type: String, default: '' },
   approvalTime: { type: String, default: null },

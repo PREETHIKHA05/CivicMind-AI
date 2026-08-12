@@ -10,14 +10,6 @@ import cors from 'cors';
 import mongoose from 'mongoose';
 import dotenv from 'dotenv';
 
-import { weatherAgent } from './agents/weatherAgent.js';
-import { waterAgent } from './agents/waterAgent.js';
-import { trafficAgent } from './agents/trafficAgent.js';
-import { emergencyAgent } from './agents/emergencyAgent.js';
-import { citizenAgent } from './agents/citizenAgent.js';
-import { memoryAgent } from './agents/memoryAgent.js';
-import { plannerAgent } from './agents/plannerAgent.js';
-
 import { ResponsePlan } from './models/ResponsePlan.js';
 import { WorkOrder } from './models/WorkOrder.js';
 import { TraceEvent } from './models/TraceEvent.js';
@@ -45,8 +37,37 @@ const MONGODB_URI = process.env.MONGODB_URI;
 app.use(cors());
 app.use(express.json());
 
+// Honest empty state — cold start (and /api/seed) must never surface the old
+// hardcoded 92/41/95% decorative plan. A judge who opens Response Plans
+// before any orchestrator run has completed should see "no plan yet", not
+// fabricated numbers we deleted everywhere else in this codebase.
+function buildEmptyStatePlan() {
+  return {
+    planId: 'active-crp-01',
+    status: 'no_run_yet',
+    incidentId: null,
+    title: 'No active plan',
+    riskScorePre: null,
+    riskScorePost: null,
+    confidence: null,
+    operatorNote: '',
+    approvalTime: null,
+    actions: [],
+    runId: null,
+    confidenceBreakdown: null,
+    conflictsResolved: [],
+    gate: null,
+    gateReason: '',
+    unresolved: [],
+    revisionHistory: 0,
+    evidencePool: [],
+    causalRiskIndex: null,
+    causalTerminals: []
+  };
+}
+
 // Persistent State Initialization (Never reset on restart unless explicitly requested)
-const defaultSynthesizedPlan = plannerAgent.synthesizePlan();
+const defaultSynthesizedPlan = buildEmptyStatePlan();
 const persistentData = loadLocalDB(defaultSynthesizedPlan);
 
 let isMongoConnected = false;
@@ -162,18 +183,17 @@ app.get('/api/health', (req, res) => {
   });
 });
 
-// AI Agents Telemetry
+// Deprecated: this used to return hardcoded per-agent telemetry from
+// backend/agents/*.js (the decorative pre-Phase-1 agent layer). Nothing in
+// the frontend calls this anymore — live agent status comes from the
+// agent:event trace (see GET /api/runs/:id/trace) instead. Left in place,
+// neutered, rather than removed, so an old client hitting it gets an honest
+// answer instead of a 404.
 app.get('/api/agents', (req, res) => {
   res.json({
-    agents: [
-      { ...weatherAgent, telemetry: weatherAgent.getTelemetry() },
-      { ...waterAgent, telemetry: waterAgent.getTelemetry() },
-      { ...trafficAgent, telemetry: trafficAgent.getTelemetry() },
-      { ...emergencyAgent, telemetry: emergencyAgent.getTelemetry() },
-      { ...citizenAgent, telemetry: citizenAgent.getTelemetry() },
-      { ...memoryAgent, telemetry: memoryAgent.getTelemetry() },
-      { ...plannerAgent }
-    ]
+    deprecated: true,
+    message: 'Static agent telemetry has been replaced by the live orchestrator trace. See GET /api/runs/:id/trace or the agent:event Socket.IO channel.',
+    agents: []
   });
 });
 
@@ -474,7 +494,7 @@ app.post('/api/plan/reset', async (req, res) => {
 
 // POST Reset Database to Unapproved Initial State
 app.post('/api/seed', async (req, res) => {
-  inMemoryPlan = plannerAgent.synthesizePlan();
+  inMemoryPlan = buildEmptyStatePlan();
   inMemoryWorkOrders = [];
   saveLocalDB(inMemoryPlan, inMemoryWorkOrders);
 

@@ -10,12 +10,13 @@ import { detectConflicts, resolveConflict } from './conflicts.js';
 import { draftPlan } from './planner.js';
 import { critiquePlan } from './critic.js';
 import { computeConfidence, decideGate } from './confidence.js';
+import { resetToolIdCounter } from '../tools/index.js';
 import { runWaterAgent } from './agents/waterAgent.js';
 import { runWeatherAgent } from './agents/weatherAgent.js';
 import { runTrafficAgent } from './agents/trafficAgent.js';
 import { runEmergencyAgent } from './agents/emergencyAgent.js';
-import { runCitizenAgent } from './agents/citizenAgent.js';
-import { runMemoryAgent } from './agents/memoryAgent.js';
+import { runCitizenAgent, resetCitizenIdCounter } from './agents/citizenAgent.js';
+import { runMemoryAgent, resetMemoryIdCounter } from './agents/memoryAgent.js';
 
 const MAX_REVISIONS = 2;
 
@@ -99,6 +100,16 @@ export async function runAgents(scenario, io, runId) {
   const seedNode = scenario.seedNode || 'rainfall_intensity';
   const horizonMin = scenario.horizonMin ?? 180;
   const extraSeeds = scenario.extraSeeds || [];
+
+  // Reset per run (not per process) so an identical scenario produces identical
+  // tool-result ids, hence identical prompt text, hence identical cache keys —
+  // required for DEMO_MODE's warm-cache replay to actually hit. Assumes one run
+  // at a time, which matches this app's actual usage; concurrent runs would
+  // collide on ids, but nothing in this codebase runs two orchestrator runs
+  // simultaneously.
+  resetToolIdCounter();
+  resetCitizenIdCounter();
+  resetMemoryIdCounter();
 
   emit(io, runId, 'run_started', 'ORCHESTRATOR', { scenario, runId }, 'info');
   await sleep(120);
@@ -214,8 +225,14 @@ export async function runAgents(scenario, io, runId) {
   const confidence = computeConfidence({
     actions: plan.actions,
     toolResults: allToolResults,
-    // No terminal reached means no cascade fired — that's a confident "nothing to
-    // escalate" result, not an uncertain one, so it shouldn't be scored as 0.
+    // APPROVED interpretation (design review, see conversation record): a causal
+    // chain that never reaches a terminal is a confident PREDICTION of low risk,
+    // not an uncertain one — the engine is not unsure whether something bad is
+    // happening, it has deterministically confirmed nothing crossed threshold.
+    // Scoring that as pathStrength=0 would treat "we checked and it's fine" the
+    // same as "we don't know", which is wrong and (without this) made it
+    // impossible for a genuinely low-risk Normal scenario to ever reach
+    // AUTO_EXECUTE regardless of how clean its evidence was.
     pathStrength: causal.terminals.length > 0 ? causal.pathStrength : 1,
     memorySimilarity: memoryHits[0]?.similarity ?? 0,
     conflictCount: conflicts.length
