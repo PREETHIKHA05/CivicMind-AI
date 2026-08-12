@@ -15,6 +15,18 @@ import {
   CheckCircle2
 } from 'lucide-react';
 
+const getIconStyle = (color) => {
+  switch (color) {
+    case 'amber': return 'bg-amber-50 border border-amber-200 text-amber-600';
+    case 'blue': return 'bg-blue-50 border border-blue-200 text-blue-600';
+    case 'cyan': return 'bg-cyan-50 border border-cyan-200 text-cyan-600';
+    case 'red': return 'bg-red-50 border border-red-200 text-red-600';
+    case 'emerald': return 'bg-emerald-50 border border-emerald-200 text-emerald-600';
+    case 'purple': return 'bg-purple-50 border border-purple-200 text-purple-600';
+    default: return 'bg-slate-50 border border-slate-200 text-slate-600';
+  }
+};
+
 export default function CityIntelligence() {
   const { setActivePage } = useCity();
 
@@ -126,60 +138,60 @@ export default function CityIntelligence() {
   return (
     <div className="space-y-8 pb-12">
       {/* Page Title */}
-      <div className="pb-2 border-b border-slate-800">
-        <span className="text-xs font-mono font-bold text-cyan-400 uppercase tracking-widest">
+      <div className="pb-2 border-b border-purple-200/60">
+        <span className="text-xs font-mono font-bold text-cyan-700 tracking-widest">
           CROSS-DEPARTMENT DATA AGGREGATOR
         </span>
-        <h1 className="text-2xl font-extrabold text-white tracking-tight">CITY INTELLIGENCE</h1>
-        <p className="text-xs text-slate-400 font-mono">
+        <h1 className="text-2xl font-extrabold text-purple-950 tracking-tight">CITY INTELLIGENCE</h1>
+        <p className="text-xs text-slate-600 font-mono">
           Unified real-time telemetry across municipal operational silos in Chennai.
         </p>
       </div>
 
-      {/* CROSS-DEPARTMENT CONNECTIONS VISUAL FLOW (WOW FEATURE) */}
-      <div className="glass-panel p-6 rounded-2xl border border-cyan-500/30 space-y-4">
-        <div className="flex items-center justify-between pb-2 border-b border-slate-800">
-          <div className="flex items-center gap-2 text-cyan-400 font-bold text-sm">
-            <GitMerge className="w-5 h-5 text-purple-400" />
+      {/* CROSS-DEPARTMENT CONNECTIONS VISUAL FLOW */}
+      <div className="glass-panel p-6 rounded-2xl border border-purple-200 space-y-4">
+        <div className="flex items-center justify-between pb-2 border-b border-purple-100">
+          <div className="flex items-center gap-2 text-cyan-800 font-bold text-sm">
+            <GitMerge className="w-5 h-5 text-purple-600" />
             <span>CROSS-DEPARTMENT CASUAL RELATIONSHIPS</span>
           </div>
-          <span className="text-xs font-mono text-slate-400">Integrated Intelligence Layer</span>
+          <span className="text-xs font-mono text-slate-500">Integrated Intelligence Layer</span>
         </div>
 
-        <p className="text-xs text-slate-300 leading-relaxed">
+        <p className="text-xs text-slate-600 leading-relaxed">
           CivicMind AI does not treat departmental events in isolation. It maps interdependent operational chains to detect cascading risks before they paralyze municipal functions:
         </p>
 
         {/* Visual Cascading Chain */}
         <div className="grid grid-cols-1 md:grid-cols-5 gap-3 pt-2">
-          <div className="p-3 rounded-xl bg-cyan-950/50 border border-cyan-500/30 text-center font-mono">
-            <span className="text-[10px] text-cyan-400 block font-bold">1. METEOROLOGY</span>
-            <span className="text-sm font-extrabold text-white block mt-1">HEAVY RAINFALL</span>
-            <span className="text-[10px] text-slate-400 block mt-1">120 mm/hr Core</span>
+          <div className="p-3 rounded-xl bg-cyan-50 border border-cyan-200 text-center font-mono">
+            <span className="text-[10px] text-cyan-800 block font-bold">1. METEOROLOGY</span>
+            <span className="text-sm font-extrabold text-cyan-950 block mt-1">HEAVY RAINFALL</span>
+            <span className="text-[10px] text-cyan-700 block mt-1">120 mm/hr Core</span>
           </div>
 
-          <div className="p-3 rounded-xl bg-blue-950/50 border border-blue-500/30 text-center font-mono">
-            <span className="text-[10px] text-blue-400 block font-bold">2. WATER RESOURCES</span>
-            <span className="text-sm font-extrabold text-white block mt-1">DRAIN OVERFLOW</span>
-            <span className="text-[10px] text-slate-400 block mt-1">Capacity at 28%</span>
+          <div className="p-3 rounded-xl bg-blue-50 border border-blue-200 text-center font-mono">
+            <span className="text-[10px] text-blue-800 block font-bold">2. WATER RESOURCES</span>
+            <span className="text-sm font-extrabold text-blue-950 block mt-1">DRAIN OVERFLOW</span>
+            <span className="text-[10px] text-blue-700 block mt-1">Capacity at 28%</span>
           </div>
 
-          <div className="p-3 rounded-xl bg-amber-950/50 border border-amber-500/30 text-center font-mono">
-            <span className="text-[10px] text-amber-400 block font-bold">3. INFRASTRUCTURE</span>
-            <span className="text-sm font-extrabold text-white block mt-1">ROAD FLOODING</span>
-            <span className="text-[10px] text-slate-400 block mt-1">32cm Water Level</span>
+          <div className="p-3 rounded-xl bg-amber-50 border border-amber-200 text-center font-mono">
+            <span className="text-[10px] text-amber-800 block font-bold">3. INFRASTRUCTURE</span>
+            <span className="text-sm font-extrabold text-amber-950 block mt-1">ROAD FLOODING</span>
+            <span className="text-[10px] text-amber-700 block mt-1">32cm Water Level</span>
           </div>
 
-          <div className="p-3 rounded-xl bg-orange-950/50 border border-orange-500/30 text-center font-mono">
-            <span className="text-[10px] text-orange-400 block font-bold">4. TRAFFIC BUREAU</span>
-            <span className="text-sm font-extrabold text-white block mt-1">CONGESTION</span>
-            <span className="text-[10px] text-slate-400 block mt-1">Speed drops to 6km/h</span>
+          <div className="p-3 rounded-xl bg-orange-50 border border-orange-200 text-center font-mono">
+            <span className="text-[10px] text-orange-800 block font-bold">4. TRAFFIC BUREAU</span>
+            <span className="text-sm font-extrabold text-orange-950 block mt-1">CONGESTION</span>
+            <span className="text-[10px] text-orange-700 block mt-1">Speed drops to 6km/h</span>
           </div>
 
-          <div className="p-3 rounded-xl bg-red-950/60 border border-red-500/40 text-center font-mono glow-red">
-            <span className="text-[10px] text-red-400 block font-bold">5. EMERGENCY 108</span>
-            <span className="text-sm font-extrabold text-white block mt-1">AMBULANCE DELAY</span>
-            <span className="text-[10px] text-slate-300 block mt-1">Hospital Access Risk</span>
+          <div className="p-3 rounded-xl bg-red-50 border border-red-200 text-center font-mono glow-red">
+            <span className="text-[10px] text-red-800 block font-bold">5. EMERGENCY 108</span>
+            <span className="text-sm font-extrabold text-red-950 block mt-1">AMBULANCE DELAY</span>
+            <span className="text-[10px] text-red-700 block mt-1">Hospital Access Risk</span>
           </div>
         </div>
       </div>
@@ -192,27 +204,29 @@ export default function CityIntelligence() {
           return (
             <div
               key={sec.id}
-              className="glass-panel-interactive p-5 rounded-2xl border border-slate-800 space-y-4 flex flex-col justify-between"
+              className="glass-panel-interactive p-5 rounded-2xl border border-purple-100 space-y-4 flex flex-col justify-between"
             >
               <div>
-                <div className="flex items-center justify-between pb-3 border-b border-slate-800">
+                <div className="flex items-center justify-between pb-3 border-b border-slate-100">
                   <div className="flex items-center gap-2.5">
-                    <div className="p-2 rounded-xl bg-slate-900 border border-slate-800 text-cyan-400">
+                    <div className={`p-2 rounded-xl ${getIconStyle(sec.color)}`}>
                       <Icon className="w-5 h-5" />
                     </div>
                     <div>
-                      <h3 className="text-xs font-mono font-bold text-white">{sec.title}</h3>
-                      <span className="text-[10px] font-mono text-slate-400">{sec.speed}</span>
+                      <h3 className="text-xs font-mono font-bold text-slate-900">{sec.title}</h3>
+                      <span className="text-[10px] font-mono text-slate-500">{sec.speed}</span>
                     </div>
                   </div>
 
                   <span
-                    className={`px-2 py-0.5 rounded text-[10px] font-mono font-bold uppercase ${
+                    className={`px-2 py-0.5 rounded text-[10px] font-mono font-bold border ${
                       sec.risk === 'CRITICAL'
-                        ? 'bg-red-950 text-red-300 border border-red-500/40'
+                        ? 'bg-red-50 text-red-700 border-red-200/60'
                         : sec.risk === 'HIGH'
-                        ? 'bg-amber-950 text-amber-300 border border-amber-500/40'
-                        : 'bg-emerald-950 text-emerald-300 border border-emerald-500/40'
+                        ? 'bg-amber-50 text-amber-700 border-amber-200/60'
+                        : sec.risk === 'MEDIUM'
+                        ? 'bg-orange-50 text-orange-700 border-orange-200/60'
+                        : 'bg-emerald-50 text-emerald-700 border-emerald-200/60'
                     }`}
                   >
                     {sec.risk} RISK
@@ -222,27 +236,27 @@ export default function CityIntelligence() {
                 {/* Metrics Grid */}
                 <div className="grid grid-cols-2 gap-2 my-4">
                   {sec.metrics.map((m, i) => (
-                    <div key={i} className="p-2 rounded-xl bg-slate-900/60 border border-slate-800/80">
+                    <div key={i} className="p-2 rounded-xl bg-slate-50/60 border border-slate-100/80">
                       <span className="text-[10px] font-mono text-slate-500 block">{m.label}</span>
-                      <span className="text-xs font-bold font-mono text-slate-200">{m.val}</span>
+                      <span className="text-xs font-bold font-mono text-slate-800">{m.val}</span>
                     </div>
                   ))}
                 </div>
 
                 {/* Latest Event */}
-                <div className="p-3 rounded-xl bg-slate-950/60 border border-slate-800/80">
-                  <span className="text-[10px] font-mono font-bold text-slate-400 uppercase tracking-wider block mb-1">
+                <div className="p-3 rounded-xl bg-purple-50/30 border border-purple-100/50">
+                  <span className="text-[10px] font-mono font-bold text-purple-700 tracking-wider block mb-1">
                     LATEST SENSOR EVENT
                   </span>
-                  <p className="text-xs text-slate-300 leading-relaxed font-mono">{sec.latestEvent}</p>
+                  <p className="text-xs text-slate-700 leading-relaxed font-mono">{sec.latestEvent}</p>
                 </div>
               </div>
 
-              <div className="pt-2 flex items-center justify-between text-xs font-mono border-t border-slate-800/60">
-                <span className="text-slate-400">Trend: {sec.trend}</span>
+              <div className="pt-2 flex items-center justify-between text-xs font-mono border-t border-slate-100">
+                <span className="text-slate-500">Trend: {sec.trend}</span>
                 <button
                   onClick={() => setActivePage('incident-intelligence')}
-                  className="text-cyan-400 hover:underline cursor-pointer"
+                  className="text-purple-600 hover:text-purple-800 hover:underline cursor-pointer font-bold"
                 >
                   Inspect Incidents →
                 </button>

@@ -215,7 +215,7 @@ export default function CommandMap() {
           <div>
             <div className="flex items-center justify-between pb-3 border-b border-purple-100">
               <span
-                className={`px-2.5 py-0.5 rounded text-[10px] font-mono font-bold uppercase tracking-wider ${
+                className={`px-2.5 py-0.5 rounded text-[10px] font-mono font-bold tracking-wider ${
                   activeMarker.severity === 'critical'
                     ? 'bg-red-50 text-red-700 border border-red-200'
                     : activeMarker.severity === 'high'
@@ -241,7 +241,7 @@ export default function CommandMap() {
 
             {/* Sensor Telemetry Box */}
             <div className="mt-4 p-3 rounded-xl bg-purple-50/50 border border-purple-100/60 space-y-2">
-              <span className="text-[11px] font-mono font-bold text-purple-600 uppercase tracking-wider block">
+              <span className="text-[11px] font-mono font-bold text-purple-600 tracking-wider block">
                 SENSOR TELEMETRY
               </span>
               <div className="grid grid-cols-2 gap-2 text-xs font-mono">

@@ -51,9 +51,9 @@ export default function HeaderBar() {
   }, []);
 
   return (
-    <header className="relative z-20 bg-white/90 backdrop-blur-md border-b border-purple-100 px-4 py-3 flex flex-wrap items-center justify-between gap-4">
+    <header className="relative z-20 bg-white/90 backdrop-blur-md border-b border-purple-100 px-4 py-2.5 flex items-center justify-between gap-3">
       {/* Left: Location & System Live Status */}
-      <div className="flex items-center gap-4">
+      <div className="flex items-center gap-3 shrink-0">
         <div className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-white border border-purple-100/60 text-xs font-mono shadow-sm">
           <MapPin className="w-4 h-4 text-purple-600" />
           <span className="font-semibold text-slate-800">{CITY_METADATA.name}</span>
@@ -66,7 +66,7 @@ export default function HeaderBar() {
             <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-purple-400 opacity-75"></span>
             <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-purple-500"></span>
           </span>
-          <span>● LIVE INTELLIGENCE</span>
+          <span>● Live Intelligence</span>
         </div>
 
         {/* Telemetry Chips */}
@@ -104,7 +104,7 @@ export default function HeaderBar() {
           {/* Quick Role Switcher Dropdown */}
           {showRoleMenu && (
             <div className="absolute right-0 mt-2 w-64 bg-white border border-purple-200/80 rounded-xl p-2 shadow-2xl z-50 space-y-1 font-mono text-xs animate-in fade-in slide-in-from-top-2 text-slate-800">
-              <div className="px-2 py-1.5 border-b border-purple-100 text-[10px] text-slate-500 uppercase font-bold">
+              <div className="px-2 py-1.5 border-b border-purple-100 text-[10px] text-slate-500 font-bold">
                 Switch Active User Account
               </div>
 
@@ -162,10 +162,10 @@ export default function HeaderBar() {
             <button
               onClick={() => startAgentRun({ seedNode: 'rainfall_intensity', magnitude: 118, horizonMin: 180 })}
               disabled={runStatus === 'running'}
-              className="px-4 py-2 rounded-xl bg-purple-600 hover:bg-purple-700 text-white font-bold text-xs font-mono tracking-wider uppercase shadow-lg shadow-purple-600/20 transition-all cursor-pointer flex items-center gap-2 border border-purple-500/20 disabled:opacity-50 disabled:cursor-not-allowed"
+              className="px-4 py-2 rounded-xl bg-purple-600 hover:bg-purple-700 text-white font-bold text-xs font-mono shadow-lg shadow-purple-600/20 transition-all cursor-pointer flex items-center gap-2 border border-purple-500/20 disabled:opacity-50 disabled:cursor-not-allowed"
             >
               <Play className="w-4 h-4 fill-current text-purple-100" />
-              <span>{runStatus === 'running' ? 'RUN IN PROGRESS…' : 'RUN CITY SIMULATION'}</span>
+              <span>{runStatus === 'running' ? 'Run in Progress…' : 'Run City Simulation'}</span>
             </button>
           ) : (
             <button

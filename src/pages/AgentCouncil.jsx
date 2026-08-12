@@ -322,7 +322,7 @@ function RiskCard({ risk, index }) {
 
         {risk.contributingAgents?.length > 0 && (
           <div className="flex items-center gap-2 flex-wrap">
-            <span className="text-[11px] font-mono text-slate-500 uppercase tracking-wider">Agents:</span>
+            <span className="text-[11px] font-mono text-slate-500 tracking-wider">Agents:</span>
             {risk.contributingAgents.map(a => {
               const c = AGENT_META[a.toLowerCase()]?.color || '#6366f1';
               return (
@@ -337,7 +337,7 @@ function RiskCard({ risk, index }) {
 
         {risk.affectedDepartments?.length > 0 && (
           <div className="flex items-center gap-2 flex-wrap">
-            <span className="text-[11px] font-mono text-slate-500 uppercase tracking-wider">
+            <span className="text-[11px] font-mono text-slate-500 tracking-wider">
               <Users className="w-3 h-3 inline mr-1" />Departments:
             </span>
             {risk.affectedDepartments.map(d => (
@@ -361,7 +361,7 @@ function RiskCard({ risk, index }) {
         {confPct !== null && (
           <div>
             <div className="flex justify-between items-center mb-1">
-              <span className="text-[11px] font-mono text-slate-500 uppercase tracking-wider">
+              <span className="text-[11px] font-mono text-slate-500 tracking-wider">
                 <Shield className="w-3 h-3 inline mr-1" />Confidence
               </span>
               <span className="text-[11px] font-mono font-bold text-black">{confPct}%</span>
@@ -376,7 +376,7 @@ function RiskCard({ risk, index }) {
           <div className="bg-slate-50 rounded-xl p-3 border border-slate-200">
             <div className="flex items-center gap-1.5 mb-1">
               <Zap className="w-3.5 h-3.5 text-violet-600" />
-              <span className="text-[11px] font-mono font-bold text-black uppercase tracking-wider">Recommended Action</span>
+              <span className="text-[11px] font-mono font-bold text-black tracking-wider">Recommended Action</span>
             </div>
             <p className="text-xs font-sans text-black leading-relaxed">{risk.recommendedAction}</p>
           </div>
@@ -692,7 +692,7 @@ export default function AgentCouncil() {
           <div ref={riskRef} className="mt-6">
             <div className="flex items-center gap-2 mb-4">
               <Shield className="w-4 h-4 text-violet-600" />
-              <h2 className="text-xs font-mono font-bold text-black uppercase tracking-wider">
+              <h2 className="text-xs font-mono font-bold text-black tracking-wider">
                 Cascading Risk Analysis
               </h2>
               {risks && (

@@ -112,20 +112,20 @@ export default function ResponsePlans() {
   if (planStatus === 'no_run_yet') {
     return (
       <div className="space-y-6 pb-12 font-sans">
-        <div className="glass-panel p-6 rounded-2xl border border-slate-800 flex flex-col md:flex-row md:items-center justify-between gap-4">
+        <div className="glass-panel p-6 rounded-2xl border border-purple-200 flex flex-col md:flex-row md:items-center justify-between gap-4">
           <div>
-            <span className="text-xs font-mono font-bold text-cyan-400 uppercase tracking-widest">
+            <span className="text-xs font-mono font-bold text-cyan-700 tracking-widest">
               HUMAN-IN-THE-LOOP DECISION MATRIX
             </span>
-            <h1 className="text-2xl font-extrabold text-white tracking-tight mt-1">
+            <h1 className="text-2xl font-extrabold text-purple-950 tracking-tight mt-1">
               COORDINATED RESPONSE PLAN (CRP)
             </h1>
           </div>
         </div>
 
-        <div className="glass-panel p-12 rounded-2xl border border-slate-800 flex flex-col items-center justify-center text-center gap-3">
+        <div className="glass-panel p-12 rounded-2xl border border-purple-100 flex flex-col items-center justify-center text-center gap-3">
           <FileCheck2 className="w-10 h-10 text-slate-600" />
-          <h2 className="text-lg font-bold text-slate-300">No active plan</h2>
+          <h2 className="text-lg font-bold text-slate-700">No active plan</h2>
           <p className="text-sm text-slate-500 font-mono max-w-md">
             Start a simulation to generate one. Go to Agent Council and run agent analysis, or use the scenario dial on Command Center.
           </p>
@@ -137,34 +137,34 @@ export default function ResponsePlans() {
   return (
     <div className="space-y-6 pb-12 font-sans">
       {/* Top Header Card */}
-      <div className="glass-panel p-6 rounded-2xl border border-slate-800 flex flex-col md:flex-row md:items-center justify-between gap-4">
+      <div className="glass-panel p-6 rounded-2xl border border-purple-200 flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
           <div className="flex items-center gap-2">
-            <span className="text-xs font-mono font-bold text-cyan-400 uppercase tracking-widest">
+            <span className="text-xs font-mono font-bold text-cyan-700 tracking-widest">
               HUMAN-IN-THE-LOOP DECISION MATRIX
             </span>
-            <span className="px-2 py-0.5 rounded bg-cyan-950 text-cyan-300 border border-cyan-500/40 text-[10px] font-mono font-bold">
+            <span className="px-2 py-0.5 rounded bg-cyan-50 text-cyan-700 border border-cyan-200 text-[10px] font-mono font-bold">
               {isCounselor ? 'Role: Zone Counselor (Admin)' : `Role: ${currentUser?.deptName || 'Department Official'}`}
             </span>
           </div>
-          <h1 className="text-2xl font-extrabold text-white tracking-tight mt-1">
+          <h1 className="text-2xl font-extrabold text-purple-950 tracking-tight mt-1">
             COORDINATED RESPONSE PLAN (CRP)
           </h1>
-          <p className="text-xs text-slate-400 font-mono">
+          <p className="text-xs text-slate-600 font-mono">
             Multi-department recommendations synthesized by CivicMind AI. Zone Counselor can customize department actions and approve work orders.
           </p>
         </div>
 
         {/* Plan Status Badge */}
-        <div className="flex items-center gap-2 px-4 py-2 rounded-xl bg-slate-900 border border-slate-800">
-          <span className="text-xs text-slate-400 font-mono">STATUS:</span>
+        <div className="flex items-center gap-2 px-4 py-2 rounded-xl bg-slate-50 border border-purple-100">
+          <span className="text-xs text-slate-500 font-mono">STATUS:</span>
           <span
-            className={`px-3 py-1 rounded-full text-xs font-mono font-bold uppercase ${
+            className={`px-3 py-1 rounded-full text-xs font-mono font-bold border ${
               planStatus === 'APPROVED BY ICCC OPERATOR'
-                ? 'bg-emerald-950 text-emerald-300 border border-emerald-500/50 shadow-md shadow-emerald-950'
+                ? 'bg-emerald-50 text-emerald-700 border-emerald-200'
                 : planStatus === 'Changes Requested'
-                ? 'bg-amber-950 text-amber-300 border border-amber-500/50'
-                : 'bg-cyan-950 text-cyan-300 border border-cyan-500/50 animate-pulse'
+                ? 'bg-amber-50 text-amber-700 border-amber-200'
+                : 'bg-cyan-50 text-cyan-700 border-cyan-200 animate-pulse'
             }`}
           >
             {planStatus}
@@ -173,68 +173,68 @@ export default function ResponsePlans() {
       </div>
 
       {/* DYNAMIC PROJECT RISK SUMMARY CARD */}
-      <div className="glass-panel p-6 rounded-2xl border border-cyan-500/30 space-y-4 shadow-xl">
+      <div className="glass-panel p-6 rounded-2xl border border-purple-200 space-y-4 shadow-xl">
         <div className="flex flex-col lg:flex-row items-start lg:items-center justify-between gap-6">
           <div>
             <div className="flex items-center gap-2">
-              <span className="px-2.5 py-0.5 rounded bg-red-950 text-red-300 border border-red-500/40 text-xs font-mono font-bold uppercase">
+              <span className="px-2.5 py-0.5 rounded bg-red-50 text-red-700 border border-red-200 text-xs font-mono font-bold">
                 CRITICAL TARGET RISK
               </span>
-              <span className="text-xs font-mono text-slate-400">Incident: INC-2026-081 (Ward 18)</span>
+              <span className="text-xs font-mono text-slate-500">Incident: INC-2026-081 (Ward 18)</span>
             </div>
-            <h2 className="text-xl font-extrabold text-white mt-2">
+            <h2 className="text-xl font-extrabold text-purple-950 mt-2">
               Hospital Access Corridor Emergency Response Plan
             </h2>
-            <p className="text-xs text-slate-400 font-mono mt-1">
+            <p className="text-xs text-slate-600 font-mono mt-1">
               Adjust department action parameters below to observe real-time risk index variations.
             </p>
           </div>
 
           {/* Dynamic Risk Gauge Box */}
-          <div className="flex items-center gap-4 bg-slate-900/90 p-4 rounded-2xl border border-slate-800 font-mono text-center shrink-0">
+          <div className="flex items-center gap-4 bg-slate-50 p-4 rounded-2xl border border-purple-100 font-mono text-center shrink-0">
             <div>
-              <span className="text-[10px] text-slate-400 block font-semibold">PRE-INTERVENTION</span>
-              <span className="text-xl font-extrabold text-red-400">92/100</span>
+              <span className="text-[10px] text-slate-500 block font-semibold">PRE-INTERVENTION</span>
+              <span className="text-xl font-extrabold text-red-750">92/100</span>
             </div>
 
-            <div className="w-px h-10 bg-slate-800" />
+            <div className="w-px h-10 bg-slate-200" />
 
             <div>
-              <span className="text-[10px] text-cyan-400 block font-semibold">DYNAMIC PROJECTED RISK</span>
+              <span className="text-[10px] text-cyan-800 block font-semibold">DYNAMIC PROJECTED RISK</span>
               <div className="flex items-center justify-center gap-1.5">
-                <span className={`text-2xl font-extrabold ${dynamicRisk <= 45 ? 'text-emerald-400' : dynamicRisk <= 65 ? 'text-amber-400' : 'text-red-400'}`}>
+                <span className={`text-2xl font-extrabold ${dynamicRisk <= 45 ? 'text-emerald-700' : dynamicRisk <= 65 ? 'text-amber-700' : 'text-red-700'}`}>
                   {dynamicRisk}/100
                 </span>
                 {dynamicRisk < 92 && (
-                  <span className="text-[10px] text-emerald-400 font-bold">
+                  <span className="text-[10px] text-emerald-700 font-bold">
                     (-{92 - dynamicRisk} pts)
                   </span>
                 )}
               </div>
             </div>
 
-            <div className="w-px h-10 bg-slate-800" />
+            <div className="w-px h-10 bg-slate-200" />
 
             <div>
-              <span className="text-[10px] text-slate-400 block font-semibold">CONFIDENCE</span>
-              <span className="text-lg font-bold text-cyan-300">94%</span>
+              <span className="text-[10px] text-slate-500 block font-semibold">CONFIDENCE</span>
+              <span className="text-lg font-bold text-cyan-800">94%</span>
             </div>
           </div>
         </div>
 
         {/* HUMAN APPROVAL ACTION BAR */}
-        <div className="p-4 rounded-xl bg-slate-900/90 border border-slate-800 flex flex-col md:flex-row items-center justify-between gap-4">
-          <div className="text-xs font-mono text-slate-300">
+        <div className="p-4 rounded-xl bg-purple-50/50 border border-purple-200/60 flex flex-col md:flex-row items-center justify-between gap-4">
+          <div className="text-xs font-mono text-slate-700">
             {planStatus === 'APPROVED BY ICCC OPERATOR' ? (
-              <div className="flex items-center gap-2 text-emerald-400 font-semibold">
+              <div className="flex items-center gap-2 text-emerald-800 font-semibold">
                 <CheckCircle2 className="w-5 h-5 shrink-0" />
                 <span>
                   APPROVED BY ZONE COUNSELOR at {approvalTime || '07:12 AM'}. Work orders dispatched to 4 department dashboards.
                 </span>
               </div>
             ) : (
-              <div className="flex items-center gap-2 text-cyan-300">
-                <UserCheck className="w-5 h-5 text-cyan-400 shrink-0" />
+              <div className="flex items-center gap-2 text-purple-800 font-semibold">
+                <UserCheck className="w-5 h-5 text-purple-600 shrink-0" />
                 <span>Zone Counselor Review & Plan Customization Mode</span>
               </div>
             )}
@@ -244,30 +244,30 @@ export default function ResponsePlans() {
             {planStatus === 'APPROVED BY ICCC OPERATOR' ? (
               <button
                 onClick={resetPlanToUnapproved}
-                className="px-5 py-2.5 rounded-xl bg-amber-950/80 hover:bg-amber-900 text-amber-200 border border-amber-500/50 font-mono text-xs font-bold cursor-pointer transition-all flex items-center gap-2 shadow-lg hover:scale-105"
+                className="px-5 py-2.5 rounded-xl bg-amber-550/10 hover:bg-amber-550/20 text-amber-800 border border-amber-500/50 font-mono text-xs font-bold cursor-pointer transition-all flex items-center gap-2 shadow-sm"
               >
-                <RotateCcw className="w-4 h-4 text-amber-400" />
+                <RotateCcw className="w-4 h-4 text-amber-600" />
                 <span>REVERT TO UNAPPROVED DRAFT</span>
               </button>
             ) : (
               <>
                 <button
                   onClick={() => setShowChangesModal(true)}
-                  className="px-4 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 font-mono text-xs font-semibold cursor-pointer transition-colors border border-slate-700"
+                  className="px-4 py-2 rounded-xl bg-white hover:bg-slate-50 text-slate-700 font-mono text-xs font-semibold cursor-pointer transition-colors border border-slate-200"
                 >
                   REQUEST CHANGES
                 </button>
 
                 <button
                   onClick={dismissPlan}
-                  className="px-4 py-2 rounded-xl bg-slate-900 hover:bg-slate-800 text-slate-400 hover:text-red-400 font-mono text-xs cursor-pointer transition-colors border border-slate-800"
+                  className="px-4 py-2 rounded-xl bg-white hover:bg-red-50 text-slate-500 hover:text-red-600 font-mono text-xs cursor-pointer transition-colors border border-slate-200"
                 >
                   DISMISS
                 </button>
 
                 <button
                   onClick={() => setShowConfirmModal(true)}
-                  className="px-6 py-2.5 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-400 hover:to-teal-500 text-white font-mono text-xs font-bold shadow-lg shadow-emerald-950 cursor-pointer transition-all border border-emerald-400/40 animate-pulse-subtle flex items-center gap-2"
+                  className="px-6 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-mono text-xs font-bold shadow-lg shadow-emerald-600/10 cursor-pointer transition-all border border-emerald-500/20 flex items-center gap-2"
                 >
                   <Send className="w-4 h-4" />
                   <span>APPROVE & DISPATCH WORK ORDERS</span>
@@ -283,7 +283,7 @@ export default function ResponsePlans() {
         <div className="bg-white p-6 rounded-2xl border border-purple-100 space-y-5 shadow-sm">
           <div className="flex flex-col md:flex-row md:items-center justify-between gap-3">
             <div>
-              <span className="text-xs font-mono font-bold text-purple-600 uppercase tracking-widest">
+              <span className="text-xs font-mono font-bold text-purple-600 tracking-widest">
                 ORCHESTRATOR GOVERNANCE — RUN {planRunId}
               </span>
               <p className="text-xs text-slate-500 font-mono mt-1">
@@ -292,7 +292,7 @@ export default function ResponsePlans() {
             </div>
             {planGate && (
               <span
-                className={`px-3 py-1.5 rounded-full text-xs font-mono font-bold uppercase border shrink-0 ${
+                className={`px-3 py-1.5 rounded-full text-xs font-mono font-bold border shrink-0 ${
                   planGate === 'AUTO_EXECUTE'
                     ? 'bg-emerald-50 text-emerald-700 border-emerald-200'
                     : planGate === 'ESCALATE'
@@ -314,7 +314,7 @@ export default function ResponsePlans() {
           {/* Confidence stacked bar */}
           {planConfidenceBreakdown && (
             <div className="space-y-2">
-              <span className="text-[10px] font-mono font-bold text-slate-500 uppercase tracking-wider block">
+              <span className="text-[10px] font-mono font-bold text-slate-500 tracking-wider block">
                 Confidence Components
               </span>
               <div className="w-full h-4 rounded-full overflow-hidden flex bg-purple-50 border border-purple-100">
@@ -353,7 +353,7 @@ export default function ResponsePlans() {
           {/* Conflicts resolved */}
           {planConflictsResolved && planConflictsResolved.length > 0 && (
             <div className="space-y-1.5">
-              <span className="text-[10px] font-mono font-bold text-amber-600 uppercase tracking-wider block">
+              <span className="text-[10px] font-mono font-bold text-amber-600 tracking-wider block">
                 Conflicts Resolved ({planConflictsResolved.length})
               </span>
               {planConflictsResolved.map((c, i) => (
@@ -367,7 +367,7 @@ export default function ResponsePlans() {
           {/* Unresolved */}
           {planUnresolved && planUnresolved.length > 0 && (
             <div className="space-y-1.5">
-              <span className="text-[10px] font-mono font-bold text-slate-500 uppercase tracking-wider block">
+              <span className="text-[10px] font-mono font-bold text-slate-500 tracking-wider block">
                 Unresolved / Known Gaps
               </span>
               {planUnresolved.map((u, i) => (
@@ -386,7 +386,7 @@ export default function ResponsePlans() {
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-3 border-b border-purple-100">
             <div>
               <div className="flex items-center gap-2">
-                <span className="px-2.5 py-0.5 rounded bg-emerald-50 text-emerald-700 border border-emerald-200 text-[10px] font-mono font-bold uppercase tracking-wider">
+                <span className="px-2.5 py-0.5 rounded bg-emerald-50 text-emerald-700 border border-emerald-200 text-[10px] font-mono font-bold tracking-wider">
                   LIVE FIELD EXECUTION PROGRESS
                 </span>
                 <span className="text-xs font-mono text-slate-500 font-semibold">Real-Time Department Sync</span>
@@ -436,7 +436,7 @@ export default function ResponsePlans() {
               >
                 <div className="flex items-center justify-between gap-2">
                   <span className="font-bold text-slate-800 truncate">{task.departmentName}</span>
-                  <span className={`px-2 py-0.5 rounded text-[10px] font-bold uppercase shrink-0 ${
+                  <span className={`px-2 py-0.5 rounded text-[10px] font-bold shrink-0 ${
                     task.status === 'Completed'
                       ? 'bg-emerald-50 text-emerald-700 border border-emerald-200'
                       : task.status === 'In Progress'
@@ -466,10 +466,10 @@ export default function ResponsePlans() {
       {/* EDITABLE DEPARTMENT RECOMMENDATIONS LIST */}
       <div className="space-y-4">
         <div className="flex items-center justify-between">
-          <h3 className="text-xs font-mono font-bold text-slate-400 uppercase tracking-wider">
+          <h3 className="text-xs font-mono font-bold text-slate-500 tracking-wider">
             SYNTHESIZED DEPARTMENTAL ACTIONS ({planActions.length})
           </h3>
-          <span className="text-xs font-mono text-cyan-400">
+          <span className="text-xs font-mono text-purple-600 font-semibold">
             Zone Counselor can edit actions & parameters below
           </span>
         </div>
@@ -484,10 +484,10 @@ export default function ResponsePlans() {
                 key={action.id}
                 className={`glass-panel p-5 rounded-2xl border transition-all ${
                   !action.enabled
-                    ? 'border-slate-800/50 opacity-60 bg-slate-950/40'
+                    ? 'border-slate-200 opacity-60 bg-slate-100/50'
                     : isEditing
-                    ? 'border-cyan-500 shadow-lg shadow-cyan-950/40 bg-slate-900/90'
-                    : 'border-slate-800 hover:border-slate-700 bg-slate-900/60'
+                    ? 'border-purple-400 bg-purple-50/80 shadow-md'
+                    : 'border-purple-100 bg-white hover:border-purple-200/80 hover:shadow-sm'
                 }`}
               >
                 <div className="flex flex-col lg:flex-row items-start lg:items-center justify-between gap-4">
@@ -498,43 +498,43 @@ export default function ResponsePlans() {
                       onClick={() => togglePlanAction(action.id)}
                       className={`p-2 rounded-xl border font-mono text-xs font-bold transition-all cursor-pointer ${
                         action.enabled
-                          ? 'bg-cyan-950 text-cyan-300 border border-cyan-500/50'
-                          : 'bg-slate-950 text-slate-500 border border-slate-800'
+                          ? 'bg-cyan-50 text-cyan-700 border border-cyan-200'
+                          : 'bg-slate-100 text-slate-400 border border-slate-200'
                       }`}
                       title={action.enabled ? 'Action Enabled' : 'Action Disabled'}
                     >
                       {action.enabled ? 'ON' : 'OFF'}
                     </button>
 
-                    <div className="p-3 rounded-xl bg-slate-900 border border-slate-800 text-cyan-400 shrink-0">
+                    <div className="p-3 rounded-xl bg-purple-50 border border-purple-100 text-purple-600 shrink-0">
                       <Icon className="w-6 h-6" />
                     </div>
 
                     <div>
-                      <div className="flex items-center gap-2">
-                        <span className="text-xs font-bold text-white font-mono uppercase">
+                      <div className="flex flex-wrap items-center gap-2">
+                        <span className="text-xs font-bold text-slate-900 font-mono">
                           {action.department}
                         </span>
 
                         <span
-                          className={`px-2 py-0.5 rounded text-[10px] font-mono font-bold uppercase ${
+                          className={`px-2 py-0.5 rounded text-[10px] font-mono font-bold border ${
                             action.priority === 'CRITICAL'
-                              ? 'bg-red-950 text-red-300 border border-red-500/40'
+                              ? 'bg-red-50 text-red-700 border-red-200'
                               : action.priority === 'HIGH'
-                              ? 'bg-amber-950 text-amber-300 border border-amber-500/40'
-                              : 'bg-slate-800 text-slate-300 border border-slate-700'
+                              ? 'bg-amber-50 text-amber-700 border-amber-200'
+                              : 'bg-slate-50 text-slate-655 border border-slate-200'
                           }`}
                         >
-                          {action.priority} PRIORITY
+                          {action.priority} {action.priority === 'CRITICAL' || action.priority === 'HIGH' ? 'PRIORITY' : ''}
                         </span>
 
-                        <span className="text-xs font-mono text-slate-400">
-                          Risk Impact: <strong className="text-emerald-400">-{action.baseRiskImpact} pts</strong>
+                        <span className="text-xs font-mono text-slate-500">
+                          Risk Impact: <strong className="text-emerald-700">-{action.baseRiskImpact} pts</strong>
                         </span>
 
                         {Array.isArray(action.evidenceIds) && action.evidenceIds.length > 0 && (
                           <span
-                            className="px-2 py-0.5 rounded text-[10px] font-mono font-bold bg-cyan-950 text-cyan-300 border border-cyan-500/30"
+                            className="px-2 py-0.5 rounded text-[10px] font-mono font-bold bg-cyan-50 text-cyan-755 border border-cyan-200"
                             title={action.evidenceIds.join(', ')}
                           >
                             {action.evidenceIds.length} evidence id{action.evidenceIds.length > 1 ? 's' : ''}
@@ -542,7 +542,7 @@ export default function ResponsePlans() {
                         )}
 
                         {action.reversible === false && (
-                          <span className="px-2 py-0.5 rounded text-[10px] font-mono font-bold bg-red-950 text-red-300 border border-red-500/40">
+                          <span className="px-2 py-0.5 rounded text-[10px] font-mono font-bold bg-red-50 text-red-700 border border-red-200">
                             IRREVERSIBLE
                           </span>
                         )}
@@ -554,17 +554,17 @@ export default function ResponsePlans() {
                           <textarea
                             value={editFields.recommendation}
                             onChange={(e) => setEditFields({ ...editFields, recommendation: e.target.value })}
-                            className="w-full p-2.5 rounded-xl bg-slate-950 border border-cyan-500/60 text-xs text-white font-mono focus:outline-none focus:border-cyan-400"
+                            className="w-full p-2.5 rounded-xl bg-white border border-purple-300 text-xs text-slate-800 font-mono focus:outline-none focus:border-purple-500"
                             rows={2}
                           />
 
                           <div className="flex items-center gap-4 text-xs font-mono">
                             <div className="flex items-center gap-2">
-                              <span className="text-slate-400">Priority:</span>
+                              <span className="text-slate-555">Priority:</span>
                               <select
                                 value={editFields.priority}
                                 onChange={(e) => setEditFields({ ...editFields, priority: e.target.value })}
-                                className="bg-slate-950 border border-slate-800 text-cyan-300 rounded px-2 py-1"
+                                className="bg-white border border-purple-200 text-purple-800 rounded px-2 py-1 focus:outline-none focus:border-purple-500"
                               >
                                 <option value="CRITICAL">CRITICAL (1.25x Impact)</option>
                                 <option value="HIGH">HIGH (1.0x Impact)</option>
@@ -574,18 +574,18 @@ export default function ResponsePlans() {
                             </div>
 
                             <div className="flex items-center gap-2">
-                              <span className="text-slate-400">Resource Count:</span>
-                              <div className="flex items-center gap-1 bg-slate-950 rounded px-2 py-0.5 border border-slate-800">
+                              <span className="text-slate-555">Resource Count:</span>
+                              <div className="flex items-center gap-1 bg-slate-50 rounded px-2 py-0.5 border border-purple-200">
                                 <button
                                   onClick={() => setEditFields({ ...editFields, resourceCount: Math.max(1, editFields.resourceCount - 1) })}
-                                  className="text-slate-400 hover:text-white p-1"
+                                  className="text-slate-500 hover:text-purple-700 p-1 cursor-pointer"
                                 >
                                   <Minus className="w-3 h-3" />
                                 </button>
-                                <span className="font-bold text-white px-1">{editFields.resourceCount}</span>
+                                <span className="font-bold text-slate-900 px-1">{editFields.resourceCount}</span>
                                 <button
                                   onClick={() => setEditFields({ ...editFields, resourceCount: editFields.resourceCount + 1 })}
-                                  className="text-slate-400 hover:text-white p-1"
+                                  className="text-slate-500 hover:text-purple-700 p-1 cursor-pointer"
                                 >
                                   <Plus className="w-3 h-3" />
                                 </button>
@@ -594,7 +594,7 @@ export default function ResponsePlans() {
                           </div>
                         </div>
                       ) : (
-                        <p className="text-xs font-mono text-slate-200 mt-1 font-semibold">
+                        <p className="text-xs font-mono text-slate-700 mt-1.5 font-semibold">
                           {action.recommendation}
                         </p>
                       )}
@@ -614,7 +614,7 @@ export default function ResponsePlans() {
                         </button>
                         <button
                           onClick={handleCancelEdit}
-                          className="px-3 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 font-mono text-xs cursor-pointer transition-colors"
+                          className="px-3 py-1.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-mono text-xs cursor-pointer border border-slate-200 transition-colors"
                         >
                           CANCEL
                         </button>
@@ -623,7 +623,7 @@ export default function ResponsePlans() {
                       isCounselor && planStatus !== 'APPROVED BY ICCC OPERATOR' && (
                         <button
                           onClick={() => handleStartEdit(action)}
-                          className="px-3 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-cyan-300 border border-slate-700 font-mono text-xs font-medium cursor-pointer transition-colors flex items-center gap-1.5"
+                          className="px-3 py-1.5 rounded-xl bg-purple-50 hover:bg-purple-100/80 text-purple-700 border border-purple-200/50 font-mono text-xs font-bold cursor-pointer transition-colors flex items-center gap-1.5"
                         >
                           <Edit3 className="w-3.5 h-3.5" />
                           <span>EDIT ACTION</span>
@@ -635,12 +635,12 @@ export default function ResponsePlans() {
 
                 {/* Additional Impact Details */}
                 {!isEditing && (
-                  <div className="mt-3 pt-3 border-t border-slate-800/80 grid grid-cols-1 md:grid-cols-2 gap-3 text-[11px] font-mono text-slate-400">
+                  <div className="mt-3 pt-3 border-t border-slate-100 grid grid-cols-1 md:grid-cols-2 gap-3 text-[11px] font-mono text-slate-500">
                     <div>
-                      <strong className="text-slate-300">Causal Trigger Reason:</strong> {action.reason}
+                      <strong className="text-slate-800">Causal Trigger Reason:</strong> {action.reason}
                     </div>
                     <div>
-                      <strong className="text-emerald-400">Expected Outcome:</strong> {action.expectedImpact}
+                      <strong className="text-emerald-700">Expected Outcome:</strong> {action.expectedImpact}
                     </div>
                   </div>
                 )}
@@ -652,39 +652,39 @@ export default function ResponsePlans() {
 
       {/* CONFIRM APPROVAL MODAL */}
       {showConfirmModal && (
-        <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-md flex items-center justify-center p-4">
-          <div className="glass-panel p-6 rounded-2xl border border-cyan-500/40 max-w-lg w-full space-y-4 shadow-2xl">
-            <div className="flex items-center gap-3 text-emerald-400">
+        <div className="fixed inset-0 z-50 bg-black/40 backdrop-blur-md flex items-center justify-center p-4">
+          <div className="bg-white p-6 rounded-2xl border border-purple-200 max-w-lg w-full space-y-4 shadow-2xl">
+            <div className="flex items-center gap-3 text-emerald-700">
               <CheckCircle2 className="w-6 h-6" />
-              <h3 className="text-lg font-bold text-white font-mono">
+              <h3 className="text-lg font-bold text-slate-900 font-mono">
                 Confirm Plan Approval & Task Dispatch
               </h3>
             </div>
 
-            <p className="text-xs text-slate-300 font-mono leading-relaxed">
+            <p className="text-xs text-slate-600 font-mono leading-relaxed">
               You are approving the 4-Point Coordinated Response Plan as <strong>Zone Counselor</strong>. Work orders will be dispatched directly to Water, Traffic, Emergency 108, and Public Info department dashboards.
             </p>
 
-            <div className="p-3 rounded-xl bg-slate-900 border border-slate-800 text-xs font-mono space-y-1">
-              <div className="flex justify-between text-slate-300">
+            <div className="p-3 rounded-xl bg-slate-50 border border-slate-100 text-xs font-mono space-y-1">
+              <div className="flex justify-between text-slate-700">
                 <span>Calculated Project Risk Index:</span>
-                <strong className="text-emerald-400">{dynamicRisk}/100</strong>
+                <strong className="text-emerald-700">{dynamicRisk}/100</strong>
               </div>
-              <div className="flex justify-between text-slate-300">
+              <div className="flex justify-between text-slate-700">
                 <span>Active Actions Dispatched:</span>
-                <strong className="text-cyan-300">{planActions.filter(a => a.enabled).length} Departments</strong>
+                <strong className="text-cyan-700">{planActions.filter(a => a.enabled).length} Departments</strong>
               </div>
             </div>
 
             <div>
-              <label className="text-xs font-mono text-slate-400 block mb-1">
+              <label className="text-xs font-mono text-slate-500 block mb-1">
                 Official Authorization Note (Optional):
               </label>
               <textarea
                 value={customNoteInput}
                 onChange={(e) => setCustomNoteInput(e.target.value)}
                 placeholder="Approved for immediate multi-department dispatch by Zone Counselor..."
-                className="w-full p-2.5 rounded-xl bg-slate-950 border border-slate-800 text-xs font-mono text-white placeholder-slate-500 focus:outline-none focus:border-cyan-500"
+                className="w-full p-2.5 rounded-xl bg-white border border-purple-200 text-xs font-mono text-slate-800 placeholder-slate-400 focus:outline-none focus:border-purple-500"
                 rows={2}
               />
             </div>
@@ -692,14 +692,14 @@ export default function ResponsePlans() {
             <div className="flex items-center justify-end gap-3 pt-2 font-mono text-xs">
               <button
                 onClick={() => setShowConfirmModal(false)}
-                className="px-4 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 font-bold cursor-pointer"
+                className="px-4 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold cursor-pointer border border-slate-200"
               >
                 CANCEL
               </button>
 
               <button
                 onClick={handleConfirmApproval}
-                className="px-5 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold cursor-pointer shadow-lg flex items-center gap-1.5"
+                className="px-5 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold cursor-pointer shadow-lg flex items-center gap-1.5"
               >
                 <Send className="w-4 h-4" />
                 <span>CONFIRM & DISPATCH WORK ORDERS</span>
@@ -711,28 +711,28 @@ export default function ResponsePlans() {
 
       {/* REQUEST CHANGES MODAL */}
       {showChangesModal && (
-        <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-md flex items-center justify-center p-4">
-          <div className="glass-panel p-6 rounded-2xl border border-amber-500/40 max-w-lg w-full space-y-4 shadow-2xl">
-            <div className="flex items-center gap-3 text-amber-400">
+        <div className="fixed inset-0 z-50 bg-black/40 backdrop-blur-md flex items-center justify-center p-4">
+          <div className="bg-white p-6 rounded-2xl border border-amber-200 max-w-lg w-full space-y-4 shadow-2xl">
+            <div className="flex items-center gap-3 text-amber-700">
               <AlertTriangle className="w-6 h-6" />
-              <h3 className="text-lg font-bold text-white font-mono">
+              <h3 className="text-lg font-bold text-slate-900 font-mono">
                 Request Changes to Response Plan
               </h3>
             </div>
 
-            <p className="text-xs text-slate-300 font-mono leading-relaxed">
+            <p className="text-xs text-slate-600 font-mono leading-relaxed">
               Flag recommendations for adjustment before dispatching to department terminals.
             </p>
 
             <div>
-              <label className="text-xs font-mono text-slate-400 block mb-1">
+              <label className="text-xs font-mono text-slate-500 block mb-1">
                 Reason for Requested Changes:
               </label>
               <textarea
                 value={customNoteInput}
                 onChange={(e) => setCustomNoteInput(e.target.value)}
                 placeholder="Requesting 3x mobile pumps instead of 2 for Station 4B sump..."
-                className="w-full p-2.5 rounded-xl bg-slate-950 border border-slate-800 text-xs font-mono text-white placeholder-slate-500 focus:outline-none focus:border-amber-500"
+                className="w-full p-2.5 rounded-xl bg-white border border-amber-200 text-xs font-mono text-slate-800 placeholder-slate-400 focus:outline-none focus:border-amber-500"
                 rows={3}
               />
             </div>
@@ -740,7 +740,7 @@ export default function ResponsePlans() {
             <div className="flex items-center justify-end gap-3 pt-2 font-mono text-xs">
               <button
                 onClick={() => setShowChangesModal(false)}
-                className="px-4 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 font-bold cursor-pointer"
+                className="px-4 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold cursor-pointer border border-slate-200"
               >
                 CANCEL
               </button>

@@ -68,9 +68,9 @@ export default function Sidebar() {
             {!isCollapsed && (
               <div className="flex flex-col">
                 <span className="font-extrabold tracking-tight text-slate-800 text-base leading-tight">
-                  CIVICMIND <span className="text-purple-600">AI</span>
+                  CivicMind <span className="text-purple-600">AI</span>
                 </span>
-                <span className="text-[10px] font-mono font-medium text-slate-500 tracking-wider uppercase truncate max-w-[130px]" title={isDeptRole ? deptName : "Zone Counselor Console"}>
+                <span className="text-[10px] font-mono font-medium text-slate-500 truncate max-w-[130px]" title={isDeptRole ? deptName : "Zone Counselor Console"}>
                   {isDeptRole ? deptName.split(' ')[0] + ' Terminal' : 'Zone Counselor'}
                 </span>
               </div>
@@ -91,7 +91,7 @@ export default function Sidebar() {
           <div className="px-4 py-2 bg-purple-50/30 border-b border-purple-100/50 flex items-center justify-between text-xs font-mono text-purple-700">
             <span className="flex items-center gap-2">
               <span className="w-2 h-2 rounded-full bg-purple-500"></span>
-              <span>{isDeptRole ? `${currentUser.deptName.split(' ')[0]} Official` : 'ZONE COUNSELOR'}</span>
+              <span>{isDeptRole ? `${currentUser.deptName.split(' ')[0]} Official` : 'Zone Counselor'}</span>
             </span>
             <span className="text-slate-400 font-bold">v2.4</span>
           </div>
