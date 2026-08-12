@@ -1,235 +1,320 @@
 import React, { useState } from 'react';
 import { useCity } from '../context/CityContext';
-import { USER_ROLES, DEPARTMENTS } from '../data/mockData';
+import { USER_ROLES } from '../data/mockData';
 import {
-  ShieldCheck,
-  Cpu,
   Building2,
-  UserCheck,
-  Droplets,
-  Car,
-  Ambulance,
-  Radio,
-  HeartPulse,
-  ArrowRight
+  Mail,
+  Lock,
+  Eye,
+  EyeOff,
+  ChevronDown,
+  LogIn,
+  Sun,
+  TrendingUp,
+  Monitor
 } from 'lucide-react';
 
 export default function LaunchScreen() {
   const { loginUser } = useCity();
 
-  // Role Type Selection: 'counselor' | 'department'
+  // Role Selection: 'counselor' | 'department'
   const [selectedRoleType, setSelectedRoleType] = useState('counselor');
 
-  // Selected Department ID for official login
-  const [selectedDeptId, setSelectedDeptId] = useState('water');
+  // Selected Department Name for official login (Traffic, Water, Sanitation, Power, Health)
+  const [selectedDeptName, setSelectedDeptName] = useState('');
+  const [isDeptDropdownOpen, setIsDeptDropdownOpen] = useState(false);
 
-  const iconMap = {
-    ShieldCheck,
-    Droplets,
-    Car,
-    Ambulance,
-    Radio,
-    HeartPulse
+  // Form Inputs
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
+
+  // Departments list matching request & mock data
+  const deptList = [
+    { name: 'Traffic', id: 'traffic' },
+    { name: 'Water', id: 'water' },
+    { name: 'Sanitation', id: 'sanitation' },
+    { name: 'Power', id: 'power' },
+    { name: 'Health', id: 'health' }
+  ];
+
+  const handleLogin = (e) => {
+    e?.preventDefault();
+    if (selectedRoleType === 'counselor') {
+      const counselorUser = USER_ROLES.find(u => u.role === 'counselor') || USER_ROLES[0];
+      loginUser(counselorUser);
+    } else {
+      const foundDept = deptList.find(d => d.name === selectedDeptName);
+      const deptId = foundDept ? foundDept.id : 'water';
+      const deptUser = USER_ROLES.find(u => u.departmentId === deptId) || USER_ROLES[1];
+      loginUser(deptUser);
+    }
   };
 
-  const handleCounselorLogin = () => {
-    const counselorUser = USER_ROLES.find(u => u.role === 'counselor') || USER_ROLES[0];
-    loginUser(counselorUser);
+  const getLoginButtonText = () => {
+    if (selectedRoleType === 'counselor') {
+      return 'Log in as Zone Counselor';
+    }
+    return selectedDeptName ? `Log in as ${selectedDeptName} Official` : 'Log in as Department Official';
   };
-
-  const handleDeptOfficialLogin = () => {
-    const deptUser = USER_ROLES.find(u => u.departmentId === selectedDeptId) || USER_ROLES[1];
-    loginUser(deptUser);
-  };
-
-  const currentDeptUser = USER_ROLES.find(u => u.departmentId === selectedDeptId) || USER_ROLES[1];
-  const DeptIcon = iconMap[currentDeptUser.avatar] || Building2;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-white text-slate-900 font-sans overflow-y-auto p-4 sm:p-6">
-      {/* Animated Grid Background */}
-      <div className="absolute inset-0 pointer-events-none overflow-hidden">
-        <svg className="absolute inset-0 w-full h-full animate-pulse opacity-20" preserveAspectRatio="none">
-          <defs>
-            <pattern id="grid" width="50" height="50" patternUnits="userSpaceOnUse" patternTransform="translate(0,0)">
-              <path d="M 50 0 L 0 0 0 50" fill="none" stroke="#000" strokeWidth="1" opacity="0.3"/>
-            </pattern>
-          </defs>
-          <rect width="100%" height="100%" fill="url(#grid)" />
-        </svg>
-        <style>{`
-          @keyframes gridSlide {
-            0% { transform: translate(0, 0); }
-            100% { transform: translate(50px, 50px); }
-          }
-          .animate-grid-slide {
-            animation: gridSlide 6s linear infinite;
-          }
-        `}</style>
-        <svg className="absolute inset-0 w-full h-full animate-grid-slide opacity-30" preserveAspectRatio="none">
-          <defs>
-            <pattern id="gridMove" width="50" height="50" patternUnits="userSpaceOnUse">
-              <path d="M 50 0 L 0 0 0 50" fill="none" stroke="#8b5cf6" strokeWidth="1.5" opacity="0.4"/>
-            </pattern>
-          </defs>
-          <rect width="100%" height="100%" fill="url(#gridMove)" />
-        </svg>
-      </div>
+    <div className="fixed inset-0 z-50 flex flex-col md:flex-row w-screen h-screen overflow-hidden bg-[#1E074B] text-white font-sans select-none">
 
-      <div className="relative z-10 max-w-3xl w-full mx-auto my-auto p-6 md:p-8 bg-white rounded-2xl border border-purple-500/30 shadow-xl">
-        {/* Header Bar */}
-        <div className="flex flex-col sm:flex-row sm:items-center justify-center gap-4 pb-6 border-b border-slate-300">
-          <div className="flex items-center gap-3 justify-center">
-            <div className="p-2 rounded-xl bg-slate-200 border border-slate-400 text-slate-700">
-              <Building2 className="w-5 h-5" />
-            </div>
-            <div>
-              <span className="text-lg font-semibold text-black">Chennai Metropolitan Authority</span>
-            </div>
+      {/* LEFT PANEL */}
+      <div className="relative flex-1 bg-white text-slate-900 flex flex-col items-center justify-between p-8 md:p-12 overflow-hidden text-center">
+        
+        {/* Static Grid Layer */}
+        <div 
+          className="absolute inset-0 pointer-events-none opacity-40 z-0" 
+          style={{
+            backgroundImage: `linear-gradient(rgba(124,58,237,0.12) 1px, transparent 1px), linear-gradient(90deg, rgba(124,58,237,0.12) 1px, transparent 1px)`,
+            backgroundSize: '48px 48px'
+          }}
+        />
+
+        {/* Animated Drifting Grid */}
+        <div 
+          className="absolute -inset-12 pointer-events-none opacity-30 z-0 animate-[gridDrift_8s_linear_infinite]"
+          style={{
+            backgroundImage: `linear-gradient(rgba(124,58,237,0.08) 1px, transparent 1px), linear-gradient(90deg, rgba(124,58,237,0.08) 1px, transparent 1px)`,
+            backgroundSize: '48px 48px'
+          }}
+        />
+
+        {/* Ambient Radial Glow */}
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[480px] h-[480px] rounded-full bg-purple-500/10 blur-3xl pointer-events-none z-0" />
+
+        {/* TOP: Authority Badge */}
+        <div className="relative z-10 inline-flex items-center justify-center gap-2.5">
+          <div className="w-9 h-9 bg-purple-500/10 border border-purple-500/30 rounded-md flex items-center justify-center shrink-0">
+            <Building2 className="w-4 h-4 text-purple-600" />
           </div>
+          <span className="text-sm font-semibold text-gray-900 tracking-wide">
+            Chennai Metropolitan Authority
+          </span>
         </div>
 
-        {/* Hero Branding */}
-        <div className="py-6 text-center">
-          <div className="inline-flex items-center justify-center p-2.5 mb-3 rounded-xl bg-slate-200 border border-slate-400 text-slate-700">
-            <Cpu className="w-7 h-7" />
-          </div>
-
-          <h1 className="text-5xl font-extrabold tracking-tight text-black">
+        {/* MIDDLE: Hero Branding */}
+        <div className="relative z-10 flex flex-col items-center my-auto py-6">
+          <div className="w-12 h-1 bg-purple-600 rounded-full mb-6 opacity-80" />
+          <h1 className="text-5xl md:text-7xl font-black tracking-tight text-gray-900 leading-none">
             CIVICMIND <span className="text-purple-600">AI</span>
           </h1>
-
-          <p className="mt-2 text-base md:text-lg font-medium text-slate-600">
+          <p className="mt-5 text-base md:text-lg font-medium text-gray-900 max-w-md leading-relaxed">
             Agentic Decision Intelligence & Multi-Department Smart City Authorization Portal
           </p>
-        </div>
 
-        {/* ROLE SELECTION CARDS */}
-        <div className="my-4">
+          {/* Stats Strip */}
+          <div className="flex items-center justify-center gap-2.5 mt-7 flex-wrap">
+            <div className="flex items-center gap-2 bg-purple-50 border border-purple-200/60 rounded-full px-3.5 py-1.5 text-xs font-medium text-gray-800 shadow-sm">
+              <span className="w-1.5 h-1.5 rounded-full bg-purple-600" />
+              <strong className="font-extrabold text-gray-900">12</strong> Wards
+            </div>
+            <div className="flex items-center gap-2 bg-purple-50 border border-purple-200/60 rounded-full px-3.5 py-1.5 text-xs font-medium text-gray-800 shadow-sm">
+              <span className="w-1.5 h-1.5 rounded-full bg-purple-600" />
+              <strong className="font-extrabold text-gray-900">5</strong> Departments
+            </div>
+            <div className="flex items-center gap-2 bg-purple-50 border border-purple-200/60 rounded-full px-3.5 py-1.5 text-xs font-medium text-gray-800 shadow-sm">
+              <span className="w-1.5 h-1.5 rounded-full bg-purple-600" />
+              <strong className="font-extrabold text-gray-900">4,200+</strong> Incidents Resolved
+            </div>
+          </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 max-w-xl mx-auto">
-            {/* Role Card 1: Zone Counselor */}
-            <button
-              onClick={() => setSelectedRoleType('counselor')}
-              className={`p-4 rounded-xl border text-left transition-all cursor-pointer flex items-start gap-3.5 ${
-                selectedRoleType === 'counselor'
-                  ? 'bg-slate-100 border-purple-500 shadow-md ring-1 ring-purple-500/40'
-                  : 'bg-slate-50 hover:bg-slate-100 border-slate-300 text-slate-700'
-              }`}
-            >
-              <div className={`p-2.5 rounded-lg border ${selectedRoleType === 'counselor' ? 'bg-purple-100 border-purple-500 text-purple-700' : 'bg-slate-200 border-slate-400 text-slate-600'}`}>
-                <ShieldCheck className="w-5 h-5" />
+          {/* Feature Highlights */}
+          <div className="flex flex-col gap-3 mt-8 w-full max-w-sm text-left">
+            <div className="flex items-center gap-3.5 p-3 bg-purple-50/80 border border-purple-200/50 rounded-xl hover:bg-purple-100/50 transition-colors">
+              <div className="w-8 h-8 rounded-lg bg-purple-100 border border-purple-300/50 flex items-center justify-center shrink-0">
+                <Sun className="w-4 h-4 text-purple-600" />
               </div>
-              <div className="space-y-1">
-                <div className="flex items-center justify-between">
-                  <span className="font-bold text-black text-sm">ZONE COUNSELOR</span>
-                  <span className="px-2 py-1 rounded bg-slate-200 text-slate-700 text-xs border border-slate-400">
-                    Administrator
-                  </span>
-                </div>
-                <p className="text-sm text-slate-700 leading-relaxed">
-                  Full oversight, plan customization, dynamic risk modeling, and multi-department approval.
-                </p>
+              <div className="flex flex-col">
+                <span className="text-xs font-bold text-gray-900">Real-time Incident Routing</span>
+                <span className="text-[11px] text-gray-600">AI dispatches field teams across all zones instantly</span>
               </div>
-            </button>
+            </div>
 
-            {/* Role Card 2: Department Official */}
-            <button
-              onClick={() => setSelectedRoleType('department')}
-              className={`p-4 rounded-2xl border text-left transition-all cursor-pointer flex items-start gap-3.5 ${
-                selectedRoleType === 'department'
-                  ? 'bg-slate-100 border-purple-500 shadow-md ring-1 ring-purple-500/40'
-                  : 'bg-slate-50 hover:bg-slate-100 border-slate-300 text-slate-700'
-              }`}
-            >
-              <div className={`p-2.5 rounded-lg border ${selectedRoleType === 'department' ? 'bg-purple-100 border-purple-500 text-purple-700' : 'bg-slate-200 border-slate-400 text-slate-600'}`}>
-                <Building2 className="w-5 h-5" />
+            <div className="flex items-center gap-3.5 p-3 bg-purple-50/80 border border-purple-200/50 rounded-xl hover:bg-purple-100/50 transition-colors">
+              <div className="w-8 h-8 rounded-lg bg-purple-100 border border-purple-300/50 flex items-center justify-center shrink-0">
+                <TrendingUp className="w-4 h-4 text-purple-600" />
               </div>
-              <div className="space-y-1">
-                <div className="flex items-center justify-between">
-                  <span className="font-bold text-black text-sm">DEPARTMENT OFFICIAL</span>
-                  <span className="px-2 py-1 rounded bg-slate-200 text-slate-700 text-xs border border-slate-400">
-                    Official Terminal
-                  </span>
-                </div>
-                <p className="text-sm text-slate-700 leading-relaxed">
-                  Access specialized department dashboard, execute assigned work orders, and post field updates.
-                </p>
+              <div className="flex flex-col">
+                <span className="text-xs font-bold text-gray-900">AI-Powered Predictions</span>
+                <span className="text-[11px] text-gray-600">Forecasts city-wide risk before incidents escalate</span>
               </div>
-            </button>
+            </div>
+
+            <div className="flex items-center gap-3.5 p-3 bg-purple-50/80 border border-purple-200/50 rounded-xl hover:bg-purple-100/50 transition-colors">
+              <div className="w-8 h-8 rounded-lg bg-purple-100 border border-purple-300/50 flex items-center justify-center shrink-0">
+                <Monitor className="w-4 h-4 text-purple-600" />
+              </div>
+              <div className="flex flex-col">
+                <span className="text-xs font-bold text-gray-900">Cross-Department Sync</span>
+                <span className="text-[11px] text-gray-600">Unified command across Traffic, Water, Health & more</span>
+              </div>
+            </div>
           </div>
         </div>
 
-        {/* AUTHENTICATION FORM CONTAINER */}
-        <div className="p-6 rounded-xl bg-slate-50 border border-slate-300 max-w-xl mx-auto space-y-4">
-          {selectedRoleType === 'counselor' ? (
-            <div className="space-y-4 text-sm">
-              <div className="flex items-center justify-between pb-3 border-b border-slate-300">
-                <span className="text-black font-bold text-lg flex items-center gap-2">
-                  <UserCheck className="w-5 h-5 text-purple-600" />
-                  Zone Counselor Command Login
-                </span>
-              </div>
-
-              <button
-                onClick={handleCounselorLogin}
-                className="w-full py-3 rounded-lg bg-purple-600 hover:bg-purple-700 text-white font-bold text-base transition-all cursor-pointer flex items-center justify-center gap-2 shadow"
-              >
-                <span>LOG IN AS ZONE COUNSELOR</span>
-                <ArrowRight className="w-5 h-5" />
-              </button>
-            </div>
-          ) : (
-            <div className="space-y-4 text-sm">
-              <div className="flex items-center justify-between pb-3 border-b border-slate-300">
-                <span className="text-black font-bold text-lg flex items-center gap-2">
-                  <Building2 className="w-5 h-5 text-purple-600" />
-                  Select Department Terminal
-                </span>
-              </div>
-
-              {/* Department Choice Buttons */}
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-sm">
-                {DEPARTMENTS.map((dept) => {
-                  const isSelected = selectedDeptId === dept.id;
-                  const userObj = USER_ROLES.find(u => u.departmentId === dept.id);
-                  const Icon = iconMap[dept.icon] || Building2;
-
-                  return (
-                    <button
-                      key={dept.id}
-                      onClick={() => setSelectedDeptId(dept.id)}
-                      className={`p-3 rounded-lg border text-left transition-all cursor-pointer flex items-center gap-3 ${
-                        isSelected
-                          ? 'bg-purple-100 border-purple-500 text-black font-bold'
-                          : 'bg-slate-100 hover:bg-slate-200 border-slate-300 text-slate-700'
-                      }`}
-                    >
-                      <div className={`p-2 rounded bg-slate-200 border border-slate-400 shrink-0 ${isSelected ? 'text-purple-700' : 'text-slate-600'}`}>
-                        <Icon className="w-5 h-5" />
-                      </div>
-                      <div className="min-w-0 flex-1">
-                        <span className="block truncate text-sm font-medium text-black">{dept.name}</span>
-                        <span className="text-xs text-slate-600 block truncate">{userObj?.name || dept.official}</span>
-                      </div>
-                    </button>
-                  );
-                })}
-              </div>
-
-              <button
-                onClick={handleDeptOfficialLogin}
-                className="w-full py-3 rounded-lg bg-purple-600 hover:bg-purple-700 text-white font-bold text-base transition-all cursor-pointer flex items-center justify-center gap-2 shadow"
-              >
-                <DeptIcon className="w-5 h-5 text-white" />
-                <span>LOG IN TO {currentDeptUser.deptName.toUpperCase()} TERMINAL</span>
-                <ArrowRight className="w-5 h-5" />
-              </button>
-            </div>
-          )}
-        </div>
-
+        <div className="h-2" />
       </div>
+
+      {/* RIGHT PANEL */}
+      <div className="relative flex-1 bg-[#1E074B] flex items-center justify-center p-6 md:p-12 overflow-y-auto">
+        
+        {/* Right Panel Mild Purple Grid */}
+        <div 
+          className="absolute inset-0 pointer-events-none opacity-30"
+          style={{
+            backgroundImage: `linear-gradient(rgba(168,85,247,0.22) 1px, transparent 1px), linear-gradient(90deg, rgba(168,85,247,0.22) 1px, transparent 1px)`,
+            backgroundSize: '48px 48px'
+          }}
+        />
+
+        {/* LOGIN CARD */}
+        <div className="relative z-10 w-full max-w-md">
+          
+          <h2 className="text-3xl md:text-4xl font-black text-white tracking-tight leading-tight mb-2">
+            Welcome back
+          </h2>
+          <p className="text-base text-white/90 mb-8 font-medium">
+            Sign in to your authorized portal
+          </p>
+
+          <form onSubmit={handleLogin} className="space-y-4">
+            
+            {/* Role Toggle Pill Buttons */}
+            <div className="grid grid-cols-2 p-1 bg-[#130820] border border-purple-500/30 rounded-full mb-6">
+              <button
+                type="button"
+                onClick={() => { setSelectedRoleType('counselor'); setIsDeptDropdownOpen(false); }}
+                className={`py-2.5 px-3 rounded-full text-sm font-semibold transition-all duration-200 cursor-pointer ${
+                  selectedRoleType === 'counselor'
+                    ? 'bg-purple-600 text-white shadow-md'
+                    : 'text-white/90 hover:text-white'
+                }`}
+              >
+                Zone Counselor
+              </button>
+
+              <button
+                type="button"
+                onClick={() => setSelectedRoleType('department')}
+                className={`py-2.5 px-3 rounded-full text-sm font-semibold transition-all duration-200 cursor-pointer ${
+                  selectedRoleType === 'department'
+                    ? 'bg-purple-600 text-white shadow-md'
+                    : 'text-white/90 hover:text-white'
+                }`}
+              >
+                Department Official
+              </button>
+            </div>
+
+            {/* Department Dropdown (shown only when Department Official is selected) */}
+            {selectedRoleType === 'department' && (
+              <div className="relative space-y-1.5">
+                <label className="block text-xs font-bold text-white uppercase tracking-wider">
+                  Department
+                </label>
+                <div className="relative">
+                  <div className="absolute left-3.5 top-1/2 -translate-y-1/2 text-white/70 pointer-events-none">
+                    <Building2 className="w-4 h-4" />
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => setIsDeptDropdownOpen(!isDeptDropdownOpen)}
+                    className="w-full bg-[#1A0A2E] border border-white/20 rounded-xl py-3 pl-10 pr-4 text-sm text-white font-medium text-left flex items-center justify-between focus:outline-none focus:border-purple-500 focus:ring-2 focus:ring-purple-500/30 transition-all"
+                  >
+                    <span>{selectedDeptName || 'Select department…'}</span>
+                    <ChevronDown className={`w-4 h-4 text-white/70 transition-transform ${isDeptDropdownOpen ? 'rotate-180' : ''}`} />
+                  </button>
+
+                  {/* Dropdown Options */}
+                  {isDeptDropdownOpen && (
+                    <div className="absolute left-0 right-0 top-full mt-1 bg-[#130820] border border-purple-500/40 rounded-xl overflow-hidden shadow-2xl z-50">
+                      {deptList.map((dept) => (
+                        <button
+                          key={dept.id}
+                          type="button"
+                          onClick={() => {
+                            setSelectedDeptName(dept.name);
+                            setIsDeptDropdownOpen(false);
+                          }}
+                          className={`w-full px-4 py-3 text-left text-sm font-medium flex items-center gap-3 transition-colors cursor-pointer border-b border-white/5 last:border-none ${
+                            selectedDeptName === dept.name
+                              ? 'bg-purple-600/30 text-purple-300 font-bold'
+                              : 'text-white/90 hover:bg-purple-600/20 hover:text-white'
+                          }`}
+                        >
+                          <span className={`w-2 h-2 rounded-full ${selectedDeptName === dept.name ? 'bg-purple-400' : 'bg-white/40'}`} />
+                          {dept.name}
+                        </button>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              </div>
+            )}
+
+            {/* Email Field */}
+            <div className="space-y-1.5">
+              <label className="block text-xs font-bold text-white uppercase tracking-wider">
+                Email address
+              </label>
+              <div className="relative">
+                <div className="absolute left-3.5 top-1/2 -translate-y-1/2 text-white/70 pointer-events-none">
+                  <Mail className="w-4 h-4" />
+                </div>
+                <input
+                  type="email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  placeholder="official@cma.gov.in"
+                  className="w-full bg-[#1A0A2E] border border-white/20 rounded-xl py-3 pl-10 pr-4 text-sm text-white placeholder:text-white/75 focus:outline-none focus:border-purple-500 focus:ring-2 focus:ring-purple-500/30 transition-all font-medium"
+                />
+              </div>
+            </div>
+
+            {/* Password Field */}
+            <div className="space-y-1.5">
+              <label className="block text-xs font-bold text-white uppercase tracking-wider">
+                Password
+              </label>
+              <div className="relative">
+                <div className="absolute left-3.5 top-1/2 -translate-y-1/2 text-white/70 pointer-events-none">
+                  <Lock className="w-4 h-4" />
+                </div>
+                <input
+                  type={showPassword ? 'text' : 'password'}
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  placeholder="Enter your password"
+                  className="w-full bg-[#1A0A2E] border border-white/20 rounded-xl py-3 pl-10 pr-10 text-sm text-white placeholder:text-white/75 focus:outline-none focus:border-purple-500 focus:ring-2 focus:ring-purple-500/30 transition-all font-medium"
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="absolute right-3.5 top-1/2 -translate-y-1/2 text-white/70 hover:text-white transition-colors cursor-pointer"
+                >
+                  {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                </button>
+              </div>
+            </div>
+
+            {/* Submit / Login Button */}
+            <button
+              type="submit"
+              className="w-full mt-4 bg-purple-600 hover:bg-purple-700 active:scale-[0.99] text-white font-bold py-3.5 px-4 rounded-xl shadow-lg shadow-purple-600/30 transition-all cursor-pointer flex items-center justify-center gap-2 text-sm tracking-wide"
+            >
+              <LogIn className="w-4 h-4" />
+              <span>{getLoginButtonText()}</span>
+            </button>
+
+          </form>
+
+        </div>
+      </div>
+
     </div>
   );
 }
+

@@ -45,19 +45,19 @@ export default function CommandMap() {
 
     const svgHtml = `
       <div style="position: relative; display: flex; items-center; justify-content: center;">
-        ${isCritical ? `<div style="position: absolute; width: 32px; height: 32px; border-radius: 50%; background-color: ${color}; opacity: 0.4; animation: ping 1.5s cubic-bezier(0, 0, 0.2, 1) infinite;"></div>` : ''}
+        ${isCritical ? `<div style="position: absolute; width: 32px; height: 32px; border-radius: 50%; background-color: ${color}; opacity: 0.25; animation: ping 1.5s cubic-bezier(0, 0, 0.2, 1) infinite;"></div>` : ''}
         <div style="
           width: 24px;
           height: 24px;
           border-radius: 50%;
-          background-color: #0f172a;
-          border: 3px solid ${color};
-          box-shadow: 0 0 15px ${color};
+          background-color: #ffffff;
+          border: 3.5px solid ${color};
+          box-shadow: 0 4px 10px rgba(124, 58, 237, 0.15);
           display: flex;
           align-items: center;
           justify-content: center;
         ">
-          <div style="width: 8px; height: 8px; border-radius: 50%; background-color: ${color};"></div>
+          <div style="width: 7px; height: 7px; border-radius: 50%; background-color: ${color};"></div>
         </div>
       </div>
     `;
@@ -81,8 +81,8 @@ export default function CommandMap() {
         zoomControl: false
       });
 
-      // CartoDB Dark Matter tiles
-      L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
+      // CartoDB Voyager Light tiles
+      L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', {
         attribution: '&copy; <a href="https://carto.com/">CARTO</a> &copy; OpenStreetMap',
         subdomains: 'abcd',
         maxZoom: 19
@@ -132,13 +132,13 @@ export default function CommandMap() {
   }, [layers]);
 
   return (
-    <div className="relative w-full h-[520px] rounded-2xl overflow-hidden border border-slate-800 shadow-2xl bg-[#080c14]">
+    <div className="relative w-full h-[520px] rounded-2xl overflow-hidden border border-purple-100 shadow-md bg-white">
       {/* Map Element Container */}
       <div ref={mapContainerRef} className="w-full h-full z-10" />
 
       {/* Layer Control Bar */}
-      <div className="absolute top-4 left-4 z-20 glass-panel p-2.5 rounded-xl border border-slate-800 text-xs flex flex-wrap items-center gap-2 max-w-xl">
-        <div className="flex items-center gap-1.5 font-mono font-bold text-cyan-400 px-2 py-1 border-r border-slate-800">
+      <div className="absolute top-4 left-4 z-20 bg-white/95 border border-purple-100 p-2.5 rounded-xl text-xs flex flex-wrap items-center gap-2 max-w-xl shadow-md">
+        <div className="flex items-center gap-1.5 font-mono font-bold text-purple-600 px-2 py-1 border-r border-purple-100">
           <Layers className="w-4 h-4" />
           <span>MAP LAYERS:</span>
         </div>
@@ -147,8 +147,8 @@ export default function CommandMap() {
           onClick={() => toggleLayer('incidents')}
           className={`px-2.5 py-1 rounded-lg font-mono text-[11px] transition-all cursor-pointer ${
             layers.incidents
-              ? 'bg-red-950/80 text-red-300 border border-red-500/40'
-              : 'bg-slate-900/60 text-slate-500 border border-slate-800'
+              ? 'bg-red-50 text-red-700 border border-red-200'
+              : 'bg-white text-slate-500 border border-purple-100/60'
           }`}
         >
           ● Incidents
@@ -158,8 +158,8 @@ export default function CommandMap() {
           onClick={() => toggleLayer('traffic')}
           className={`px-2.5 py-1 rounded-lg font-mono text-[11px] transition-all cursor-pointer ${
             layers.traffic
-              ? 'bg-amber-950/80 text-amber-300 border border-amber-500/40'
-              : 'bg-slate-900/60 text-slate-500 border border-slate-800'
+              ? 'bg-amber-50 text-amber-700 border border-amber-200'
+              : 'bg-white text-slate-500 border border-purple-100/60'
           }`}
         >
           ● Traffic
@@ -169,8 +169,8 @@ export default function CommandMap() {
           onClick={() => toggleLayer('floodRisk')}
           className={`px-2.5 py-1 rounded-lg font-mono text-[11px] transition-all cursor-pointer ${
             layers.floodRisk
-              ? 'bg-blue-950/80 text-blue-300 border border-blue-500/40'
-              : 'bg-slate-900/60 text-slate-500 border border-slate-800'
+              ? 'bg-blue-50 text-blue-700 border border-blue-200'
+              : 'bg-white text-slate-500 border border-purple-100/60'
           }`}
         >
           ● Flood Risk
@@ -180,8 +180,8 @@ export default function CommandMap() {
           onClick={() => toggleLayer('hospitals')}
           className={`px-2.5 py-1 rounded-lg font-mono text-[11px] transition-all cursor-pointer ${
             layers.hospitals
-              ? 'bg-emerald-950/80 text-emerald-300 border border-emerald-500/40'
-              : 'bg-slate-900/60 text-slate-500 border border-slate-800'
+              ? 'bg-emerald-50 text-emerald-700 border border-emerald-200'
+              : 'bg-white text-slate-500 border border-purple-100/60'
           }`}
         >
           ● Hospitals
@@ -191,8 +191,8 @@ export default function CommandMap() {
           onClick={() => toggleLayer('emergencyRoutes')}
           className={`px-2.5 py-1 rounded-lg font-mono text-[11px] transition-all cursor-pointer ${
             layers.emergencyRoutes
-              ? 'bg-cyan-950/80 text-cyan-300 border border-cyan-500/40'
-              : 'bg-slate-900/60 text-slate-500 border border-slate-800'
+              ? 'bg-purple-50 text-purple-700 border border-purple-200'
+              : 'bg-white text-slate-500 border border-purple-100/60'
           }`}
         >
           ● Emergency Routes
@@ -200,8 +200,8 @@ export default function CommandMap() {
       </div>
 
       {/* Map Legend Overlay */}
-      <div className="absolute bottom-4 left-4 z-20 glass-panel p-3 rounded-xl border border-slate-800 text-[11px] font-mono hidden sm:flex items-center gap-4">
-        <div className="text-slate-400 font-semibold">SEVERITY:</div>
+      <div className="absolute bottom-4 left-4 z-20 bg-white border border-purple-100 p-3 rounded-xl text-[11px] font-mono hidden sm:flex items-center gap-4 shadow-md text-slate-700">
+        <div className="text-slate-500 font-semibold">SEVERITY:</div>
         <div className="flex items-center gap-1.5"><span className="w-2.5 h-2.5 rounded-full bg-red-500"></span>Critical</div>
         <div className="flex items-center gap-1.5"><span className="w-2.5 h-2.5 rounded-full bg-orange-500"></span>High</div>
         <div className="flex items-center gap-1.5"><span className="w-2.5 h-2.5 rounded-full bg-amber-500"></span>Warning</div>
@@ -211,56 +211,56 @@ export default function CommandMap() {
 
       {/* Marker Telemetry Detail Modal Drawer */}
       {showDetailModal && activeMarker && (
-        <div className="absolute inset-y-0 right-0 z-30 w-full sm:w-96 glass-panel border-l border-slate-800 p-5 overflow-y-auto shadow-2xl flex flex-col justify-between">
+        <div className="absolute inset-y-0 right-0 z-30 w-full sm:w-96 bg-white border-l border-purple-100 p-5 overflow-y-auto shadow-2xl flex flex-col justify-between text-slate-800">
           <div>
-            <div className="flex items-center justify-between pb-3 border-b border-slate-800">
+            <div className="flex items-center justify-between pb-3 border-b border-purple-100">
               <span
                 className={`px-2.5 py-0.5 rounded text-[10px] font-mono font-bold uppercase tracking-wider ${
                   activeMarker.severity === 'critical'
-                    ? 'bg-red-950 text-red-300 border border-red-500/40'
+                    ? 'bg-red-50 text-red-700 border border-red-200'
                     : activeMarker.severity === 'high'
-                    ? 'bg-orange-950 text-orange-300 border border-orange-500/40'
-                    : 'bg-emerald-950 text-emerald-300 border border-emerald-500/40'
+                    ? 'bg-amber-50 text-amber-700 border border-amber-200'
+                    : 'bg-emerald-50 text-emerald-700 border border-emerald-200'
                 }`}
               >
                 {activeMarker.severity} SEVERITY
               </span>
               <button
                 onClick={() => setShowDetailModal(false)}
-                className="p-1 rounded-lg hover:bg-slate-800 text-slate-400 hover:text-white cursor-pointer"
+                className="p-1 rounded-lg hover:bg-purple-50 text-slate-400 hover:text-purple-600 cursor-pointer"
               >
                 <X className="w-5 h-5" />
               </button>
             </div>
 
             <div className="mt-4">
-              <span className="text-xs font-mono text-cyan-400 font-semibold">{activeMarker.ward}</span>
-              <h3 className="text-base font-bold text-slate-100 mt-1">{activeMarker.title}</h3>
-              <p className="text-xs text-slate-300 mt-2 leading-relaxed">{activeMarker.description}</p>
+              <span className="text-xs font-mono text-purple-600 font-bold">{activeMarker.ward}</span>
+              <h3 className="text-base font-bold text-slate-800 mt-1">{activeMarker.title}</h3>
+              <p className="text-xs text-slate-600 mt-2 leading-relaxed">{activeMarker.description}</p>
             </div>
 
             {/* Sensor Telemetry Box */}
-            <div className="mt-4 p-3 rounded-xl bg-slate-900/80 border border-slate-800 space-y-2">
-              <span className="text-[11px] font-mono font-bold text-slate-400 uppercase tracking-wider block">
+            <div className="mt-4 p-3 rounded-xl bg-purple-50/50 border border-purple-100/60 space-y-2">
+              <span className="text-[11px] font-mono font-bold text-purple-600 uppercase tracking-wider block">
                 SENSOR TELEMETRY
               </span>
               <div className="grid grid-cols-2 gap-2 text-xs font-mono">
                 {Object.entries(activeMarker.telemetry || {}).map(([k, v]) => (
-                  <div key={k} className="p-2 rounded bg-slate-950/60 border border-slate-800/60">
+                  <div key={k} className="p-2 rounded bg-white border border-purple-100/60">
                     <span className="text-slate-500 text-[10px] block capitalize">{k.replace(/([A-Z])/g, ' $1')}</span>
-                    <span className="text-cyan-300 font-semibold">{v}</span>
+                    <span className="text-purple-700 font-bold">{v}</span>
                   </div>
                 ))}
               </div>
             </div>
 
             {/* AI Prediction Box */}
-            <div className="mt-4 p-3 rounded-xl bg-purple-950/40 border border-purple-500/30">
-              <div className="flex items-center gap-2 text-xs font-mono font-bold text-purple-300 mb-1">
-                <Cpu className="w-4 h-4 text-purple-400" />
+            <div className="mt-4 p-3 rounded-xl bg-purple-50 border border-purple-200/60">
+              <div className="flex items-center gap-2 text-xs font-mono font-bold text-purple-700 mb-1">
+                <Cpu className="w-4 h-4 text-purple-600" />
                 <span>AI PREDICTIVE INSIGHT</span>
               </div>
-              <p className="text-xs text-purple-200 leading-relaxed font-mono">
+              <p className="text-xs text-purple-900 leading-relaxed font-mono">
                 {activeMarker.aiPrediction}
               </p>
             </div>
@@ -268,7 +268,7 @@ export default function CommandMap() {
 
           <button
             onClick={() => setShowDetailModal(false)}
-            className="mt-6 w-full py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-mono font-semibold transition-colors cursor-pointer"
+            className="mt-6 w-full py-2.5 rounded-xl bg-purple-600 hover:bg-purple-700 text-white font-bold text-xs font-mono tracking-wide transition-colors cursor-pointer"
           >
             Close Telemetry Panel
           </button>

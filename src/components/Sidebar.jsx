@@ -53,24 +53,24 @@ export default function Sidebar() {
 
   return (
     <aside
-      className={`relative z-30 h-screen bg-[#090e1a] border-r border-slate-800/80 flex flex-col justify-between transition-all duration-300 ${
+      className={`relative z-30 h-screen bg-white border-r border-purple-100 flex flex-col justify-between transition-all duration-300 ${
         isCollapsed ? 'w-20' : 'w-64'
       }`}
     >
       {/* Sidebar Top Header */}
       <div>
-        <div className="p-4 border-b border-slate-800/80 flex items-center justify-between">
+        <div className="p-4 border-b border-purple-100 flex items-center justify-between">
           <div className={`flex items-center gap-3 overflow-hidden ${isCollapsed ? 'justify-center w-full' : ''}`}>
-            <div className="p-2 rounded-xl bg-slate-900 border border-slate-800 text-cyan-400 shrink-0 shadow-md">
+            <div className="p-2 rounded-xl bg-purple-50 border border-purple-100 text-purple-600 shrink-0 shadow-sm">
               <Cpu className="w-6 h-6" />
             </div>
 
             {!isCollapsed && (
               <div className="flex flex-col">
-                <span className="font-extrabold tracking-tight text-white text-base leading-tight">
-                  CIVICMIND <span className="text-cyan-400">AI</span>
+                <span className="font-extrabold tracking-tight text-slate-800 text-base leading-tight">
+                  CIVICMIND <span className="text-purple-600">AI</span>
                 </span>
-                <span className="text-[10px] font-mono font-medium text-slate-400 tracking-wider uppercase truncate max-w-[130px]" title={isDeptRole ? deptName : "Zone Counselor Console"}>
+                <span className="text-[10px] font-mono font-medium text-slate-500 tracking-wider uppercase truncate max-w-[130px]" title={isDeptRole ? deptName : "Zone Counselor Console"}>
                   {isDeptRole ? deptName.split(' ')[0] + ' Terminal' : 'Zone Counselor'}
                 </span>
               </div>
@@ -79,7 +79,7 @@ export default function Sidebar() {
 
           <button
             onClick={() => setIsCollapsed(!isCollapsed)}
-            className="hidden md:flex p-1.5 rounded-lg bg-slate-800/60 hover:bg-slate-700 text-slate-400 hover:text-white transition-colors cursor-pointer"
+            className="hidden md:flex p-1.5 rounded-lg bg-purple-50/50 hover:bg-purple-100/50 text-slate-500 hover:text-purple-600 transition-colors cursor-pointer"
             title={isCollapsed ? "Expand Sidebar" : "Collapse Sidebar"}
           >
             {isCollapsed ? <ChevronRight className="w-4 h-4" /> : <ChevronLeft className="w-4 h-4" />}
@@ -88,12 +88,12 @@ export default function Sidebar() {
 
         {/* Role Mode Indicator Strip */}
         {!isCollapsed && (
-          <div className="px-4 py-2 bg-slate-900/60 border-b border-slate-800/60 flex items-center justify-between text-xs font-mono text-cyan-300">
+          <div className="px-4 py-2 bg-purple-50/30 border-b border-purple-100/50 flex items-center justify-between text-xs font-mono text-purple-700">
             <span className="flex items-center gap-2">
-              <span className="w-2 h-2 rounded-full bg-cyan-400"></span>
+              <span className="w-2 h-2 rounded-full bg-purple-500"></span>
               <span>{isDeptRole ? `${currentUser.deptName.split(' ')[0]} Official` : 'ZONE COUNSELOR'}</span>
             </span>
-            <span className="text-slate-500">v2.4</span>
+            <span className="text-slate-400 font-bold">v2.4</span>
           </div>
         )}
 
@@ -115,16 +115,16 @@ export default function Sidebar() {
                     setActivePage(item.id);
                   }
                 }}
-                className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-xl font-medium text-sm transition-all cursor-pointer group relative ${
+                className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-xl font-semibold text-sm transition-all cursor-pointer group relative ${
                   isActive
-                    ? 'bg-slate-800/90 text-white border border-cyan-500/40 shadow-md shadow-cyan-950/40'
-                    : 'text-slate-400 hover:text-slate-200 hover:bg-slate-900/50 border border-transparent'
+                    ? 'bg-purple-50 text-purple-700 border border-purple-200/60 shadow-sm'
+                    : 'text-slate-600 hover:text-purple-700 hover:bg-purple-50/30 border border-transparent'
                 } ${isCollapsed ? 'justify-center px-0' : ''}`}
                 title={isCollapsed ? item.label : undefined}
               >
                 <Icon
                   className={`w-5 h-5 shrink-0 transition-transform group-hover:scale-110 ${
-                    isActive ? 'text-cyan-400' : 'text-slate-400 group-hover:text-cyan-300'
+                    isActive ? 'text-purple-600' : 'text-slate-400 group-hover:text-purple-500'
                   }`}
                 />
 
@@ -136,8 +136,8 @@ export default function Sidebar() {
                   <span
                     className={`px-2 py-0.5 text-[10px] font-mono font-semibold rounded-full ${
                       item.id.includes('tasks') || item.id === 'department-dashboard'
-                        ? 'bg-emerald-950/90 text-emerald-300 border border-emerald-500/30'
-                        : 'bg-cyan-950/90 text-cyan-300 border border-cyan-500/30'
+                        ? 'bg-emerald-50 text-emerald-700 border border-emerald-200/60'
+                        : 'bg-purple-100 text-purple-700 border border-purple-200/60'
                     }`}
                   >
                     {item.badge}
@@ -146,7 +146,7 @@ export default function Sidebar() {
 
                 {/* Collapsed Active Indicator Dot */}
                 {isCollapsed && isActive && (
-                  <span className="absolute left-1 top-1/2 -translate-y-1/2 w-1.5 h-6 bg-cyan-400 rounded-r-full" />
+                  <span className="absolute left-1 top-1/2 -translate-y-1/2 w-1.5 h-6 bg-purple-600 rounded-r-full" />
                 )}
               </button>
             );
@@ -155,7 +155,7 @@ export default function Sidebar() {
       </div>
 
       {/* Bottom Status Panel */}
-      <div className="p-3 border-t border-slate-800/80 bg-slate-950/60"></div>
+      <div className="p-3 border-t border-purple-100 bg-purple-50/10"></div>
     </aside>
   );
 }

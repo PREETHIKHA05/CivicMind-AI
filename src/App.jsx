@@ -49,7 +49,7 @@ function MainLayout() {
   };
 
   return (
-    <div className="flex h-screen bg-[#080c14] text-slate-100 overflow-hidden font-sans select-none">
+    <div className="flex h-screen bg-[#f6f5f9] text-slate-800 overflow-hidden font-sans select-none">
       {/* Persistent Left Navigation Sidebar */}
       <Sidebar />
 
@@ -62,7 +62,7 @@ function MainLayout() {
         <SimulationBar />
 
         {/* Dynamic Page Container */}
-        <main className="flex-1 overflow-y-auto p-4 md:p-6 lg:p-8 bg-[#080c14] bg-[radial-gradient(ellipse_80%_80%_at_50%_-20%,rgba(6,182,212,0.08),rgba(255,255,255,0))]">
+        <main className="flex-1 overflow-y-auto p-4 md:p-6 lg:p-8 bg-[#f6f5f9] bg-[radial-gradient(ellipse_80%_80%_at_50%_-20%,rgba(124,58,237,0.06),rgba(255,255,255,0))]">
           <div className="max-w-7xl mx-auto">
             {renderPage()}
           </div>
@@ -80,20 +80,20 @@ function MainLayout() {
         {toasts.map((toast) => (
           <div
             key={toast.id}
-            className={`pointer-events-auto p-3.5 rounded-xl glass-panel border shadow-2xl flex items-start gap-3 transition-all animate-slide-in ${
+            className={`pointer-events-auto p-3.5 rounded-xl border shadow-xl flex items-start gap-3 transition-all animate-slide-in ${
               toast.type === 'critical'
-                ? 'border-red-500/50 bg-red-950/80 text-red-200'
+                ? 'border-red-200 bg-red-50 text-red-950'
                 : toast.type === 'success'
-                ? 'border-emerald-500/50 bg-emerald-950/80 text-emerald-200'
+                ? 'border-emerald-200 bg-emerald-50 text-emerald-950'
                 : toast.type === 'warning'
-                ? 'border-amber-500/50 bg-amber-950/80 text-amber-200'
-                : 'border-cyan-500/50 bg-cyan-950/80 text-cyan-200'
+                ? 'border-amber-200 bg-amber-50 text-amber-950'
+                : 'border-purple-200 bg-purple-50 text-purple-950'
             }`}
           >
-            {toast.type === 'critical' && <AlertTriangle className="w-5 h-5 text-red-400 shrink-0 mt-0.5" />}
-            {toast.type === 'success' && <CheckCircle2 className="w-5 h-5 text-emerald-400 shrink-0 mt-0.5" />}
-            {toast.type === 'warning' && <AlertCircle className="w-5 h-5 text-amber-400 shrink-0 mt-0.5" />}
-            {toast.type === 'info' && <Info className="w-5 h-5 text-cyan-400 shrink-0 mt-0.5" />}
+            {toast.type === 'critical' && <AlertTriangle className="w-5 h-5 text-red-600 shrink-0 mt-0.5" />}
+            {toast.type === 'success' && <CheckCircle2 className="w-5 h-5 text-emerald-600 shrink-0 mt-0.5" />}
+            {toast.type === 'warning' && <AlertCircle className="w-5 h-5 text-amber-600 shrink-0 mt-0.5" />}
+            {toast.type === 'info' && <Info className="w-5 h-5 text-purple-600 shrink-0 mt-0.5" />}
 
             <div className="flex-1 min-w-0">
               <div className="flex items-center justify-between text-xs font-bold font-mono">
@@ -105,7 +105,7 @@ function MainLayout() {
 
             <button
               onClick={() => removeToast(toast.id)}
-              className="text-slate-400 hover:text-white cursor-pointer"
+              className="text-slate-400 hover:text-slate-600 cursor-pointer"
             >
               <X className="w-4 h-4" />
             </button>
