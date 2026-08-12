@@ -39,7 +39,13 @@ export default function ResponsePlans() {
     planActions,
     updatePlanAction,
     togglePlanAction,
-    calculateProjectedRisk
+    calculateProjectedRisk,
+    planRunId,
+    planConfidenceBreakdown,
+    planGate,
+    planGateReason,
+    planUnresolved,
+    planConflictsResolved
   } = useCity();
 
   const isCounselor = currentUser && currentUser.role === 'counselor';
@@ -239,6 +245,108 @@ export default function ResponsePlans() {
         </div>
       </div>
 
+      {/* AI GOVERNANCE: GATE + CONFIDENCE BREAKDOWN — populated once a real orchestrator run has produced this plan */}
+      {planRunId && (
+        <div className="glass-panel p-6 rounded-2xl border border-purple-500/30 space-y-5">
+          <div className="flex flex-col md:flex-row md:items-center justify-between gap-3">
+            <div>
+              <span className="text-xs font-mono font-bold text-purple-400 uppercase tracking-widest">
+                ORCHESTRATOR GOVERNANCE — RUN {planRunId}
+              </span>
+              <p className="text-xs text-slate-400 font-mono mt-1">
+                Gate decision and confidence are plain arithmetic — Gemini never self-reports this number.
+              </p>
+            </div>
+            {planGate && (
+              <span
+                className={`px-3 py-1.5 rounded-full text-xs font-mono font-bold uppercase border shrink-0 ${
+                  planGate === 'AUTO_EXECUTE'
+                    ? 'bg-emerald-950 text-emerald-300 border-emerald-500/50'
+                    : planGate === 'ESCALATE'
+                    ? 'bg-red-950 text-red-300 border-red-500/50'
+                    : 'bg-amber-950 text-amber-300 border-amber-500/50'
+                }`}
+              >
+                {planGate}
+              </span>
+            )}
+          </div>
+
+          {planGateReason && (
+            <p className="text-xs font-mono text-slate-300 bg-slate-900/80 border border-slate-800 rounded-xl p-3">
+              {planGateReason}
+            </p>
+          )}
+
+          {/* Confidence stacked bar */}
+          {planConfidenceBreakdown && (
+            <div className="space-y-2">
+              <span className="text-[10px] font-mono font-bold text-slate-400 uppercase tracking-wider block">
+                Confidence Components
+              </span>
+              <div className="w-full h-4 rounded-full overflow-hidden flex bg-slate-900 border border-slate-800">
+                {[
+                  { key: 'evidenceCoverage', label: 'Evidence', color: '#06b6d4', weight: 0.30 },
+                  { key: 'dataFreshness', label: 'Freshness', color: '#3b82f6', weight: 0.20 },
+                  { key: 'pathStrength', label: 'Path Strength', color: '#a855f7', weight: 0.25 },
+                  { key: 'memorySupport', label: 'Memory', color: '#f59e0b', weight: 0.10 },
+                  { key: 'agentAgreement', label: 'Agreement', color: '#10b981', weight: 0.15 }
+                ].map((c) => (
+                  <div
+                    key={c.key}
+                    className="h-full"
+                    style={{ width: `${c.weight * 100}%`, backgroundColor: c.color, opacity: 0.35 + 0.65 * (planConfidenceBreakdown[c.key] ?? 0) }}
+                    title={`${c.label}: ${((planConfidenceBreakdown[c.key] ?? 0) * 100).toFixed(0)}%`}
+                  />
+                ))}
+              </div>
+              <div className="grid grid-cols-2 sm:grid-cols-5 gap-2 text-[10px] font-mono">
+                {[
+                  { key: 'evidenceCoverage', label: 'Evidence (30%)', color: 'text-cyan-400' },
+                  { key: 'dataFreshness', label: 'Freshness (20%)', color: 'text-blue-400' },
+                  { key: 'pathStrength', label: 'Path Strength (25%)', color: 'text-purple-400' },
+                  { key: 'memorySupport', label: 'Memory (10%)', color: 'text-amber-400' },
+                  { key: 'agentAgreement', label: 'Agreement (15%)', color: 'text-emerald-400' }
+                ].map((c) => (
+                  <div key={c.key} className="flex items-center justify-between bg-slate-900/60 border border-slate-800 rounded-lg px-2 py-1">
+                    <span className="text-slate-400">{c.label}</span>
+                    <span className={`font-bold ${c.color}`}>{((planConfidenceBreakdown[c.key] ?? 0) * 100).toFixed(0)}%</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* Conflicts resolved */}
+          {planConflictsResolved && planConflictsResolved.length > 0 && (
+            <div className="space-y-1.5">
+              <span className="text-[10px] font-mono font-bold text-amber-400 uppercase tracking-wider block">
+                Conflicts Resolved ({planConflictsResolved.length})
+              </span>
+              {planConflictsResolved.map((c, i) => (
+                <div key={i} className="text-xs font-mono text-amber-200 bg-amber-950/30 border border-amber-500/30 rounded-xl p-2.5">
+                  Rejected <strong>{c.route}</strong> — {c.cost}
+                </div>
+              ))}
+            </div>
+          )}
+
+          {/* Unresolved */}
+          {planUnresolved && planUnresolved.length > 0 && (
+            <div className="space-y-1.5">
+              <span className="text-[10px] font-mono font-bold text-slate-400 uppercase tracking-wider block">
+                Unresolved / Known Gaps
+              </span>
+              {planUnresolved.map((u, i) => (
+                <div key={i} className="text-xs font-mono text-slate-300 bg-slate-900/60 border border-slate-800 rounded-xl p-2.5">
+                  {u}
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+      )}
+
       {/* EDITABLE DEPARTMENT RECOMMENDATIONS LIST */}
       <div className="space-y-4">
         <div className="flex items-center justify-between">
@@ -307,6 +415,21 @@ export default function ResponsePlans() {
                         <span className="text-xs font-mono text-slate-400">
                           Risk Impact: <strong className="text-emerald-400">-{action.baseRiskImpact} pts</strong>
                         </span>
+
+                        {Array.isArray(action.evidenceIds) && action.evidenceIds.length > 0 && (
+                          <span
+                            className="px-2 py-0.5 rounded text-[10px] font-mono font-bold bg-cyan-950 text-cyan-300 border border-cyan-500/30"
+                            title={action.evidenceIds.join(', ')}
+                          >
+                            {action.evidenceIds.length} evidence id{action.evidenceIds.length > 1 ? 's' : ''}
+                          </span>
+                        )}
+
+                        {action.reversible === false && (
+                          <span className="px-2 py-0.5 rounded text-[10px] font-mono font-bold bg-red-950 text-red-300 border border-red-500/40">
+                            IRREVERSIBLE
+                          </span>
+                        )}
                       </div>
 
                       {/* Recommendation Text or Edit Input */}

@@ -31,6 +31,16 @@ export function CityProvider({ children }) {
   // Editable Response Plan Actions
   const [planActions, setPlanActions] = useState(COORDINATED_RESPONSE_PLAN.actions);
 
+  // Fields populated by a real orchestrator run (backend/orchestrator/run.js) — additive,
+  // null/empty until the first live run completes.
+  const [planRunId, setPlanRunId] = useState(null);
+  const [planConfidenceBreakdown, setPlanConfidenceBreakdown] = useState(null);
+  const [planGate, setPlanGate] = useState(null);
+  const [planGateReason, setPlanGateReason] = useState('');
+  const [planUnresolved, setPlanUnresolved] = useState([]);
+  const [planConflictsResolved, setPlanConflictsResolved] = useState([]);
+  const [planCausalRiskIndex, setPlanCausalRiskIndex] = useState(null);
+
   // Department Assigned Work Orders (Tasks) — Initialized EMPTY until assigned by Zone Counselor!
   const [departmentTasks, setDepartmentTasks] = useState([]);
 
@@ -165,6 +175,24 @@ export function CityProvider({ children }) {
         setPlanActions(plan.actions);
         setDepartmentTasks(workOrders || []);
         addToast('info', 'System Reset', 'Plan reset to unapproved initial state.');
+      });
+
+      // A completed orchestrator run replaces the draft plan — same shape the
+      // existing approve/modify/dismiss flow already reads from, extended.
+      socket.on('planGenerated', (plan) => {
+        setPlanStatus(plan.status);
+        setPlanActions(plan.actions);
+        setOperatorNote('');
+        setApprovalTime(null);
+        setPlanRunId(plan.runId || null);
+        setPlanConfidenceBreakdown(plan.confidenceBreakdown || null);
+        setPlanGate(plan.gate || null);
+        setPlanGateReason(plan.gateReason || '');
+        setPlanUnresolved(plan.unresolved || []);
+        setPlanConflictsResolved(plan.conflictsResolved || []);
+        setPlanCausalRiskIndex(plan.causalRiskIndex ?? null);
+        setCurrentRiskScore(plan.riskScorePre ?? plan.causalRiskIndex ?? currentRiskScore);
+        addToast('info', 'New Plan Generated', `Orchestrator run complete — gate: ${plan.gate || 'n/a'}, confidence ${plan.confidence ?? '?'}%.`);
       });
 
       socket.on('planReset', ({ plan, workOrders }) => {
@@ -488,6 +516,13 @@ export function CityProvider({ children }) {
         currentRun,
         runStatus,
         startAgentRun,
+        planRunId,
+        planConfidenceBreakdown,
+        planGate,
+        planGateReason,
+        planUnresolved,
+        planConflictsResolved,
+        planCausalRiskIndex,
         isAiDrawerOpen,
         setIsAiDrawerOpen,
         aiMessages,

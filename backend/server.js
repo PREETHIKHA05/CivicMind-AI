@@ -24,7 +24,7 @@ import { TraceEvent } from './models/TraceEvent.js';
 
 import { loadLocalDB, saveLocalDB } from './storage.js';
 import { propagateRisk, loadGraph } from './causal/engine.js';
-import { startRun, getTrace, setTracePersistHook } from './orchestrator/run.js';
+import { startRun, getTrace, setTracePersistHook, setPlanReadyHook } from './orchestrator/run.js';
 
 dotenv.config();
 
@@ -59,6 +59,29 @@ setTracePersistHook((event) => {
   if (isMongoConnected) {
     TraceEvent.create(event).catch(() => {});
   }
+});
+
+// A completed orchestrator run replaces the draft plan the existing
+// approve/modify/dismiss flow already reads from. Same in-memory-first,
+// best-effort-Mongo pattern as everything else in this file.
+setPlanReadyHook((generatedPlan) => {
+  inMemoryPlan = {
+    ...inMemoryPlan,
+    ...generatedPlan,
+    planId: 'active-crp-01',
+    status: 'Awaiting Human Review',
+    operatorNote: '',
+    approvalTime: null
+  };
+  saveLocalDB(inMemoryPlan, inMemoryWorkOrders);
+
+  if (isMongoConnected) {
+    ResponsePlan.findOneAndUpdate({ planId: 'active-crp-01' }, inMemoryPlan, { upsert: true, new: true }).catch((err) => {
+      console.error('MongoDB plan-ready save error:', err);
+    });
+  }
+
+  io.emit('planGenerated', inMemoryPlan);
 });
 
 // Connect to MongoDB Atlas if connection URI is provided

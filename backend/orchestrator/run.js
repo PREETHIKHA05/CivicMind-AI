@@ -7,12 +7,17 @@
 import { propagateRisk } from '../causal/engine.js';
 import { decideRouting } from './supervisor.js';
 import { detectConflicts, resolveConflict } from './conflicts.js';
+import { draftPlan } from './planner.js';
+import { critiquePlan } from './critic.js';
+import { computeConfidence, decideGate } from './confidence.js';
 import { runWaterAgent } from './agents/waterAgent.js';
 import { runWeatherAgent } from './agents/weatherAgent.js';
 import { runTrafficAgent } from './agents/trafficAgent.js';
 import { runEmergencyAgent } from './agents/emergencyAgent.js';
 import { runCitizenAgent } from './agents/citizenAgent.js';
 import { runMemoryAgent } from './agents/memoryAgent.js';
+
+const MAX_REVISIONS = 2;
 
 const AGENT_IDS = ['weather', 'water', 'traffic', 'emergency', 'citizen', 'memory'];
 
@@ -34,6 +39,14 @@ export const traceStore = new Map(); // runId -> events[]
 let persistHook = null;
 export function setTracePersistHook(fn) {
   persistHook = fn;
+}
+
+// Called once per completed run with the final plan object (or null if the
+// run aborted/escalated with no plan) — server.js uses this to replace the
+// draft plan the existing approve/modify/dismiss flow already reads from.
+let planReadyHook = null;
+export function setPlanReadyHook(fn) {
+  planReadyHook = fn;
 }
 
 function emit(io, runId, type, agent, payload, level = 'info') {
@@ -116,6 +129,8 @@ export async function runAgents(scenario, io, runId) {
   const invokedAgents = routing.agents;
   const chainSummary = `rainfall ${magnitude}mm/hr, riskIndex ${causal.riskIndex.toFixed(0)}/100, terminals reached: ${causal.terminals.map((t) => `${t.id} (${t.activation.toFixed(0)})`).join(', ') || 'none'}`;
   const peerFindings = []; // essential: later agents see earlier agents' findings, not just parallel silence
+  const allToolResults = [];
+  let memoryHits = [];
 
   for (const agentId of invokedAgents) {
     emit(io, runId, 'agent_started', agentId.toUpperCase(), {}, 'info');
@@ -125,8 +140,11 @@ export async function runAgents(scenario, io, runId) {
     const runner = AGENT_RUNNERS[agentId];
     if (!runner) continue;
 
-    const { finding, geminiMeta } = await runner({ scenario, causal, chainSummary, peerFindings, emit: agentEmit });
+    const agentResult = await runner({ scenario, causal, chainSummary, peerFindings, emit: agentEmit });
+    const { finding, geminiMeta, toolResults } = agentResult;
     peerFindings.push(finding);
+    allToolResults.push(...(toolResults || []));
+    if (agentId === 'memory' && agentResult.hits) memoryHits = agentResult.hits;
 
     agentEmit('agent_finding', {
       conclusion: finding.conclusion,
@@ -161,28 +179,96 @@ export async function runAgents(scenario, io, runId) {
     await sleep(100);
   }
 
-  // STUB — Phase 5 replaces plan drafting / critique / confidence / gating with the real thing.
-  emit(io, runId, 'plan_drafted', 'PLANNER', { actionCount: peerFindings.length, findingsUsed: peerFindings.length }, 'info');
+  // Evidence pool: every tool result any agent produced this run, plus memory hits
+  // wrapped the same way — this is the ONLY thing an evidenceId is allowed to cite.
+  const evidencePool = [
+    ...allToolResults.filter((t) => t.ok).map((t) => ({ id: t.id, data: t.data })),
+    ...memoryHits.map((h) => ({ id: `memory:${h.id}`, data: { title: h.title, outcome: h.outcome, similarity: h.similarity } }))
+  ];
+
+  let plan = await draftPlan({ scenario, chainSummary, peerFindings, conflictsResolved, evidencePool, critique: null });
+  emit(io, runId, 'plan_drafted', 'PLANNER', { actionCount: plan.actions.length, title: plan.title, geminiFallback: plan.geminiMeta.fallback }, 'info');
   await sleep(120);
-  emit(io, runId, 'critique', 'CRITIC', { verdict: 'APPROVE (stub)' }, 'info');
-  await sleep(100);
-  emit(io, runId, 'confidence_computed', 'ORCHESTRATOR', { confidence: 0.75 }, 'info');
+
+  let revisionCount = 0;
+  let critiqueResult = critiquePlan(plan, { peerFindings, conflictsResolved, evidencePool, causal });
+  emit(io, runId, 'critique', 'CRITIC', { verdict: critiqueResult.verdict, reasons: critiqueResult.reasons }, critiqueResult.verdict === 'REVISE' ? 'warn' : 'info');
   await sleep(100);
 
-  const gate = causal.riskIndex >= 85 ? 'AUTO_EXECUTE' : causal.riskIndex < 40 ? 'ESCALATE' : 'HUMAN_APPROVAL';
-  emit(io, runId, 'gate_decision', 'ORCHESTRATOR', { gate }, gate === 'ESCALATE' ? 'warn' : 'info');
+  while (critiqueResult.verdict === 'REVISE' && revisionCount < MAX_REVISIONS) {
+    revisionCount += 1;
+    emit(io, runId, 'revision_started', 'PLANNER', { revisionNumber: revisionCount, reasons: critiqueResult.reasons }, 'warn');
+    await sleep(100);
+
+    plan = await draftPlan({ scenario, chainSummary, peerFindings, conflictsResolved, evidencePool, critique: critiqueResult.reasons.join('\n') });
+    emit(io, runId, 'plan_drafted', 'PLANNER', { actionCount: plan.actions.length, title: plan.title, revisionNumber: revisionCount }, 'info');
+    await sleep(120);
+
+    critiqueResult = critiquePlan(plan, { peerFindings, conflictsResolved, evidencePool, causal });
+    emit(io, runId, 'critique', 'CRITIC', { verdict: critiqueResult.verdict, reasons: critiqueResult.reasons, revisionNumber: revisionCount }, critiqueResult.verdict === 'REVISE' ? 'warn' : 'info');
+    await sleep(100);
+  }
+
+  const escalatedToHuman = critiqueResult.verdict === 'REVISE'; // hit MAX_REVISIONS without an APPROVE
+
+  const confidence = computeConfidence({
+    actions: plan.actions,
+    toolResults: allToolResults,
+    // No terminal reached means no cascade fired — that's a confident "nothing to
+    // escalate" result, not an uncertain one, so it shouldn't be scored as 0.
+    pathStrength: causal.terminals.length > 0 ? causal.pathStrength : 1,
+    memorySimilarity: memoryHits[0]?.similarity ?? 0,
+    conflictCount: conflicts.length
+  });
+  emit(io, runId, 'confidence_computed', 'ORCHESTRATOR', { confidence: confidence.score, breakdown: confidence.breakdown }, 'info');
+  await sleep(100);
+
+  let gateResult = decideGate(confidence.score, plan.actions);
+  if (escalatedToHuman) {
+    gateResult = { gate: 'ESCALATE', gateReason: `Critic still returned REVISE after ${MAX_REVISIONS} revision(s): ${critiqueResult.reasons.join('; ')}` };
+  }
+  emit(io, runId, 'gate_decision', 'ORCHESTRATOR', { gate: gateResult.gate, gateReason: gateResult.gateReason }, gateResult.gate === 'AUTO_EXECUTE' ? 'info' : 'warn');
   await sleep(80);
+
+  const finalPlan = {
+    runId,
+    incidentId: scenario.incidentId || 'INC-2026-081',
+    title: plan.title,
+    riskScorePre: Math.round(causal.riskIndex),
+    riskScorePost: Math.max(15, Math.round(causal.riskIndex * (1 - confidence.score / 200))),
+    confidence: confidence.score,
+    confidenceBreakdown: confidence.breakdown,
+    status: 'Awaiting Human Review',
+    actions: plan.actions,
+    evidencePool,
+    conflictsResolved: conflictsResolved.map((c) => ({ route: c.conflict.route, adoptedRoute: c.resolution.adoptedRoute, cost: c.resolution.resolution })),
+    gate: gateResult.gate,
+    gateReason: gateResult.gateReason,
+    unresolved: plan.unresolved,
+    revisionHistory: revisionCount,
+    causalRiskIndex: causal.riskIndex,
+    causalTerminals: causal.terminals
+  };
+
+  if (planReadyHook) {
+    try {
+      planReadyHook(finalPlan);
+    } catch (err) {
+      console.error('planReadyHook error:', err);
+    }
+  }
 
   emit(io, runId, 'run_completed', 'ORCHESTRATOR', {
     runId,
     agentsInvoked: invokedAgents,
     totalAgents: AGENT_IDS.length,
     riskIndex: causal.riskIndex,
-    gate,
-    conflictCount: conflicts.length
+    gate: gateResult.gate,
+    conflictCount: conflicts.length,
+    confidence: confidence.score
   }, 'info');
 
-  return { runId, causal, gate, agentsInvoked: invokedAgents, peerFindings, conflictsResolved };
+  return { runId, causal, gate: gateResult.gate, agentsInvoked: invokedAgents, peerFindings, conflictsResolved, plan: finalPlan };
 }
 
 export { AGENT_IDS };

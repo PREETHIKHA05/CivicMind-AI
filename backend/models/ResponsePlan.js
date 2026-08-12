@@ -15,7 +15,9 @@ const ActionSchema = new mongoose.Schema({
   reason: { type: String },
   confidence: { type: String, default: '94%' },
   expectedImpact: { type: String },
-  workOrderStatus: { type: String, default: 'Pending Dispatch' }
+  workOrderStatus: { type: String, default: 'Pending Dispatch' },
+  evidenceIds: { type: [String], default: [] },
+  reversible: { type: Boolean, default: true }
 }, { _id: false });
 
 const ResponsePlanSchema = new mongoose.Schema({
@@ -32,7 +34,18 @@ const ResponsePlanSchema = new mongoose.Schema({
   },
   operatorNote: { type: String, default: '' },
   approvalTime: { type: String, default: null },
-  actions: [ActionSchema]
+  actions: [ActionSchema],
+  // Additive fields populated by the real orchestrator (backend/orchestrator/run.js).
+  runId: { type: String, default: null },
+  confidenceBreakdown: { type: mongoose.Schema.Types.Mixed, default: null },
+  conflictsResolved: { type: [mongoose.Schema.Types.Mixed], default: [] },
+  gate: { type: String, default: null },
+  gateReason: { type: String, default: '' },
+  unresolved: { type: [String], default: [] },
+  revisionHistory: { type: Number, default: 0 },
+  evidencePool: { type: [mongoose.Schema.Types.Mixed], default: [] },
+  causalRiskIndex: { type: Number, default: null },
+  causalTerminals: { type: [mongoose.Schema.Types.Mixed], default: [] }
 }, { timestamps: true });
 
 export const ResponsePlan = mongoose.models.ResponsePlan || mongoose.model('ResponsePlan', ResponsePlanSchema);

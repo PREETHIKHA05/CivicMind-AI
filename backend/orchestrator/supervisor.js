@@ -84,7 +84,10 @@ export async function decideRouting(causal, scenario, hopCount = 1) {
 
   const fallback = () => ({
     action: 'INVOKE_AGENTS',
-    agents: deptBasedAgents.length > 0 ? [...new Set(deptBasedAgents)] : ['water', 'memory'],
+    // 'memory' has no corresponding causal dept, so dept-based routing alone would
+    // never select it — always include it: historical precedent is what keeps
+    // this from being a hollow parallel-agents demo (see memoryAgent.js).
+    agents: [...new Set([...(deptBasedAgents.length > 0 ? deptBasedAgents : ['water']), 'memory'])],
     reason: `Fallback routing from activated depts: rainfall ${scenario.magnitude}mm/hr, riskIndex ${causal.riskIndex.toFixed(0)}.`
   });
 
